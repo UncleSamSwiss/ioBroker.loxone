@@ -1,0 +1,40 @@
+{
+  "name": "iobroker.loxone",
+  "version": "0.0.1",
+  "description": "Adapter for ioBroker that communicates with a Loxone Miniserver",
+  "main": "loxone.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UncleSamSwiss/ioBroker.loxone.git"
+  },
+  "keywords": [
+    "ioBroker",
+    "loxone",
+    "miniserver",
+    "home automation",
+    "smart home"
+  ],
+  "author": {
+    "name": "UncleSamSwiss",
+    "email": "samuel.weibel@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "UncleSamSwiss",
+      "email": "samuel.weibel@gmail.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/UncleSamSwiss/ioBroker.loxone/issues"
+  },
+  "homepage": "https://github.com/UncleSamSwiss/ioBroker.loxone",
+  "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+  "dependencies": {
+    "node-lox-ws-api": "^0.2.8",
+    "sprintf-js": "^1.0.3"
+  }
+}

@@ -1,0 +1,29 @@
+{
+    "common": {
+        "name":                     "loxone",
+        "version":                  "0.0.1",
+        "title":                    "Loxone Miniserver Adapter",
+        "desc":                     "Communicates with a Loxone Miniserver.",
+        "authors": [
+            "UncleSamSwiss <samuel.weibel@gmail.com>"
+        ],
+        "license":                  "Apache 2.0",
+        "platform":                 "Javascript/Node.js",
+        "mode":                     "daemon",
+        "messagebox":               true,
+        "readme":                   "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+        "loglevel":                 "info",
+        "type":                     "hardware",
+        "keywords":                 ["loxone", "miniserver", "smarthome"],
+        "icon":                     "loxone.png",
+        "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png"
+    },
+    "native": {
+      "host": "0.0.0.0",
+      "port": 80,
+      "username": "",
+      "password": ""
+    },
+    "objects": [
+    ]
+}

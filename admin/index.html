@@ -1,0 +1,105 @@
+﻿<html>
+    <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css" />
+
+    <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
+    <script type="text/javascript">
+        var bridges = [];
+        systemDictionary = {
+            "Loxone Miniserver adapter settings": {
+                "en": "Loxone Miniserver adapter settings",
+                "de": "Loxone Miniserver Adapter-Einstellungen"
+            },
+            "Miniserver Hostname / IP": { "en": "Miniserver Hostname / IP", "de": "Hostname /IP des Miniservers" },
+            "Miniserver Port": { "en": "Miniserver Port", "de": "Port des Miniservers" },
+            "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers" },
+            "Miniserver Password": { "en": "Miniserver Password", "de": "Passwort des Miniservers" },
+        };
+
+        var active   = false;
+
+        function setValue(id, value, onChange) {
+            // example: select elements with id=key and class=value and insert value
+            if ($('#' + id + '.value').attr('type') == 'checkbox') {
+                $('#' + id + '.value').prop('checked', value).change(function() {
+                    onChange();
+                });
+            } else {
+                $('#' + id + '.value').val(value).change(function() {
+                    onChange();
+                }).keyup(function() {
+                    $(this).trigger('change');
+                });
+            }
+        }
+
+        // the function loadSettings has to exist ...
+        function load(settings, onChange) {
+            for (var key in settings) {
+                setValue(key, settings[key], onChange);
+            }
+            // read if instance is active or enabled
+            socket.emit('getState', 'system.adapter.' + adapter + '.' + instance + '.alive', function (err, state) {
+                active = common.enabled || (state && state.val);
+            });
+            onChange(false);
+        }
+
+        // ... and the function save has to exist.
+        // you have to make sure the callback is called with the settings object as first param!
+        function save(callback) {
+            // example: select elements with class=value and build settings object
+            var obj = {};
+            $('.value').each(function () {
+                var $this = $(this);
+                if ($this.attr('type') == 'checkbox') {
+                    obj[$this.attr('id')] = $this.prop('checked');
+                } else {
+                    obj[$this.attr('id')] = $this.val();
+                }
+            });
+            $('.check').each(function () {
+                var $this = $(this);
+                obj[$this.attr('id')] = $this.is('checked');
+            });
+            callback(obj);
+        }
+    </script> 
+
+    <style>
+        #settings tr {
+            line-height: 2.5em;
+        }
+    </style>
+
+    <!-- you have to put your config page in a div with id adapter-container -->
+    <div id="adapter-container">
+        <table><tr><td><img src="loxone.png" width="64" height="64"></td><td><h3 class="translate">Loxone Miniserver adapter settings</h3></td></tr></table>
+        <div id="settings">
+            <table>
+                <tr>
+                    <td class="translate">Miniserver Hostname / IP</td>
+                    <td><input type="text" id="host" class="value"></td>
+                </tr>
+                <tr>
+                    <td class="translate">Miniserver Port</td>
+                    <td><input type="text" id="port" class="value"></td>
+                </tr>
+                <tr>
+                    <td class="translate">Miniserver Username</td>
+                    <td><input type="text" id="username" class="value"></td>
+                </tr>
+                <tr>
+                    <td class="translate">Miniserver Password</td>
+                    <td><input type="password" id="password" class="value"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</html> 
