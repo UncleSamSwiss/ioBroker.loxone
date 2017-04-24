@@ -3,7 +3,16 @@
         "name":                     "loxone",
         "version":                  "0.0.1",
         "title":                    "Loxone Miniserver Adapter",
-        "desc":                     "Communicates with a Loxone Miniserver.",
+        "titleLang": {
+            "en": "Loxone Miniserver Adapter",
+            "de": "Loxone Miniserver-Adapter",
+            "ru": "Драйвер для Loxone Miniserver"
+        },
+        "desc":                     {
+            "en": "Communicates with a Loxone Miniserver.",
+            "de": "Kommuniziert mit dem Loxone Miniserver.",
+            "ru": "Подключается к Loxone Miniserver и позволяет им управлять."
+        }
         "authors": [
             "UncleSamSwiss <samuel.weibel@gmail.com>"
         ],
