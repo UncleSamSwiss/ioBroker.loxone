@@ -159,6 +159,16 @@ function loadControls(controls) {
             eval('load' + control.type + 'Control(control)');
         } catch (e) {
             adapter.log.error('Unsupported control type ' + control.type + ': ' + e);
+            
+            var deviceName = normalizeName(control.name);
+            adapter.setObject(deviceName, {
+                type: 'device',
+                common: {
+                    name: control.name,
+                    role: 'info'
+                },
+                native: control
+            });
         };
     }
 }
