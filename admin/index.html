@@ -1,4 +1,5 @@
-﻿<html>
+<html>
+<head>
     <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css" />
 
     <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
@@ -14,19 +15,23 @@
         systemDictionary = {
             "Loxone Miniserver adapter settings": {
                 "en": "Loxone Miniserver adapter settings",
-                "de": "Loxone Miniserver Adapter-Einstellungen"
+                "de": "Loxone Miniserver Adapter-Einstellungen",
+                "ru": "Настройки драйвера Loxone Miniserver"
             },
-            "Miniserver Hostname / IP": { "en": "Miniserver Hostname / IP", "de": "Hostname /IP des Miniservers" },
-            "Miniserver Port": { "en": "Miniserver Port", "de": "Port des Miniservers" },
-            "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers" },
-            "Miniserver Password": { "en": "Miniserver Password", "de": "Passwort des Miniservers" },
+            "Miniserver Hostname / IP": { "en": "Miniserver Hostname / IP", "de": "Hostname /IP des Miniservers", "ru": "IP / Hostname Минисервера" },
+            "Miniserver Port": { "en": "Miniserver Port", "de": "Port des Miniservers", "ru": "Порт Минисервера" },
+            "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers", "ru": "Имя пользователя" },
+            "Miniserver Password": { "en": "Miniserver Password", "de": "Kennwort des Miniservers", "ru": "Пароль" },
+            "tooltip_host": { 
+                "en": "IP address of Loxone miniservers or DNS name", 
+                "de": "IP Adresse von Loxone Miniserver oder DNS-Name",
+                "ru": "IP Адрес или DNS имя Loxone Miniserver"
+            },
         };
-
-        var active   = false;
 
         function setValue(id, value, onChange) {
             // example: select elements with id=key and class=value and insert value
-            if ($('#' + id + '.value').attr('type') == 'checkbox') {
+            if ($('#' + id + '.value').attr('type') === 'checkbox') {
                 $('#' + id + '.value').prop('checked', value).change(function() {
                     onChange();
                 });
@@ -44,10 +49,6 @@
             for (var key in settings) {
                 setValue(key, settings[key], onChange);
             }
-            // read if instance is active or enabled
-            socket.emit('getState', 'system.adapter.' + adapter + '.' + instance + '.alive', function (err, state) {
-                active = common.enabled || (state && state.val);
-            });
             onChange(false);
         }
 
@@ -58,7 +59,7 @@
             var obj = {};
             $('.value').each(function () {
                 var $this = $(this);
-                if ($this.attr('type') == 'checkbox') {
+                if ($this.attr('type') === 'checkbox') {
                     obj[$this.attr('id')] = $this.prop('checked');
                 } else {
                     obj[$this.attr('id')] = $this.val();
@@ -77,29 +78,35 @@
             line-height: 2.5em;
         }
     </style>
-
+</head>     
+<body>
     <!-- you have to put your config page in a div with id adapter-container -->
     <div id="adapter-container">
         <table><tr><td><img src="loxone.png" width="64" height="64"></td><td><h3 class="translate">Loxone Miniserver adapter settings</h3></td></tr></table>
         <div id="settings">
             <table>
                 <tr>
-                    <td class="translate">Miniserver Hostname / IP</td>
+                    <td><label class="translate" for="host">Miniserver Hostname / IP</label></td>
+                    <td class="admin-icon"></td>
                     <td><input type="text" id="host" class="value"></td>
                 </tr>
                 <tr>
-                    <td class="translate">Miniserver Port</td>
+                    <td><label class="translate" for="port">Miniserver Port</label></td>
+                    <td class="admin-icon"></td>
                     <td><input type="text" id="port" class="value"></td>
                 </tr>
                 <tr>
-                    <td class="translate">Miniserver Username</td>
+                    <td><label class="translate" for="username">Miniserver Username</label></td>
+                    <td class="admin-icon"></td>
                     <td><input type="text" id="username" class="value"></td>
                 </tr>
                 <tr>
-                    <td class="translate">Miniserver Password</td>
+                    <td><label class="translate" for="password">Miniserver Password</label></td>
+                    <td class="admin-icon"></td>
                     <td><input type="password" id="password" class="value"></td>
                 </tr>
             </table>
         </div>
     </div>
+</body>
 </html> 
