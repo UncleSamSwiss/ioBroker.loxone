@@ -105,6 +105,16 @@ Native value from ioBroker &gt; Objects
 
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
+## Changelog
+### 0.0.1
+* (UncleSamSwiss) Initial version
+
+### 0.0.2
+* (UncleSamSwiss) Added creation of an empty device for all unsupported controls (helps figure out its configuration)
+
+### 0.1.0
+* (Bluefox) Formatting, refactoring and Russian translations
+
 ## Legal
 
 This project is not affiliated directly or indirectly with the company Loxone Electronics GmbH.

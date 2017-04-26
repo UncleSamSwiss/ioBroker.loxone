@@ -1,7 +1,21 @@
 {
     "common": {
         "name":                     "loxone",
-        "version":                  "0.0.1",
+        "version":                  "0.0.3",
+        "news": {
+			"0.0.3": {
+                "en": "Formatting, refactoring and Russian translations by Bluefox",
+                "de": "Formatierungen, refactoring und russische Übersetzungen durch Bluefox"
+            },
+            "0.0.2": {
+                "en": "Added creation of an empty device for all unsupported controls (helps figure out its configuration)",
+                "de": "Nicht unterstützte Controls werden nun als leeres Gerät hinzugefügt (hilft dessen Konfiguration herauszufinden)"
+            },
+            "0.0.1": {
+                "en": "initial commit",
+                "de": "initial commit"
+            }
+        },
         "title":                    "Loxone Miniserver Adapter",
         "titleLang": {
             "en": "Loxone Miniserver Adapter",
