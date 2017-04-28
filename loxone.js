@@ -29,6 +29,7 @@ adapter.on('ready', function () {
 });
 
 var stateEventHandlers = {};
+var operatingModes = {};
 
 function main() {
     var client = new loxoneWsApi(adapter.config.host + ':' + adapter.config.port, adapter.config.username, adapter.config.password, true, 'AES-256-CBC');
@@ -105,6 +106,7 @@ function main() {
 
 function loadStructureFile(data) {
     stateEventHandlers = {};
+    operatingModes = data.operatingModes;
     loadGlobalStates(data.globalStates);
     loadControls(data.controls);
 }
@@ -113,42 +115,75 @@ function loadGlobalStates(globalStates) {
     var globalStateInfos = {
         operatingMode: {
             type: 'number',
-            role: 'value'
+            role: 'value',
+            handler: setOperatingMode
         },
         sunrise: {
             type: 'number',
-            role: 'value'
+            role: 'value',
+            handler: setStateAck
         },
         sunset: {
             type: 'number',
-            role: 'value'
+            role: 'value',
+            handler: setStateAck
         },
         notifications: {
             type: 'number',
-            role: 'value'
+            role: 'value',
+            handler: setStateAck
         },
         modifications: {
             type: 'number',
-            role: 'value'
+            role: 'value',
+            handler: setStateAck
         }
     };
+    var defaultInfo = {
+        type: 'string',
+        role: 'text',
+        handler: setStateAck
+    };
+    
+    // special case for operating mode (text)
+    adapter.setObject(
+        'operatingMode-text', {
+            type: 'state',
+            common: {
+                name: 'operatingMode: text',
+                read: true,
+                write: false,
+                type: 'string',
+                role: 'text'
+            },
+            native: {
+                uuid: globalStates['operatingMode']
+            }
+        });
+
     for (var globalStateName in globalStates) {
-        var info = globalStateInfos[globalStateName];
+        var info = globalStateInfos.hasOwnProperty(globalStateName) ? globalStateInfos[globalStateName] : defaultInfo;
         createStateObject(
             globalStateName,
             {
                 name: globalStateName,
                 read: true,
                 write: false,
-                type: info === undefined ? 'string' : info.type,
-                role: info === undefined ? 'text' : info.role
+                type: info.type,
+                role: info.role
             },
             globalStates[globalStateName],
-            setStateAck);
+            info.handler);
     }
 }
 
+function setOperatingMode(name, value) {
+    setStateAck(name, value);
+    setStateAck(name + '-text', operatingModes[value]);
+}
+
 function loadControls(controls) {
+    var hasUnsupported = false;
     for (var uuid in controls) {
         var control = controls[uuid];
         if (!control.hasOwnProperty('type')) {
@@ -160,17 +195,47 @@ function loadControls(controls) {
         } catch (e) {
             adapter.log.error('Unsupported control type ' + control.type + ': ' + e);
             
+            if (!hasUnsupported) {
+                hasUnsupported = true;
+                adapter.setObject('Unsupported', {
+                    type: 'device',
+                    common: {
+                        name: 'Unsupported',
+                        role: 'info'
+                    },
+                    native: control
+                });
+            }
+            
             var deviceName = normalizeName(control.name);
-            adapter.setObject(deviceName, {
-                type: 'device',
+            adapter.setObject('Unsupported.' + deviceName, {
+                type: 'state',
                 common: {
                     name: control.name,
-                    role: 'info'
+                    read: true,
+                    write: false,
+                    type: 'string',
+                    role: 'text'
                 },
                 native: control
             });
         };
     }
+}
+
+// this function is called if the control has no type (currently seems to be only for window monitoring)
+function loadControl(control) {
+    var deviceName = normalizeName(control.name);
+    adapter.setObject(deviceName, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'info'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, deviceName, control.states, []);
 }
 
 function loadInfoOnlyDigitalControl(control) {
@@ -333,7 +398,7 @@ function loadOtherControlStates(controlName, deviceName, states, skipKeys) {
 }
 
 function normalizeName(name) {
-    return name.trim().replace(/\W+/g, '_');
+    return name.trim().replace(/[^\wäöüÄÖÜäöüéàèêçß]+/g, '_');
 }
 
 function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
