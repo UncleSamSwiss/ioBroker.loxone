@@ -1,4 +1,6 @@
-﻿// always required: utils
+﻿"use strict";
+
+// always required: utils
 var utils = require(__dirname + '/lib/utils');
 
 // other dependencies:
@@ -191,7 +193,7 @@ function loadControls(controls) {
         }
 
         try {
-            eval('load' + control.type + 'Control(control)');
+            eval('load' + control.type + 'Control(uuid, control)');
         } catch (e) {
             adapter.log.error('Unsupported control type ' + control.type + ': ' + e);
             
@@ -207,8 +209,7 @@ function loadControls(controls) {
                 });
             }
             
-            var deviceName = normalizeName(control.name);
-            adapter.setObject('Unsupported.' + deviceName, {
+            adapter.setObject('Unsupported.' + uuid, {
                 type: 'state',
                 common: {
                     name: control.name,
@@ -224,9 +225,8 @@ function loadControls(controls) {
 }
 
 // this function is called if the control has no type (currently seems to be only for window monitoring)
-function loadControl(control) {
-    var deviceName = normalizeName(control.name);
-    adapter.setObject(deviceName, {
+function loadControl(uuid, control) {
+    adapter.setObject(uuid, {
         type: 'device',
         common: {
             name: control.name,
@@ -235,12 +235,11 @@ function loadControl(control) {
         native: control
     });
     
-    loadOtherControlStates(control.name, deviceName, control.states, []);
+    loadOtherControlStates(control.name, uuid, control.states, []);
 }
 
-function loadInfoOnlyDigitalControl(control) {
-    var deviceName = normalizeName(control.name);
-    adapter.setObject(deviceName, {
+function loadInfoOnlyDigitalControl(uuid, control) {
+    adapter.setObject(uuid, {
         type: 'device',
         common: {
             name: control.name,
@@ -249,25 +248,13 @@ function loadInfoOnlyDigitalControl(control) {
         native: control
     });
     
-    loadOtherControlStates(control.name, deviceName, control.states, ['active']);
+    loadOtherControlStates(control.name, uuid, control.states, ['active']);
 
     if (!control.hasOwnProperty('states') || !control.states.hasOwnProperty('active')) {
         return;
     }
     
-    createStateObject(
-        deviceName + '.active',
-        {
-            name: control.name + ': active',
-            read: true,
-            write: false,
-            type: 'boolean',
-            role: 'indicator'
-        },
-        control.states.active,
-        function (name, value) {
-            setStateAck(name, value == 1);
-        });
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
     
     if (!control.hasOwnProperty('details')) {
         return;
@@ -275,7 +262,7 @@ function loadInfoOnlyDigitalControl(control) {
     
     if (control.details.hasOwnProperty('text')) {
         createStateObject(
-            deviceName + '.active-text',
+            uuid + '.active-text',
             {
                 name: control.name + ': active as text',
                 read: true,
@@ -291,7 +278,7 @@ function loadInfoOnlyDigitalControl(control) {
     
     if (control.details.hasOwnProperty('image')) {
         createStateObject(
-            deviceName + '.active-image',
+            uuid + '.active-image',
             {
                 name: control.name + ': active as image',
                 read: true,
@@ -307,7 +294,7 @@ function loadInfoOnlyDigitalControl(control) {
     
     if (control.details.hasOwnProperty('color')) {
         createStateObject(
-            deviceName + '.active-color',
+            uuid + '.active-color',
             {
                 name: control.name + ': active as color',
                 read: true,
@@ -322,9 +309,8 @@ function loadInfoOnlyDigitalControl(control) {
     }
 }
 
-function loadInfoOnlyAnalogControl(control) {
-    var deviceName = normalizeName(control.name);
-    adapter.setObject(deviceName, {
+function loadInfoOnlyAnalogControl(uuid, control) {
+    adapter.setObject(uuid, {
         type: 'device',
         common: {
             name: control.name,
@@ -333,23 +319,13 @@ function loadInfoOnlyAnalogControl(control) {
         native: control
     });
     
-    loadOtherControlStates(control.name, deviceName, control.states, ['value']);
+    loadOtherControlStates(control.name, uuid, control.states, ['value']);
     
     if (!control.hasOwnProperty('states') || !control.states.hasOwnProperty('value')) {
         return;
     }
     
-    createStateObject(
-        deviceName + '.value',
-        {
-            name: control.name + ': value',
-            read: true,
-            write: false,
-            type: 'number',
-            role: 'value'
-        },
-        control.states.value,
-        setStateAck);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'value', 'number', 'value');
     
     if (!control.hasOwnProperty('details')) {
         return;
@@ -357,7 +333,7 @@ function loadInfoOnlyAnalogControl(control) {
     
     if (control.details.hasOwnProperty('format')) {
         createStateObject(
-            deviceName + '.value-formatted',
+            uuid + '.value-formatted',
             {
                 name: control.name + ': formatted value',
                 read: true,
@@ -372,7 +348,33 @@ function loadInfoOnlyAnalogControl(control) {
     }
 }
 
-function loadOtherControlStates(controlName, deviceName, states, skipKeys) {
+function loadJalousieControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'blind'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['up', 'down', 'position', 'shadePosition', 'safetyActive', 'autoAllowed', 'autoActive', 'locked']);
+    
+    if (!control.hasOwnProperty('states')) {
+        return;
+    }
+    
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'up');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'down');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'shadePosition', 'number', 'value');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'safetyActive');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'autoAllowed');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'autoActive');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'locked');
+}
+
+function loadOtherControlStates(controlName, uuid, states, skipKeys) {
     if (states === undefined) {
         return;
     }
@@ -381,19 +383,42 @@ function loadOtherControlStates(controlName, deviceName, states, skipKeys) {
         if (skipKeys.indexOf(stateName) !== -1) {
             continue;
         }
+        
+        createSimpleControlStateObject(controlName, uuid, states, stateName, 'string', 'text');
+    }
+}
 
-        var uuid = states[stateName];
+function createSimpleControlStateObject(controlName, uuid, states, name, type, role) {
+    if (states.hasOwnProperty(name)) {
         createStateObject(
-            deviceName + '.' + normalizeName(stateName),
+            uuid + '.' + normalizeName(name),
             {
-                name: controlName + ': ' + stateName,
+                name: controlName + ': ' + name,
                 read: true,
                 write: false,
-                type: 'string',
-                role: 'text'
+                type: type,
+                role: role
             },
-            uuid,
+            states[name],
             setStateAck);
+    }
+}
+
+function createIndicatorControlStateObject(controlName, uuid, states, name) {
+    if (states.hasOwnProperty(name)) {
+        createStateObject(
+            uuid + '.' + normalizeName(name),
+            {
+                name: controlName + ': ' + name,
+                read: true,
+                write: false,
+                type: 'boolean',
+                role: 'indicator'
+            },
+            states[name],
+            function (name, value) {
+                setStateAck(name, value == 1);
+            });
     }
 }
 
