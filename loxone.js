@@ -111,6 +111,7 @@ function loadStructureFile(data) {
     operatingModes = data.operatingModes;
     loadGlobalStates(data.globalStates);
     loadControls(data.controls);
+    loadWeatherServer(data.weatherServer);
 }
 
 function loadGlobalStates(globalStates) {
@@ -122,12 +123,12 @@ function loadGlobalStates(globalStates) {
         },
         sunrise: {
             type: 'number',
-            role: 'value',
+            role: 'value.interval',
             handler: setStateAck
         },
         sunset: {
             type: 'number',
-            role: 'value',
+            role: 'value.interval',
             handler: setStateAck
         },
         notifications: {
@@ -236,6 +237,50 @@ function loadControl(uuid, control) {
     });
     
     loadOtherControlStates(control.name, uuid, control.states, []);
+}
+
+function loadAlarmControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'alarm'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['armed', 'nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'startTime', 'armedDelay', 'armedDelayTotal', 'sensors', 'disabledMove']);
+
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'armed');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelay', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelayTotal', 'number', 'value.interval');
+    createListControlStateObject(control.name, uuid, control.states, 'sensors');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'disabledMove');
+
+    // TODO: check what we can do with subControls
+}
+
+function loadGateControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'blind'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['position', 'active', 'preventOpen', 'preventClose']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'value');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'preventOpen');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'preventClose');
 }
 
 function loadInfoOnlyDigitalControl(uuid, control) {
@@ -348,6 +393,25 @@ function loadInfoOnlyAnalogControl(uuid, control) {
     }
 }
 
+function loadIntercomControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'blind'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['bell', 'lastBellEvents', 'version']);
+    
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'bell');
+    createListControlStateObject(control.name, uuid, control.states, 'lastBellEvents');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'version', 'string', 'text');
+
+    // TODO: check what we can do with subControls
+}
+
 function loadJalousieControl(uuid, control) {
     adapter.setObject(uuid, {
         type: 'device',
@@ -360,10 +424,6 @@ function loadJalousieControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['up', 'down', 'position', 'shadePosition', 'safetyActive', 'autoAllowed', 'autoActive', 'locked']);
     
-    if (!control.hasOwnProperty('states')) {
-        return;
-    }
-    
     createIndicatorControlStateObject(control.name, uuid, control.states, 'up');
     createIndicatorControlStateObject(control.name, uuid, control.states, 'down');
     createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
@@ -372,6 +432,145 @@ function loadJalousieControl(uuid, control) {
     createIndicatorControlStateObject(control.name, uuid, control.states, 'autoAllowed');
     createIndicatorControlStateObject(control.name, uuid, control.states, 'autoActive');
     createIndicatorControlStateObject(control.name, uuid, control.states, 'locked');
+}
+
+function loadMeterControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'sensor'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['actual', 'total']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'actual', 'number', 'value.power.consumption');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'total', 'number', 'value.power.consumption');
+    
+    if (!control.hasOwnProperty('details')) {
+        return;
+    }
+    
+    if (control.details.hasOwnProperty('actualFormat')) {
+        createStateObject(
+            uuid + '.actual-formatted',
+            {
+                name: control.name + ': formatted actual value',
+                read: true,
+                write: false,
+                type: 'string',
+                role: 'text'
+            },
+            control.states.actual,
+            function (name, value) {
+                setFormattedStateAck(name, value, control.details.actualFormat);
+            });
+    }
+    
+    if (control.details.hasOwnProperty('totalFormat')) {
+        createStateObject(
+            uuid + '.total-formatted',
+            {
+                name: control.name + ': formatted total value',
+                read: true,
+                write: false,
+                type: 'string',
+                role: 'text'
+            },
+            control.states.total,
+            function (name, value) {
+                setFormattedStateAck(name, value, control.details.totalFormat);
+            });
+    }
+}
+
+function loadPushbuttonControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'switch'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['active']);
+    
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
+}
+
+function loadSmokeAlarmControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'alarm'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'sensors', 'acousticAlarm', 'testAlarm', 'alarmCause', 'startTime', 'timeServiceMode']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value');
+    createListControlStateObject(control.name, uuid, control.states, 'sensors');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'acousticAlarm');
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'testAlarm');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'alarmCause', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'value.interval');
+
+    // TODO: check what we can do with subControls
+}
+
+function loadSwitchControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'switch'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['active']);
+    
+    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
+}
+
+function loadTimedSwitchControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'switch'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['deactivationDelayTotal', 'deactivationDelay']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelayTotal', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelay', 'number', 'value.interval');
+}
+
+function loadTrackerControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'info'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['entries']);
+    
+    createListControlStateObject(control.name, uuid, control.states, 'entries');
 }
 
 function loadOtherControlStates(controlName, uuid, states, skipKeys) {
@@ -388,8 +587,114 @@ function loadOtherControlStates(controlName, uuid, states, skipKeys) {
     }
 }
 
+function loadWeatherServer(data) {
+    if (data === undefined || !data.hasOwnProperty('states') || !data.states.hasOwnProperty('actual')) {
+        return;
+    }
+    
+    var deviceName = 'WeatherServer';
+    adapter.setObject(deviceName, {
+        type: 'device',
+        common: {
+            name: deviceName,
+            role: 'weather'
+        },
+        native: data
+    });
+    
+    var setWeatherObject = function (channelName, id, name, type, role) {
+        adapter.setObject(deviceName + '.' + channelName + '.' + id, {
+            type: 'state',
+            common: {
+                name: name,
+                read: true,
+                write: false,
+                type: type,
+                role: role
+            },
+            native: {}
+        });
+    };
+    
+    var setWeatherObjects = function (channelName) {
+        adapter.setObject(deviceName + '.' + channelName, {
+            type: 'channel',
+            common: {
+                name: channelName,
+                role: 'weather.current'
+            },
+            native: {}
+        });
+
+        setWeatherObject(channelName, 'barometricPressure', channelName + ': Barometric pressure', 'number', 'value');
+        setWeatherObject(channelName, 'barometricPressure-formatted', channelName + ': Barometric pressure: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'dewPoint', channelName + ': Dew point', 'number', 'value.temperature');
+        setWeatherObject(channelName, 'dewPoint-formatted', channelName + ': Dew point: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'perceivedTemperature', channelName + ': Perceived temperature', 'number', 'value.temperature');
+        setWeatherObject(channelName, 'perceivedTemperature-formatted', channelName + ': Perceived temperature: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'precipitation', channelName + ': Precipitation', 'number', 'value');
+        setWeatherObject(channelName, 'precipitation-formatted', channelName + ': Precipitation: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'relativeHumidity', channelName + ': Relative humidity', 'number', 'value.humidity');
+        setWeatherObject(channelName, 'relativeHumidity-formatted', channelName + ': Relative humidity: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'solarRadiation', channelName + ': Solar radiation', 'number', 'value');
+        setWeatherObject(channelName, 'temperature', channelName + ': Temperature', 'number', 'value.temperature');
+        setWeatherObject(channelName, 'temperature-formatted', channelName + ': Temperature: formatted', 'string', 'text');
+        setWeatherObject(channelName, 'timestamp', channelName + ': Timestamp', 'number', 'value.time');
+        setWeatherObject(channelName, 'weatherType', channelName + ': Weather type', 'number', 'value');
+        setWeatherObject(channelName, 'weatherType-text', channelName + ': Weather type: text', 'string', 'text');
+        setWeatherObject(channelName, 'windDirection', channelName + ': Wind direction', 'number', 'value');
+        setWeatherObject(channelName, 'windSpeed', channelName + ': Wind speed', 'number', 'value');
+        setWeatherObject(channelName, 'windSpeed-formatted', channelName + ': Wind speed: formatted', 'string', 'text');
+    };
+    
+    var setWeatherStates = function (parent, values) {
+        if (values === undefined) {
+            return;
+        }
+        
+        setStateAck(parent + '.barometricPressure', values.barometricPressure);
+        setFormattedStateAck(parent + '.barometricPressure-formatted', values.barometricPressure, data.format.barometricPressure);
+        setStateAck(parent + '.dewPoint', values.dewPoint);
+        setFormattedStateAck(parent + '.dewPoint-formatted', values.dewPoint, data.format.temperature);
+        setStateAck(parent + '.perceivedTemperature', values.perceivedTemperature);
+        setFormattedStateAck(parent + '.perceivedTemperature-formatted', values.perceivedTemperature, data.format.temperature);
+        setStateAck(parent + '.precipitation', values.precipitation);
+        setFormattedStateAck(parent + '.precipitation-formatted', values.precipitation, data.format.precipitation);
+        setStateAck(parent + '.relativeHumidity', values.relativeHumidity);
+        setFormattedStateAck(parent + '.relativeHumidity-formatted', values.relativeHumidity, data.format.relativeHumidity);
+        setStateAck(parent + '.solarRadiation', values.solarRadiation);
+        setStateAck(parent + '.temperature', values.temperature);
+        setFormattedStateAck(parent + '.temperature-formatted', values.temperature, data.format.temperature);
+        setTimeStateAck(parent + '.timestamp', values.timestamp);
+        setStateAck(parent + '.weatherType', values.weatherType);
+        setStateAck(parent + '.weatherType-text', data.weatherTypeTexts[values.weatherType]);
+        setStateAck(parent + '.windDirection', values.windDirection);
+        setStateAck(parent + '.windSpeed', values.windSpeed);
+        setFormattedStateAck(parent + '.windSpeed-formatted', values.windSpeed, data.format.windSpeed);
+    };
+    
+    setWeatherObjects('Actual');
+
+    addStateEventHandler(data.states.actual, function (evt) {
+        setWeatherStates(deviceName + '.Actual', evt.entry[0]);
+    });
+    
+    var forecastChannelsCount = 0;
+    addStateEventHandler(data.states.forecast, function (evt) {
+        for (var i = 0; i < evt.entry.length; i++) {
+            var channelName = 'Hour' + sprintf("%02d", i);
+            if (i >= forecastChannelsCount) {
+                setWeatherObjects(channelName);
+                forecastChannelsCount++;
+            }
+            
+            setWeatherStates(deviceName + '.' + channelName, evt.entry[i]);
+        }
+    });
+}
+
 function createSimpleControlStateObject(controlName, uuid, states, name, type, role) {
-    if (states.hasOwnProperty(name)) {
+    if (states !== undefined && states.hasOwnProperty(name)) {
         createStateObject(
             uuid + '.' + normalizeName(name),
             {
@@ -405,7 +710,7 @@ function createSimpleControlStateObject(controlName, uuid, states, name, type, r
 }
 
 function createIndicatorControlStateObject(controlName, uuid, states, name) {
-    if (states.hasOwnProperty(name)) {
+    if (states !== undefined && states.hasOwnProperty(name)) {
         createStateObject(
             uuid + '.' + normalizeName(name),
             {
@@ -418,6 +723,24 @@ function createIndicatorControlStateObject(controlName, uuid, states, name) {
             states[name],
             function (name, value) {
                 setStateAck(name, value == 1);
+            });
+    }
+}
+
+function createListControlStateObject(controlName, uuid, states, name) {
+    if (states !== undefined && states.hasOwnProperty(name)) {
+        createStateObject(
+            uuid + '.' + normalizeName(name),
+            {
+                name: controlName + ': ' + name,
+                read: true,
+                write: false,
+                type: 'array',
+                role: 'list'
+            },
+            states[name],
+            function (name, value) {
+                setStateAck(name, value.toString().split('|'));
             });
     }
 }
@@ -435,14 +758,19 @@ function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
         }
     };
     adapter.setObject(id, obj);
-    if (stateEventHandlers[stateUuid] === undefined) {
-        stateEventHandlers[stateUuid] = [];
-    }
-
-    stateEventHandlers[stateUuid].push(function (value) {
+    addStateEventHandler(stateUuid, function (value) {
         stateEventHandler(id, value);
     });
 }
+
+function addStateEventHandler(uuid, eventHandler) {
+    if (stateEventHandlers[uuid] === undefined) {
+        stateEventHandlers[uuid] = [];
+    }
+    
+    stateEventHandlers[uuid].push(eventHandler);
+};
+
 
 function setStateAck(name, value) {
     adapter.setState(name, { val: value, ack: true });
@@ -452,6 +780,12 @@ function setFormattedStateAck(name, value, format) {
     value = sprintf(format, value);
     setStateAck(name, value);
 }
+
+function setTimeStateAck(name, miniserverTime) {
+    var value = (miniserverTime * 1000) + new Date(2009, 0, 1).getTime();
+    setStateAck(name, value);
+};
+
 
 function handleEvent(uuid, evt) {
     var stateEventHandlerList = stateEventHandlers[uuid];
