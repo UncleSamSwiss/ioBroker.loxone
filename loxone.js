@@ -457,6 +457,11 @@ function loadIntercomControl(uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'version', 'string', 'text');
 
     // TODO: check what we can do with subControls
+    
+    createSwitchCommandStateObject(control.name, uuid, 'answer');
+    addStateChangeListener(uuid + '.answer', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'answer');
+    });
 }
 
 function loadJalousieControl(uuid, control) {
@@ -790,6 +795,21 @@ function createListControlStateObject(controlName, uuid, states, name) {
                 setStateAck(name, value.toString().split('|'));
             });
     }
+}
+
+function createSwitchCommandStateObject(controlName, uuid, name) {
+    var obj = {
+        type: 'state',
+        common: {
+            name: controlName + ': ' + name,
+            read: false,
+            write: true,
+            type: 'boolean',
+            role: 'switch'
+        },
+        native: {}
+    };
+    adapter.setObject(uuid + '.' + normalizeName(name), obj);
 }
 
 function normalizeName(name) {
