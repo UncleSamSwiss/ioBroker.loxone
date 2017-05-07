@@ -10,6 +10,12 @@ var sprintf = require("sprintf-js").sprintf;
 // create the adapter object
 var adapter = utils.adapter('loxone');
 
+var stateChangeListeners = {};
+var stateEventHandlers = {};
+var operatingModes = {};
+var currentStateValues = {};
+var client = undefined;
+
 // unloading
 adapter.on('unload', function (callback) {
     callback();
@@ -17,24 +23,35 @@ adapter.on('unload', function (callback) {
 
 // is called if a subscribed state changes
 adapter.on('stateChange', function (id, state) {
+    // Warning: state can be null if it was deleted!
     if (!id || !state || state.ack) {
         return;
     }
     
-    // Warning, state can be null if it was deleted
     adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
+    if (!stateChangeListeners.hasOwnProperty(id)) {
+        adapter.log.error('Unsupported state change: ' + id);
+        return;
+    }
+
+    stateChangeListeners[id](currentStateValues[id], state.val);
 });
 
 // startup
 adapter.on('ready', function () {
-    main();
+    adapter.getStates('*', function (err, states) {
+        for (var id in states) {
+            if (states[id] && states[id].ack) {
+                currentStateValues[id] = states[id].val;
+            }
+        }
+        
+        main();
+    });
 });
 
-var stateEventHandlers = {};
-var operatingModes = {};
-
 function main() {
-    var client = new loxoneWsApi(adapter.config.host + ':' + adapter.config.port, adapter.config.username, adapter.config.password, true, 'AES-256-CBC');
+    client = new loxoneWsApi(adapter.config.host + ':' + adapter.config.port, adapter.config.username, adapter.config.password, true, 'AES-256-CBC');
     client.connect();
     
     client.on('connect', function () {
@@ -103,7 +120,7 @@ function main() {
     client.on('update_event_daytimer', handleAnyEvent);
     client.on('update_event_weather', handleAnyEvent);
 
-    //adapter.subscribeStates('*');
+    adapter.subscribeStates('*');
 }
 
 function loadStructureFile(data) {
@@ -278,9 +295,39 @@ function loadGateControl(uuid, control) {
     loadOtherControlStates(control.name, uuid, control.states, ['position', 'active', 'preventOpen', 'preventClose']);
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'level', 'value', true);
     createIndicatorControlStateObject(control.name, uuid, control.states, 'preventOpen');
     createIndicatorControlStateObject(control.name, uuid, control.states, 'preventClose');
+
+    addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
+        oldValue = parseInt(oldValue);
+        newValue = parseInt(newValue);
+        if (newValue === oldValue) {
+            return;
+        }
+        else if (newValue === 1) {
+            if (oldValue === -1) {
+                // open twice because we are currently closing
+                client.send_cmd(control.uuidAction, 'open');
+            }
+            client.send_cmd(control.uuidAction, 'open');
+        }
+        else if (newValue === -1) {
+            if (oldValue === 1) {
+                // close twice because we are currently opening
+                client.send_cmd(control.uuidAction, 'close');
+            }
+            client.send_cmd(control.uuidAction, 'close');
+        }
+        else if (newValue === 0) {
+            if (oldValue === 1) {
+                client.send_cmd(control.uuidAction, 'close');
+            }
+            else if (oldValue === -1) {
+                client.send_cmd(control.uuidAction, 'open');
+            }
+        }
+    });
 }
 
 function loadInfoOnlyDigitalControl(uuid, control) {
@@ -693,14 +740,14 @@ function loadWeatherServer(data) {
     });
 }
 
-function createSimpleControlStateObject(controlName, uuid, states, name, type, role) {
+function createSimpleControlStateObject(controlName, uuid, states, name, type, role, writable) {
     if (states !== undefined && states.hasOwnProperty(name)) {
         createStateObject(
             uuid + '.' + normalizeName(name),
             {
                 name: controlName + ': ' + name,
                 read: true,
-                write: false,
+                write: writable === true,
                 type: type,
                 role: role
             },
@@ -769,22 +816,27 @@ function addStateEventHandler(uuid, eventHandler) {
     }
     
     stateEventHandlers[uuid].push(eventHandler);
-};
-
-
-function setStateAck(name, value) {
-    adapter.setState(name, { val: value, ack: true });
 }
 
-function setFormattedStateAck(name, value, format) {
+function addStateChangeListener(id, listener) {
+    stateChangeListeners[adapter.namespace + '.' + id] = listener;
+}
+
+
+function setStateAck(id, value) {
+    currentStateValues[adapter.namespace + '.' + id] = value;
+    adapter.setState(id, { val: value, ack: true });
+}
+
+function setFormattedStateAck(id, value, format) {
     value = sprintf(format, value);
-    setStateAck(name, value);
+    setStateAck(id, value);
 }
 
-function setTimeStateAck(name, miniserverTime) {
+function setTimeStateAck(id, miniserverTime) {
     var value = (miniserverTime * 1000) + new Date(2009, 0, 1).getTime();
-    setStateAck(name, value);
-};
+    setStateAck(id, value);
+}
 
 
 function handleEvent(uuid, evt) {
