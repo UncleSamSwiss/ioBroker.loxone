@@ -268,7 +268,7 @@ function loadAlarmControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['armed', 'nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'startTime', 'armedDelay', 'armedDelayTotal', 'sensors', 'disabledMove']);
 
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'armed');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'armed', 'switch', true);
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
@@ -277,7 +277,35 @@ function loadAlarmControl(uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelayTotal', 'number', 'value.interval');
     createListControlStateObject(control.name, uuid, control.states, 'sensors');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'disabledMove');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'disabledMove', 'switch', true);
+    
+    addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'off');
+        }
+    });
+    
+    addStateChangeListener(uuid + '.disabledMove', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'dismv/0');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'dismv/1');
+        }
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'delayedOn');
+    addStateChangeListener(uuid + '.delayedOn', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'delayedon/' + (newValue ? 1 : 0));
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'quit');
+    });
 
     // TODO: check what we can do with subControls
 }
@@ -296,8 +324,8 @@ function loadGateControl(uuid, control) {
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'level', 'value', true);
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'preventOpen');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'preventClose');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'preventOpen', 'indicator');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'preventClose', 'indicator');
 
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         oldValue = parseInt(oldValue);
@@ -346,7 +374,7 @@ function loadInfoOnlyDigitalControl(uuid, control) {
         return;
     }
     
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'indicator');
     
     if (!control.hasOwnProperty('details')) {
         return;
@@ -452,7 +480,7 @@ function loadIntercomControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['bell', 'lastBellEvents', 'version']);
     
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'bell');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'bell', 'indicator');
     createListControlStateObject(control.name, uuid, control.states, 'lastBellEvents');
     createSimpleControlStateObject(control.name, uuid, control.states, 'version', 'string', 'text');
 
@@ -476,14 +504,57 @@ function loadJalousieControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['up', 'down', 'position', 'shadePosition', 'safetyActive', 'autoAllowed', 'autoActive', 'locked']);
     
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'up');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'down');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'up', 'indicator', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'down', 'indicator', true);
     createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'shadePosition', 'number', 'value');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'safetyActive');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'autoAllowed');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'autoActive');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'locked');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'safetyActive', 'indicator');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'autoAllowed', 'indicator');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'autoActive', 'indicator', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'locked', 'indicator');
+    
+    addStateChangeListener(uuid + '.up', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'up');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'UpOff');
+        }
+    });
+    addStateChangeListener(uuid + '.down', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'down');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'DownOff');
+        }
+    });
+    addStateChangeListener(uuid + '.autoActive', function (oldValue, newValue) {
+        if (newValue == oldValue) {
+            return;
+        }
+        else if (newValue) {
+            client.send_cmd(control.uuidAction, 'auto');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'NoAuto');
+        }
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'fullUp');
+    addStateChangeListener(uuid + '.fullUp', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'FullUp');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'fullDown');
+    addStateChangeListener(uuid + '.fullDown', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'FullDown');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'shade');
+    addStateChangeListener(uuid + '.shade', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'shade');
+    });
 }
 
 function loadMeterControl(uuid, control) {
@@ -500,6 +571,11 @@ function loadMeterControl(uuid, control) {
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'actual', 'number', 'value.power.consumption');
     createSimpleControlStateObject(control.name, uuid, control.states, 'total', 'number', 'value.power.consumption');
+    
+    createSwitchCommandStateObject(control.name, uuid, 'reset');
+    addStateChangeListener(uuid + '.reset', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'reset');
+    });
     
     if (!control.hasOwnProperty('details')) {
         return;
@@ -550,7 +626,24 @@ function loadPushbuttonControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['active']);
     
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', true);
+
+    addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
+        if (newValue == oldValue) {
+            return;
+        }
+        else if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'off');
+        }
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'pulse');
+    addStateChangeListener(uuid + '.pulse', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'pulse');
+    });
 }
 
 function loadSmokeAlarmControl(uuid, control) {
@@ -570,11 +663,30 @@ function loadSmokeAlarmControl(uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value');
     createListControlStateObject(control.name, uuid, control.states, 'sensors');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'acousticAlarm');
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'testAlarm');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'acousticAlarm', 'indicator');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'testAlarm', 'indicator');
     createSimpleControlStateObject(control.name, uuid, control.states, 'alarmCause', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'level.interval', true);
+    
+    createSwitchCommandStateObject(control.name, uuid, 'mute');
+    addStateChangeListener(uuid + '.mute', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'mute');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'quit');
+    });
+    
+    addStateChangeListener(uuid + '.timeServiceMode', function (oldValue, newValue) {
+        newValue = parseInt(newValue);
+        if (newValue === undefined || newValue < 0) {
+            return;
+        }
+        
+        client.send_cmd(control.uuidAction, 'servicemode/' + newValue);
+    });
 
     // TODO: check what we can do with subControls
 }
@@ -591,7 +703,19 @@ function loadSwitchControl(uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['active']);
     
-    createIndicatorControlStateObject(control.name, uuid, control.states, 'active');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', true);
+    
+    addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
+        if (newValue == oldValue) {
+            return;
+        }
+        else if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'off');
+        }
+    });
 }
 
 function loadTimedSwitchControl(uuid, control) {
@@ -608,6 +732,24 @@ function loadTimedSwitchControl(uuid, control) {
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelayTotal', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelay', 'number', 'value.interval');
+    
+    createSwitchCommandStateObject(control.name, uuid, 'active');
+    addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
+        if (newValue == oldValue) {
+            return;
+        }
+        else if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        }
+        else {
+            client.send_cmd(control.uuidAction, 'off');
+        }
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'pulse');
+    addStateChangeListener(uuid + '.pulse', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'pulse');
+    });
 }
 
 function loadTrackerControl(uuid, control) {
@@ -761,16 +903,16 @@ function createSimpleControlStateObject(controlName, uuid, states, name, type, r
     }
 }
 
-function createIndicatorControlStateObject(controlName, uuid, states, name) {
+function createBooleanControlStateObject(controlName, uuid, states, name, role, writable) {
     if (states !== undefined && states.hasOwnProperty(name)) {
         createStateObject(
             uuid + '.' + normalizeName(name),
             {
                 name: controlName + ': ' + name,
                 read: true,
-                write: false,
+                write: writable === true,
                 type: 'boolean',
-                role: 'indicator'
+                role: role
             },
             states[name],
             function (name, value) {
