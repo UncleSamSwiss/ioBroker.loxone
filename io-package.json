@@ -26,7 +26,7 @@
             "en": "Communicates with a Loxone Miniserver.",
             "de": "Kommuniziert mit dem Loxone Miniserver.",
             "ru": "Подключается к Loxone Miniserver и позволяет им управлять."
-        }
+        },
         "authors": [
             "UncleSamSwiss <samuel.weibel@gmail.com>"
         ],
