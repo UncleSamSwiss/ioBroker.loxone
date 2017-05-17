@@ -211,7 +211,7 @@ function loadControls(controls) {
         }
 
         try {
-            eval('load' + control.type + 'Control(uuid, control)');
+            eval('load' + control.type + "Control('device', uuid, control)");
         } catch (e) {
             adapter.log.error('Unsupported control type ' + control.type + ': ' + e);
             
@@ -242,10 +242,35 @@ function loadControls(controls) {
     }
 }
 
+function loadSubControls(parentUuid, control) {
+    if (!control.hasOwnProperty('subControls')) {
+        return;
+    }
+    for (var uuid in control.subControls) {
+        var subControl = control.subControls[uuid];
+        if (!subControl.hasOwnProperty('type')) {
+            continue;
+        }
+        
+        try {
+            if (uuid.startsWith(parentUuid + '/')) {
+                uuid = uuid.replace('/', '.');
+            }
+            else {
+                uuid = parentUuid + '.' + uuid.replace('/', '-');
+            }
+            subControl.name = control.name + ': ' + subControl.name;
+            eval('load' + subControl.type + "Control('channel', uuid, subControl)");
+        } catch (e) {
+            adapter.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
+        };
+    }
+}
+
 // this function is called if the control has no type (currently seems to be only for window monitoring)
-function loadControl(uuid, control) {
+function loadControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'info'
@@ -256,9 +281,9 @@ function loadControl(uuid, control) {
     loadOtherControlStates(control.name, uuid, control.states, []);
 }
 
-function loadAlarmControl(uuid, control) {
+function loadAlarmControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'alarm'
@@ -307,12 +332,12 @@ function loadAlarmControl(uuid, control) {
         client.send_cmd(control.uuidAction, 'quit');
     });
 
-    // TODO: check what we can do with subControls
+    // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
-function loadGateControl(uuid, control) {
+function loadGateControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'blind'
@@ -358,9 +383,9 @@ function loadGateControl(uuid, control) {
     });
 }
 
-function loadInfoOnlyDigitalControl(uuid, control) {
+function loadInfoOnlyDigitalControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'switch'
@@ -429,9 +454,9 @@ function loadInfoOnlyDigitalControl(uuid, control) {
     }
 }
 
-function loadInfoOnlyAnalogControl(uuid, control) {
+function loadInfoOnlyAnalogControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'sensor'
@@ -468,9 +493,9 @@ function loadInfoOnlyAnalogControl(uuid, control) {
     }
 }
 
-function loadIntercomControl(uuid, control) {
+function loadIntercomControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'blind'
@@ -483,18 +508,18 @@ function loadIntercomControl(uuid, control) {
     createBooleanControlStateObject(control.name, uuid, control.states, 'bell', 'indicator');
     createListControlStateObject(control.name, uuid, control.states, 'lastBellEvents');
     createSimpleControlStateObject(control.name, uuid, control.states, 'version', 'string', 'text');
-
-    // TODO: check what we can do with subControls
     
     createSwitchCommandStateObject(control.name, uuid, 'answer');
     addStateChangeListener(uuid + '.answer', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'answer');
     });
+
+    loadSubControls(uuid, control);
 }
 
-function loadJalousieControl(uuid, control) {
+function loadJalousieControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'blind'
@@ -557,9 +582,9 @@ function loadJalousieControl(uuid, control) {
     });
 }
 
-function loadLightControllerControl(uuid, control) {
+function loadLightControllerControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'light'
@@ -612,15 +637,15 @@ function loadLightControllerControl(uuid, control) {
         client.send_cmd(control.uuidAction, 'minus');
     });
 
-    // TODO: currently we don't support scene modifications ("learn" and "delete"),
+    // TODO: currently we don't support scene modifications ("learn" and "delete" commands),
     // IMHO this should be done using the Loxone Web interface
 
-    // TODO: check what we can do with subControls
+    loadSubControls(uuid, control);
 }
 
-function loadMeterControl(uuid, control) {
+function loadMeterControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'sensor'
@@ -675,9 +700,9 @@ function loadMeterControl(uuid, control) {
     }
 }
 
-function loadPushbuttonControl(uuid, control) {
+function loadPushbuttonControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'switch'
@@ -707,9 +732,9 @@ function loadPushbuttonControl(uuid, control) {
     });
 }
 
-function loadSmokeAlarmControl(uuid, control) {
+function loadSmokeAlarmControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'alarm'
@@ -748,13 +773,13 @@ function loadSmokeAlarmControl(uuid, control) {
         
         client.send_cmd(control.uuidAction, 'servicemode/' + newValue);
     });
-
-    // TODO: check what we can do with subControls
+    
+    // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
-function loadSwitchControl(uuid, control) {
+function loadSwitchControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'switch'
@@ -779,9 +804,9 @@ function loadSwitchControl(uuid, control) {
     });
 }
 
-function loadTimedSwitchControl(uuid, control) {
+function loadTimedSwitchControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'switch'
@@ -813,9 +838,9 @@ function loadTimedSwitchControl(uuid, control) {
     });
 }
 
-function loadTrackerControl(uuid, control) {
+function loadTrackerControl(type, uuid, control) {
     adapter.setObject(uuid, {
-        type: 'device',
+        type: type,
         common: {
             name: control.name,
             role: 'info'
@@ -1070,6 +1095,10 @@ function handleEvent(uuid, evt) {
     }
 
     stateEventHandlerList.forEach(function (stateEventHandler) {
-        stateEventHandler(evt);
+        try {
+            stateEventHandler(evt);
+        } catch (e) {
+            adapter.log.error('Error while handling event UUID ' + uuid + ': ' + e);
+        };
     });
 }
