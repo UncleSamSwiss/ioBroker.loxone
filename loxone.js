@@ -323,7 +323,7 @@ function loadGateControl(uuid, control) {
     loadOtherControlStates(control.name, uuid, control.states, ['position', 'active', 'preventOpen', 'preventClose']);
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'level', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'level', true);
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventOpen', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventClose', 'indicator');
 
@@ -555,6 +555,67 @@ function loadJalousieControl(uuid, control) {
     addStateChangeListener(uuid + '.shade', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'shade');
     });
+}
+
+function loadLightControllerControl(uuid, control) {
+    adapter.setObject(uuid, {
+        type: 'device',
+        common: {
+            name: control.name,
+            role: 'light'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['activeScene', 'sceneList']);
+
+    createSimpleControlStateObject(control.name, uuid, control.states, 'activeScene', 'number', 'level', true);
+    addStateChangeListener(uuid + '.activeScene', function (oldValue, newValue) {
+        newValue = parseInt(newValue);
+        if (newValue === 9) {
+            client.send_cmd(control.uuidAction, 'on');
+        }
+        else {
+            client.send_cmd(control.uuidAction, newValue.toString());
+        }
+    });
+    
+    if (control.states.hasOwnProperty('sceneList')) {
+        createStateObject(
+            uuid + '.sceneList',
+            {
+                name: control.name + ': sceneList',
+                read: true,
+                write: false,
+                type: 'array',
+                role: 'list'
+            },
+            control.states.sceneList,
+            function (name, value) {
+                // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
+                if (value.hasOwnProperty('text')) {
+                    setStateAck(name, value.text.split(','));
+                }
+                else {
+                    setStateAck(name, value.toString().split(','));
+                }
+            });
+    }
+    
+    createSwitchCommandStateObject(control.name, uuid, 'plus');
+    addStateChangeListener(uuid + '.plus', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'plus');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'minus');
+    addStateChangeListener(uuid + '.minus', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'minus');
+    });
+
+    // TODO: currently we don't support scene modifications ("learn" and "delete"),
+    // IMHO this should be done using the Loxone Web interface
+
+    // TODO: check what we can do with subControls
 }
 
 function loadMeterControl(uuid, control) {
