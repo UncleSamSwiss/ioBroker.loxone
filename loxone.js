@@ -335,6 +335,39 @@ function loadAlarmControl(type, uuid, control) {
     // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
+function loadDimmerControl(type, uuid, control) {
+    adapter.setObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'light'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['position', 'min', 'max', 'step']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'level.dimmer', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'min', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'max', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'step', 'number', 'value');
+    
+    addStateChangeListener(uuid + '.position', function (oldValue, newValue) {
+        newValue = parseInt(newValue);
+        client.send_cmd(control.uuidAction, newValue.toString());
+    });
+
+    createSwitchCommandStateObject(control.name, uuid, 'on');
+    addStateChangeListener(uuid + '.on', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'on');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'off');
+    addStateChangeListener(uuid + '.off', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'off');
+    });
+}
+
 function loadGateControl(type, uuid, control) {
     adapter.setObject(uuid, {
         type: type,
