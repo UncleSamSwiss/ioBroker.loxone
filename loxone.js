@@ -335,6 +335,99 @@ function loadAlarmControl(type, uuid, control) {
     // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
+function loadColorpickerControl(type, uuid, control) {
+    if (control.details.pickerType != 'Rgb') {
+        throw 'Unsupported color picker type: ' + control.details.pickerType;
+    }
+
+    adapter.setObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'light.color.hsl'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['color', 'favorites']);
+    
+    if (!control.states || !control.states.hasOwnProperty('color')) {
+        return;
+    }
+    
+    createStateObject(
+        uuid + '.hue',
+        {
+            name: control.name + ': hue',
+            read: true,
+            write: true,
+            type: 'number',
+            role: 'level.color.hue'
+        },
+        control.states.color,
+        function (name, value) {
+            var match = value.toString().match(/hsv\((\d+),\d+,\d+\)/i);
+            if (match) {
+                setStateAck(uuid + '.hue', match[1]);
+            }
+        });
+    createStateObject(
+        uuid + '.saturation',
+        {
+            name: control.name + ': saturation',
+            read: true,
+            write: true,
+            type: 'number',
+            role: 'level.color.saturation'
+        },
+        control.states.color,
+        function (name, value) {
+            var match = value.toString().match(/hsv\(\d+,(\d+),\d+\)/i);
+            if (match) {
+                setStateAck(uuid + '.saturation', match[1]);
+            }
+        });
+    createStateObject(
+        uuid + '.luminance',
+        {
+            name: control.name + ': luminance',
+            read: true,
+            write: true,
+            type: 'number',
+            role: 'level.color.luminance'
+        },
+        control.states.color,
+        function (name, value) {
+            var match = value.toString().match(/hsv\(\d+,\d+,(\d+)\)/i);
+            if (match) {
+                setStateAck(uuid + '.luminance', match[1]);
+            }
+        });
+    
+    // we use a timer (100 ms) to update the three color values,
+    // so if somebody sends us the three values (almost) at once,
+    // we don't change the color three times using commands
+    var colorUpdateTimer = null;
+    var parentId = adapter.namespace + '.' + uuid;
+    var updateColorValue = function () {
+        adapter.getStates(uuid + '.*', function (err, states) {
+            var hue = parseInt(states[parentId + '.hue'].val);
+            var saturation = parseInt(states[parentId + '.saturation'].val);
+            var luminance = parseInt(states[parentId + '.luminance'].val);
+            client.send_cmd(control.uuidAction, sprintf('hsv(%d,%d,%d)', hue, saturation, luminance));
+        });
+    };
+    var startUpdateTimer = function (oldValue, newValue) {
+        if (colorUpdateTimer) {
+            clearTimeout(colorUpdateTimer);
+        }
+        colorUpdateTimer = setTimeout(updateColorValue, 100);
+    };
+    addStateChangeListener(uuid + '.hue', startUpdateTimer);
+    addStateChangeListener(uuid + '.saturation', startUpdateTimer);
+    addStateChangeListener(uuid + '.luminance', startUpdateTimer);
+}
+
 function loadDimmerControl(type, uuid, control) {
     adapter.setObject(uuid, {
         type: type,
