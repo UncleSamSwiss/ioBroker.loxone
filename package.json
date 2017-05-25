@@ -33,9 +33,12 @@
   },
   "homepage": "https://github.com/UncleSamSwiss/ioBroker.loxone",
   "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+  "engines": {
+    "node": ">=1.0"
+  },
   "dependencies": {
-    "node-lox-ws-api": "^0.2.8",
-    "sprintf-js": "^1.0.3"
+    "node-lox-ws-api": "^0.3.3",
+    "sprintf-js": "^1.1.0"
   },
   "devDependencies": {
       "grunt": "^0.4.5",
