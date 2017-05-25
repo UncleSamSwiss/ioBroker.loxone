@@ -1204,7 +1204,7 @@ function loadWeatherServer(data) {
     var forecastChannelsCount = 0;
     addStateEventHandler(data.states.forecast, function (evt) {
         for (var i = 0; i < evt.entry.length; i++) {
-            var channelName = 'Hour' + sprintf("%02d", i);
+            var channelName = 'Hour' + sprintf("%02d", i + 1);
             if (i >= forecastChannelsCount) {
                 setWeatherObjects(channelName);
                 forecastChannelsCount++;
