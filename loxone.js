@@ -624,7 +624,7 @@ function loadIntercomControl(type, uuid, control) {
         type: type,
         common: {
             name: control.name,
-            role: 'blind'
+            role: 'info'
         },
         native: control
     });
@@ -977,6 +977,68 @@ function loadTrackerControl(type, uuid, control) {
     loadOtherControlStates(control.name, uuid, control.states, ['entries']);
     
     createListControlStateObject(control.name, uuid, control.states, 'entries');
+}
+
+function loadWindowMonitorControl(type, uuid, control) {
+    adapter.setObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'sensor'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['windowStates', 'numOpen', 'numClosed', 'numTilted', 'numOffline', 'numLocked', 'numUnlocked']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numOpen', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numClosed', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numTilted', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numOffline', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numLocked', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'numUnlocked', 'number', 'value');
+    
+    if (!control.hasOwnProperty('details') || !control.details.hasOwnProperty('windows') || !control.states.hasOwnProperty('windowStates')) {
+        return;
+    }
+    var windowPositions = { 1: 'closed', 2: 'tilted', 4: 'open', 8: 'locked', 16: 'unlocked' };
+    for (var index in control.details.windows) {
+        var window = control.details.windows[index];
+        var id = uuid + '.' + (parseInt(index) + 1);
+        adapter.setObject(id, {
+            type: 'channel',
+            common: {
+                name: control.name + ': ' + window.name,
+                role: 'sensor.window.3'
+            },
+            native: window
+        });
+        for (var mask in windowPositions) {
+            var windowPosition = windowPositions[mask];
+            var obj = {
+                type: 'state',
+                common: {
+                    name: control.name + ': ' + window.name + ': ' + windowPosition,
+                    read: true,
+                    write: false,
+                    type: 'boolean',
+                    role: 'indicator'
+                },
+                native: { }
+            };
+            adapter.setObject(id + '.' + windowPosition, obj);
+        };
+    }
+
+    addStateEventHandler(control.states.windowStates, function (value) {
+        var values = value.split(',');
+        for (var index in values) {
+            for (var mask in windowPositions) {
+                var windowPosition = windowPositions[mask];
+                setStateAck(uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition, (values[index] & mask) == mask);
+            }
+        }
+    });
 }
 
 function loadOtherControlStates(controlName, uuid, states, skipKeys) {
