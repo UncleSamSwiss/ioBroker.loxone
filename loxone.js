@@ -335,6 +335,77 @@ function loadAlarmControl(type, uuid, control) {
     // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
+function loadAudioZoneControl(type, uuid, control) {
+    adapter.setObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'media.music'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states,
+        ['serverState', 'playState', 'clientState', 'power', 'volume', 'maxVolume', 'volumeStep', 'shuffle', 'sourceList', 'repeat',
+        'songName', 'duration', 'progress', 'album', 'artist', 'station', 'genre', 'cover', 'source']);
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'serverState', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'playState', 'number', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'clientState', 'number', 'value');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'power', 'switch', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'volume', 'number', 'level.volume', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'maxVolume', 'number', 'value');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'shuffle', 'switch', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'sourceList', 'string', 'json');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'repeat', 'number', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'songName', 'string', 'text');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'duration', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'progress', 'number', 'value.interval', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'album', 'string', 'text');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'artist', 'string', 'text');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'station', 'string', 'text');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'genre', 'string', 'text');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'cover', 'string', 'text.url');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'source', 'number', 'value', true);
+    
+    addStateChangeListener(uuid + '.playState', function (oldValue, newValue) {
+        newValue = parseInt(newValue);
+        if (newValue === 0 || newValue === 1) {
+            client.send_cmd(control.uuidAction, 'pause');
+        }
+        else if (newValue === 2) {
+            client.send_cmd(control.uuidAction, 'play');
+        }
+    });
+    addStateChangeListener(uuid + '.power', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, (newValue ? 'on' : 'off'));
+    });
+    addStateChangeListener(uuid + '.volume', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'volume/' + newValue);
+    });
+    addStateChangeListener(uuid + '.shuffle', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'shuffle/' + (newValue ? 1 : 0));
+    });
+    addStateChangeListener(uuid + '.repeat', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'repeat/' + newValue);
+    });
+    addStateChangeListener(uuid + '.progress', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'progress/' + newValue);
+    });
+    addStateChangeListener(uuid + '.source', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'source/' + newValue);
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'prev');
+    addStateChangeListener(uuid + '.prev', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'prev');
+    });
+    createSwitchCommandStateObject(control.name, uuid, 'next');
+    addStateChangeListener(uuid + '.next', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'next');
+    });
+}
+
 function loadColorpickerControl(type, uuid, control) {
     if (control.details.pickerType != 'Rgb') {
         throw 'Unsupported color picker type: ' + control.details.pickerType;
