@@ -3,6 +3,7 @@
 # ioBroker adapter for Loxone Miniserver
 
 [![NPM version](http://img.shields.io/npm/v/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Downloads](https://img.shields.io/npm/dm/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Travis](https://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone/) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/UncleSamSwiss/iobroker-loxone.svg)](https://ci.appveyor.com/project/UncleSamSwiss/iobroker-loxone) [![GitHub issues](https://img.shields.io/github/issues/UncleSamSwiss/ioBroker.loxone.svg)](https://github.com/UncleSamSwiss/ioBroker.loxone/issues)
+
 Fetches all information available in Loxone Miniserver (and Loxone Miniserver Go) and provides changes in realtime.
 
 ## Install
@@ -51,7 +52,7 @@ The IDs of the states are formatted like this: `loxone.<instance>.<control>.<sta
 - `<state>` is the state within the control (see [Supported Control Types](#supported-control-types) for more information).
 
 The name provided when configuring a control in Loxone Config will only be used as its display name in ioBroker.
-This is because a user can use the same name for multiple controls.
+This is because a user may choose the same name for multiple controls.
 
 For more information about controls and their states, please also have a look at the Loxone API (especially the Structure File): https://www.loxone.com/enen/kb/api/
 
