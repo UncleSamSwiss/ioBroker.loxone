@@ -1,7 +1,7 @@
 {
     "common": {
         "name":                     "loxone",
-        "version":                  "0.0.3",
+        "version": "0.0.3",
         "news": {
 			"0.0.3": {
                 "en": "Formatting, refactoring and Russian translations by Bluefox",

@@ -1,4 +1,7 @@
-﻿"use strict";
+﻿/* jshint -W097 */ // no "use strict" warnings
+/* jshint -W061 */ // no "eval" warnings
+/* jslint node: true */
+"use strict";
 
 // always required: utils
 var utils = require(__dirname + '/lib/utils');
@@ -14,7 +17,7 @@ var stateChangeListeners = {};
 var stateEventHandlers = {};
 var operatingModes = {};
 var currentStateValues = {};
-var client = undefined;
+var client;
 
 // unloading
 adapter.on('unload', function (callback) {
@@ -177,7 +180,7 @@ function loadGlobalStates(globalStates) {
                 role: 'text'
             },
             native: {
-                uuid: globalStates['operatingMode']
+                uuid: globalStates.operatingMode
             }
         });
 
@@ -238,7 +241,7 @@ function loadControls(controls) {
                 },
                 native: control
             });
-        };
+        }
     }
 }
 
@@ -255,15 +258,14 @@ function loadSubControls(parentUuid, control) {
         try {
             if (uuid.startsWith(parentUuid + '/')) {
                 uuid = uuid.replace('/', '.');
-            }
-            else {
+            } else {
                 uuid = parentUuid + '.' + uuid.replace('/', '-');
             }
             subControl.name = control.name + ': ' + subControl.name;
             eval('load' + subControl.type + "Control('channel', uuid, subControl)");
         } catch (e) {
             adapter.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
-        };
+        }
     }
 }
 
@@ -307,8 +309,7 @@ function loadAlarmControl(type, uuid, control) {
     addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'off');
         }
     });
@@ -316,8 +317,7 @@ function loadAlarmControl(type, uuid, control) {
     addStateChangeListener(uuid + '.disabledMove', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'dismv/0');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'dismv/1');
         }
     });
@@ -372,8 +372,7 @@ function loadAudioZoneControl(type, uuid, control) {
         newValue = parseInt(newValue);
         if (newValue === 0 || newValue === 1) {
             client.send_cmd(control.uuidAction, 'pause');
-        }
-        else if (newValue === 2) {
+        } else if (newValue === 2) {
             client.send_cmd(control.uuidAction, 'play');
         }
     });
@@ -554,26 +553,22 @@ function loadGateControl(type, uuid, control) {
         newValue = parseInt(newValue);
         if (newValue === oldValue) {
             return;
-        }
-        else if (newValue === 1) {
+        } else if (newValue === 1) {
             if (oldValue === -1) {
                 // open twice because we are currently closing
                 client.send_cmd(control.uuidAction, 'open');
             }
             client.send_cmd(control.uuidAction, 'open');
-        }
-        else if (newValue === -1) {
+        } else if (newValue === -1) {
             if (oldValue === 1) {
                 // close twice because we are currently opening
                 client.send_cmd(control.uuidAction, 'close');
             }
             client.send_cmd(control.uuidAction, 'close');
-        }
-        else if (newValue === 0) {
+        } else if (newValue === 0) {
             if (oldValue === 1) {
                 client.send_cmd(control.uuidAction, 'close');
-            }
-            else if (oldValue === -1) {
+            } else if (oldValue === -1) {
                 client.send_cmd(control.uuidAction, 'open');
             }
         }
@@ -738,27 +733,23 @@ function loadJalousieControl(type, uuid, control) {
     addStateChangeListener(uuid + '.up', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'up');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'UpOff');
         }
     });
     addStateChangeListener(uuid + '.down', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'down');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'DownOff');
         }
     });
     addStateChangeListener(uuid + '.autoActive', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
-        }
-        else if (newValue) {
+        } else if (newValue) {
             client.send_cmd(control.uuidAction, 'auto');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'NoAuto');
         }
     });
@@ -796,8 +787,7 @@ function loadLightControllerControl(type, uuid, control) {
         newValue = parseInt(newValue);
         if (newValue === 9) {
             client.send_cmd(control.uuidAction, 'on');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, newValue.toString());
         }
     });
@@ -817,8 +807,7 @@ function loadLightControllerControl(type, uuid, control) {
                 // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                 if (value.hasOwnProperty('text')) {
                     setStateAck(name, value.text.split(','));
-                }
-                else {
+                } else {
                     setStateAck(name, value.toString().split(','));
                 }
             });
@@ -914,11 +903,9 @@ function loadPushbuttonControl(type, uuid, control) {
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
-        }
-        else if (newValue) {
+        } else if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'off');
         }
     });
@@ -991,11 +978,9 @@ function loadSwitchControl(type, uuid, control) {
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
-        }
-        else if (newValue) {
+        } else if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'off');
         }
     });
@@ -1020,11 +1005,9 @@ function loadTimedSwitchControl(type, uuid, control) {
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
-        }
-        else if (newValue) {
+        } else if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
-        }
-        else {
+        } else {
             client.send_cmd(control.uuidAction, 'off');
         }
     });
@@ -1072,7 +1055,7 @@ function loadWindowMonitorControl(type, uuid, control) {
     if (!control.hasOwnProperty('details') || !control.details.hasOwnProperty('windows') || !control.states.hasOwnProperty('windowStates')) {
         return;
     }
-    var windowPositions = { 1: 'closed', 2: 'tilted', 4: 'open', 8: 'locked', 16: 'unlocked' };
+    var windowPositions = {1: 'closed', 2: 'tilted', 4: 'open', 8: 'locked', 16: 'unlocked'};
     for (var index in control.details.windows) {
         var window = control.details.windows[index];
         var id = uuid + '.' + (parseInt(index) + 1);
@@ -1095,10 +1078,10 @@ function loadWindowMonitorControl(type, uuid, control) {
                     type: 'boolean',
                     role: 'indicator'
                 },
-                native: { }
+                native: {}
             };
             adapter.setObject(id + '.' + windowPosition, obj);
-        };
+        }
     }
 
     addStateEventHandler(control.states.windowStates, function (value) {
@@ -1332,7 +1315,7 @@ function addStateChangeListener(id, listener) {
 
 function setStateAck(id, value) {
     currentStateValues[adapter.namespace + '.' + id] = value;
-    adapter.setState(id, { val: value, ack: true });
+    adapter.setState(id, {val: value, ack: true});
 }
 
 function setFormattedStateAck(id, value, format) {
@@ -1358,6 +1341,6 @@ function handleEvent(uuid, evt) {
             stateEventHandler(evt);
         } catch (e) {
             adapter.log.error('Error while handling event UUID ' + uuid + ': ' + e);
-        };
+        }
     });
 }
