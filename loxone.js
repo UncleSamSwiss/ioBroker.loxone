@@ -1160,29 +1160,31 @@ function loadEnums(values, enumName, found, enabled) {
             native: item
         };
         
-        // similar to hm-rega.js:
-        (function (newObj, id) {
-            adapter.getForeignObject(id, function (err, obj) {
-                var changed = false;
-                if (!obj) {
-                    obj = newObj;
-                    changed = true;
-                } else {
-                    obj.common = obj.common || {};
-                    obj.common.members = obj.common.members || [];
-                    for (var m = 0; m < newObj.common.members.length; m++) {
-                        if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
-                            changed = true;
-                            obj.common.members.push(newObj.common.members[m]);
-                        }
-                    }
-                }
-                if (changed) {
-                    adapter.setForeignObject(id, obj);
-                }
-            });
-        })(obj, enumName + '.' + item.name);
+        updateEnumObject(enumName + '.' + item.name, obj);
     }
+}
+
+function updateEnumObject(id, newObj) {
+    // similar to hm-rega.js:
+    adapter.getForeignObject(id, function (err, obj) {
+        var changed = false;
+        if (!obj) {
+            obj = newObj;
+            changed = true;
+        } else {
+            obj.common = obj.common || {};
+            obj.common.members = obj.common.members || [];
+            for (var m = 0; m < newObj.common.members.length; m++) {
+                if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
+                    changed = true;
+                    obj.common.members.push(newObj.common.members[m]);
+                }
+            }
+        }
+        if (changed) {
+            adapter.setForeignObject(id, obj);
+        }
+    });
 }
 
 function loadWeatherServer(data) {
