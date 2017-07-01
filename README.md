@@ -42,6 +42,14 @@ Provide the password for the given username (see above).
 
 Please be aware that this password is stored unsecured inside ioBroker - therefore don't use the "admin" user!
 
+### Synchronize Rooms
+
+This will populate the enum.rooms enumeration with all rooms provided by the Loxone Miniserver and will link all controls.
+
+### Synchronize Functions
+
+This will populate the enum.functions enumeration with all categories provided by the Loxone Miniserver and will link all controls.
+
 ## States
 
 The adapter automatically connects to the configured Loxone Miniserver and creates states for each control state it finds.
@@ -404,6 +412,9 @@ Native value from ioBroker &gt; Objects
 
 ### 0.1.0
 * (UncleSamSwiss) Added support for many more controls including commands from ioBroker to Loxone Miniserver
+
+### 0.1.1
+* (UncleSamSwiss) Added support for synchronizing rooms and functions (categories) from Loxone Miniserver
 
 ## Legal
 

@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "news": {
+            "0.1.1": {
+                "en": "Added support for synchronizing rooms and functions (categories) from Loxone Miniserver",
+                "de": "Unterstützung für die Synchronisation von Räumen und Gewerken (Kategorien) vom Loxone Miniserver"
+            },
             "0.1.0": {
                 "en": "Added support for many more controls including commands from ioBroker to Loxone Miniserver",
                 "de": "Unterstützung für viele weitere Controls hinzugefügt; inklusive versenden von Befehlen an den Loxone Miniserver"
