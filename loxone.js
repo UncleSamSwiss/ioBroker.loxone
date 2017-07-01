@@ -54,6 +54,8 @@ adapter.on('ready', function () {
 });
 
 function main() {
+    adapter.setState('info.connection', false, true);
+
     client = new loxoneWsApi(adapter.config.host + ':' + adapter.config.port, adapter.config.username, adapter.config.password, true, 'AES-256-CBC');
     client.connect();
     
@@ -64,8 +66,7 @@ function main() {
     
     client.on('authorized', function () {
         adapter.log.debug('authorized');
-        //node.authenticated = true;
-        //node.connection = client;
+        adapter.setState('info.connection', true, true);
     });
     
     client.on('auth_failed', function () {
@@ -82,9 +83,7 @@ function main() {
     
     client.on('close', function () {
         adapter.log.info("connection closed");
-        //node.connected = false;
-        //node.authenticated = false;
-        //node.connection = null;
+        adapter.setState('info.connection', false, true);
     });
     
     client.on('send', function (message) {
