@@ -9,6 +9,9 @@ systemDictionary = {
     "Miniserver Port": { "en": "Miniserver Port", "de": "Port des Miniservers", "ru": "Порт Минисервера" },
     "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers", "ru": "Имя пользователя" },
     "Miniserver Password": { "en": "Miniserver Password", "de": "Kennwort des Miniservers", "ru": "Пароль" },
+    "Synchronize": { "en": "Synchronize", "de": "Synchronisieren", "ru": "Синхронизация" },
+    "Rooms": { "en": "Rooms", "de": "Räume", "ru": "комнат" },
+    "Functions": { "en": "Functions", "de": "Gewerke", "ru": "групп устройств" },
     "tooltip_host": {
         "en": "IP address of Loxone miniservers or DNS name", 
         "de": "IP Adresse von Loxone Miniserver oder DNS-Name",

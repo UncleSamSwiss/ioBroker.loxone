@@ -17,6 +17,8 @@ var stateChangeListeners = {};
 var stateEventHandlers = {};
 var operatingModes = {};
 var currentStateValues = {};
+var foundRooms = {};
+var foundCats = {};
 var client;
 
 // unloading
@@ -127,9 +129,13 @@ function main() {
 
 function loadStructureFile(data) {
     stateEventHandlers = {};
+    foundRooms = {};
+    foundCats = {};
     operatingModes = data.operatingModes;
     loadGlobalStates(data.globalStates);
     loadControls(data.controls);
+    loadEnums(data.rooms, 'enum.rooms', foundRooms, adapter.config.syncRooms);
+    loadEnums(data.cats, 'enum.functions', foundCats, adapter.config.syncFunctions);
     loadWeatherServer(data.weatherServer);
 }
 
@@ -211,9 +217,10 @@ function loadControls(controls) {
         if (!control.hasOwnProperty('type')) {
             continue;
         }
-
+        
         try {
             eval('load' + control.type + "Control('device', uuid, control)");
+            storeRoomAndCat(control, uuid);
         } catch (e) {
             adapter.log.error('Unsupported control type ' + control.type + ': ' + e);
             
@@ -262,9 +269,28 @@ function loadSubControls(parentUuid, control) {
             }
             subControl.name = control.name + ': ' + subControl.name;
             eval('load' + subControl.type + "Control('channel', uuid, subControl)");
+            storeRoomAndCat(subControl, uuid);
         } catch (e) {
             adapter.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
         }
+    }
+}
+
+function storeRoomAndCat(control, uuid) {
+    if (control.hasOwnProperty('room')) {
+        if (!foundRooms.hasOwnProperty(control.room)) {
+            foundRooms[control.room] = [];
+        }
+        
+        foundRooms[control.room].push(uuid);
+    }
+    
+    if (control.hasOwnProperty('cat')) {
+        if (!foundCats.hasOwnProperty(control.cat)) {
+            foundCats[control.cat] = [];
+        }
+        
+        foundCats[control.cat].push(uuid);
     }
 }
 
@@ -1105,6 +1131,57 @@ function loadOtherControlStates(controlName, uuid, states, skipKeys) {
         }
         
         createSimpleControlStateObject(controlName, uuid, states, stateName, 'string', 'text');
+    }
+}
+
+function loadEnums(values, enumName, found, enabled) {
+    if (!enabled) {
+        return;
+    }
+
+    for (var uuid in values) {
+        if (!found.hasOwnProperty(uuid)) {
+            // don't sync room/cat if we have no control that is using it
+            continue;
+        }
+        
+        var members = [];
+        for (var i in found[uuid]) {
+            members.push(adapter.namespace + '.' + found[uuid][i]);
+        }
+        
+        var item = values[uuid];
+        var obj = {
+            type: 'enum',
+            common: {
+                name: item.name,
+                members: members
+            },
+            native: item
+        };
+        
+        // similar to hm-rega.js:
+        (function (newObj, id) {
+            adapter.getForeignObject(id, function (err, obj) {
+                var changed = false;
+                if (!obj) {
+                    obj = newObj;
+                    changed = true;
+                } else {
+                    obj.common = obj.common || {};
+                    obj.common.members = obj.common.members || [];
+                    for (var m = 0; m < newObj.common.members.length; m++) {
+                        if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
+                            changed = true;
+                            obj.common.members.push(newObj.common.members[m]);
+                        }
+                    }
+                }
+                if (changed) {
+                    adapter.setForeignObject(id, obj);
+                }
+            });
+        })(obj, enumName + '.' + item.name);
     }
 }
 

@@ -49,7 +49,9 @@
       "host": "0.0.0.0",
       "port": 80,
       "username": "",
-      "password": ""
+      "password": "",
+      "syncRooms":  false,
+      "syncFunctions":  false
     },
     "objects": [
     ]
