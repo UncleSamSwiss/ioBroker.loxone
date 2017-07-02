@@ -416,6 +416,9 @@ Native value from ioBroker &gt; Objects
 ### 0.1.1
 * (UncleSamSwiss) Added support for synchronizing rooms and functions (categories) from Loxone Miniserver
 
+### 0.2.0
+* (UncleSamSwiss) Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController
+
 ## Legal
 
 This project is not affiliated directly or indirectly with the company Loxone Electronics GmbH.

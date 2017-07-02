@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.1.1",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController",
+                "de": "Bessere Unterstützung für Alexa für die folgenden Controls: Alarm, AudioZone, Gate, Jalousie und LightController"
+            },
             "0.1.1": {
                 "en": "Added support for synchronizing rooms and functions (categories) from Loxone Miniserver",
                 "de": "Unterstützung für die Synchronisation von Räumen und Gewerken (Kategorien) vom Loxone Miniserver"
