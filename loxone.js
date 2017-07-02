@@ -9,6 +9,7 @@ var utils = require(__dirname + '/lib/utils');
 // other dependencies:
 var loxoneWsApi = require('node-lox-ws-api');
 var sprintf = require("sprintf-js").sprintf;
+var extend = require('extend');
 
 // create the adapter object
 var adapter = utils.adapter('loxone');
@@ -320,7 +321,7 @@ function loadAlarmControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['armed', 'nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'startTime', 'armedDelay', 'armedDelayTotal', 'sensors', 'disabledMove']);
 
-    createBooleanControlStateObject(control.name, uuid, control.states, 'armed', 'switch', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'armed', 'switch', {write: true, smartIgnore: false});
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
@@ -329,7 +330,7 @@ function loadAlarmControl(type, uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelayTotal', 'number', 'value.interval');
     createListControlStateObject(control.name, uuid, control.states, 'sensors');
-    createBooleanControlStateObject(control.name, uuid, control.states, 'disabledMove', 'switch', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'disabledMove', 'switch', {write: true});
     
     addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
         if (newValue) {
@@ -375,23 +376,23 @@ function loadAudioZoneControl(type, uuid, control) {
         'songName', 'duration', 'progress', 'album', 'artist', 'station', 'genre', 'cover', 'source']);
     
     createSimpleControlStateObject(control.name, uuid, control.states, 'serverState', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'playState', 'number', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'playState', 'number', 'value', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'clientState', 'number', 'value');
-    createBooleanControlStateObject(control.name, uuid, control.states, 'power', 'switch', true);
-    createSimpleControlStateObject(control.name, uuid, control.states, 'volume', 'number', 'level.volume', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'power', 'switch', {write: true, smartIgnore: false});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'volume', 'number', 'level.volume', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'maxVolume', 'number', 'value');
-    createBooleanControlStateObject(control.name, uuid, control.states, 'shuffle', 'switch', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'shuffle', 'switch', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'sourceList', 'string', 'json');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'repeat', 'number', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'repeat', 'number', 'value', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'songName', 'string', 'text');
     createSimpleControlStateObject(control.name, uuid, control.states, 'duration', 'number', 'value.interval');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'progress', 'number', 'value.interval', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'progress', 'number', 'value.interval', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'album', 'string', 'text');
     createSimpleControlStateObject(control.name, uuid, control.states, 'artist', 'string', 'text');
     createSimpleControlStateObject(control.name, uuid, control.states, 'station', 'string', 'text');
     createSimpleControlStateObject(control.name, uuid, control.states, 'genre', 'string', 'text');
     createSimpleControlStateObject(control.name, uuid, control.states, 'cover', 'string', 'text.url');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'source', 'number', 'value', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'source', 'number', 'value', {write: true});
     
     addStateChangeListener(uuid + '.playState', function (oldValue, newValue) {
         newValue = parseInt(newValue);
@@ -457,7 +458,8 @@ function loadColorpickerControl(type, uuid, control) {
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.hue'
+            role: 'level.color.hue',
+            smartIgnore: true
         },
         control.states.color,
         function (name, value) {
@@ -473,7 +475,8 @@ function loadColorpickerControl(type, uuid, control) {
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.saturation'
+            role: 'level.color.saturation',
+            smartIgnore: true
         },
         control.states.color,
         function (name, value) {
@@ -489,7 +492,8 @@ function loadColorpickerControl(type, uuid, control) {
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.luminance'
+            role: 'level.color.luminance',
+            smartIgnore: true
         },
         control.states.color,
         function (name, value) {
@@ -535,7 +539,7 @@ function loadDimmerControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['position', 'min', 'max', 'step']);
     
-    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'level.dimmer', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'level.dimmer', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'min', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'max', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'step', 'number', 'value');
@@ -568,11 +572,11 @@ function loadGateControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['position', 'active', 'preventOpen', 'preventClose']);
     
-    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'level', true);
+    createPercentageControlStateObject(control.name, uuid, control.states, 'position', 'level', {write: true, smartIgnore: false});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'value', {write: true});
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventOpen', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventClose', 'indicator');
-
+    
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         oldValue = parseInt(oldValue);
         newValue = parseInt(newValue);
@@ -598,6 +602,45 @@ function loadGateControl(type, uuid, control) {
             }
         }
     });
+    
+    // for Alexa support:
+    if (control.states.position) {
+        addStateChangeListener(
+            uuid + '.position',
+            function (oldValue, newValue) {
+                newValue = Math.max(0, Math.min(100, newValue)); // 0 <= newValue <= 100
+                if (oldValue == newValue) {
+                    return;
+                }
+                
+                var targetValue;
+                if (oldValue < newValue) {
+                    targetValue = (newValue - 1) / 100;
+                    client.send_cmd(control.uuidAction, 'open');
+                } else {
+                    targetValue = (newValue + 1) / 100;
+                    client.send_cmd(control.uuidAction, 'close');
+                }
+                
+                if (newValue == 100 || newValue === 0) {
+                    return;
+                }
+                
+                var listenerName = 'auto';
+                addStateEventHandler(
+                    control.states.position,
+                    function (value) {
+                        if (oldValue < newValue && value >= targetValue) {
+                            removeStateEventHandler(control.states.position, listenerName);
+                            client.send_cmd(control.uuidAction, 'close');
+                        } else if (oldValue > newValue && value <= targetValue) {
+                            removeStateEventHandler(control.states.position, listenerName);
+                            client.send_cmd(control.uuidAction, 'open');
+                        }
+                    },
+                    listenerName);
+            });
+    }
 }
 
 function loadInfoOnlyDigitalControl(type, uuid, control) {
@@ -630,7 +673,8 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.active,
             function (name, value) {
@@ -646,7 +690,8 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.active,
             function (name, value) {
@@ -662,7 +707,8 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.active,
             function (name, value) {
@@ -701,7 +747,8 @@ function loadInfoOnlyAnalogControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.value,
             function (name, value) {
@@ -746,14 +793,15 @@ function loadJalousieControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['up', 'down', 'position', 'shadePosition', 'safetyActive', 'autoAllowed', 'autoActive', 'locked']);
     
-    createBooleanControlStateObject(control.name, uuid, control.states, 'up', 'indicator', true);
-    createBooleanControlStateObject(control.name, uuid, control.states, 'down', 'indicator', true);
-    createSimpleControlStateObject(control.name, uuid, control.states, 'position', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'shadePosition', 'number', 'value');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'up', 'indicator', {write: true});
+    createBooleanControlStateObject(control.name, uuid, control.states, 'down', 'indicator', {write: true});
+    createPercentageControlStateObject(control.name, uuid, control.states, 'position', 'level.blind', {write: true, smartIgnore: false});
+    createPercentageControlStateObject(control.name, uuid, control.states, 'shadePosition', 'level');
     createBooleanControlStateObject(control.name, uuid, control.states, 'safetyActive', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'autoAllowed', 'indicator');
-    createBooleanControlStateObject(control.name, uuid, control.states, 'autoActive', 'indicator', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'autoActive', 'indicator', {write: true});
     createBooleanControlStateObject(control.name, uuid, control.states, 'locked', 'indicator');
+    
     
     addStateChangeListener(uuid + '.up', function (oldValue, newValue) {
         if (newValue) {
@@ -778,6 +826,48 @@ function loadJalousieControl(type, uuid, control) {
             client.send_cmd(control.uuidAction, 'NoAuto');
         }
     });
+    
+    // for Alexa support:
+    if (control.states.position) {
+        addStateChangeListener(
+            uuid + '.position',
+            function (oldValue, newValue) {
+                newValue = Math.max(0, Math.min(100, newValue)); // 0 <= newValue <= 100
+                if (oldValue == newValue) {
+                    return;
+                }
+                
+                if (newValue == 100) {
+                    client.send_cmd(control.uuidAction, 'FullDown');
+                    return;
+                }
+                if (newValue === 0) {
+                    client.send_cmd(control.uuidAction, 'FullUp');
+                    return;
+                }
+                var targetValue;
+                if (oldValue < newValue) {
+                    targetValue = (newValue - 5) / 100;
+                    client.send_cmd(control.uuidAction, 'down');
+                } else {
+                    targetValue = (newValue + 5) / 100;
+                    client.send_cmd(control.uuidAction, 'up');
+                }
+                var listenerName = 'auto';
+                addStateEventHandler(
+                    control.states.position,
+                    function (value) {
+                        if (oldValue < newValue && value >= targetValue) {
+                            removeStateEventHandler(control.states.position, listenerName);
+                            client.send_cmd(control.uuidAction, 'DownOff');
+                        } else if (oldValue > newValue && value <= targetValue) {
+                            removeStateEventHandler(control.states.position, listenerName);
+                            client.send_cmd(control.uuidAction, 'UpOff');
+                        }
+                    },
+                    listenerName);
+           });
+    }
     
     createSwitchCommandStateObject(control.name, uuid, 'fullUp');
     addStateChangeListener(uuid + '.fullUp', function (oldValue, newValue) {
@@ -807,7 +897,7 @@ function loadLightControllerControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['activeScene', 'sceneList']);
 
-    createSimpleControlStateObject(control.name, uuid, control.states, 'activeScene', 'number', 'level', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'activeScene', 'number', 'level', {write: true});
     addStateChangeListener(uuid + '.activeScene', function (oldValue, newValue) {
         newValue = parseInt(newValue);
         if (newValue === 9) {
@@ -825,7 +915,8 @@ function loadLightControllerControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'array',
-                role: 'list'
+                role: 'list',
+                smartIgnore: true
             },
             control.states.sceneList,
             function (name, value) {
@@ -846,6 +937,16 @@ function loadLightControllerControl(type, uuid, control) {
     createSwitchCommandStateObject(control.name, uuid, 'minus');
     addStateChangeListener(uuid + '.minus', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'minus');
+    });
+    
+    // for Alexa support:
+    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
+    addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        } else {
+            client.send_cmd(control.uuidAction, '0');
+        }
     });
 
     // TODO: currently we don't support scene modifications ("learn" and "delete" commands),
@@ -886,7 +987,8 @@ function loadMeterControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.actual,
             function (name, value) {
@@ -902,7 +1004,8 @@ function loadMeterControl(type, uuid, control) {
                 read: true,
                 write: false,
                 type: 'string',
-                role: 'text'
+                role: 'text',
+                smartIgnore: true
             },
             control.states.total,
             function (name, value) {
@@ -923,7 +1026,7 @@ function loadPushbuttonControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['active']);
     
-    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', {write: true, smartIgnore: type == 'channel'});
 
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
@@ -962,7 +1065,7 @@ function loadSmokeAlarmControl(type, uuid, control) {
     createBooleanControlStateObject(control.name, uuid, control.states, 'testAlarm', 'indicator');
     createSimpleControlStateObject(control.name, uuid, control.states, 'alarmCause', 'number', 'value');
     createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'level.interval', true);
+    createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'level.interval', {write: true});
     
     createSwitchCommandStateObject(control.name, uuid, 'mute');
     addStateChangeListener(uuid + '.mute', function (oldValue, newValue) {
@@ -998,7 +1101,7 @@ function loadSwitchControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['active']);
     
-    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', true);
+    createBooleanControlStateObject(control.name, uuid, control.states, 'active', 'switch', {write: true, smartIgnore: type == 'channel'});
     
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
@@ -1026,7 +1129,7 @@ function loadTimedSwitchControl(type, uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelayTotal', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelay', 'number', 'value.interval');
     
-    createSwitchCommandStateObject(control.name, uuid, 'active');
+    createSwitchCommandStateObject(control.name, uuid, 'active', {smartIgnore: type == 'channel'});
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
@@ -1088,7 +1191,8 @@ function loadWindowMonitorControl(type, uuid, control) {
             type: 'channel',
             common: {
                 name: control.name + ': ' + window.name,
-                role: 'sensor.window.3'
+                role: 'sensor.window.3',
+                smartIgnore: true
             },
             native: window
         });
@@ -1101,7 +1205,8 @@ function loadWindowMonitorControl(type, uuid, control) {
                     read: true,
                     write: false,
                     type: 'boolean',
-                    role: 'indicator'
+                    role: 'indicator',
+                    smartIgnore: true
                 },
                 native: {}
             };
@@ -1293,36 +1398,70 @@ function loadWeatherServer(data) {
     });
 }
 
-function createSimpleControlStateObject(controlName, uuid, states, name, type, role, writable) {
+function createSimpleControlStateObject(controlName, uuid, states, name, type, role, commonExt) {
     if (states !== undefined && states.hasOwnProperty(name)) {
+        var common = {
+            name: controlName + ': ' + name,
+            read: true,
+            write: false,
+            type: type,
+            role: role,
+            smartIgnore: true
+        };
+        if (commonExt && typeof commonExt === 'object') {
+            extend(true, common, commonExt);
+        }
         createStateObject(
             uuid + '.' + normalizeName(name),
-            {
-                name: controlName + ': ' + name,
-                read: true,
-                write: writable === true,
-                type: type,
-                role: role
-            },
+            common,
             states[name],
             setStateAck);
     }
 }
 
-function createBooleanControlStateObject(controlName, uuid, states, name, role, writable) {
+function createBooleanControlStateObject(controlName, uuid, states, name, role, commonExt) {
     if (states !== undefined && states.hasOwnProperty(name)) {
+        var common = {
+            name: controlName + ': ' + name,
+            read: true,
+            write: false,
+            type: 'boolean',
+            role: role,
+            smartIgnore: true
+        };
+        if (commonExt && typeof commonExt === 'object') {
+            extend(true, common, commonExt);
+        }
         createStateObject(
             uuid + '.' + normalizeName(name),
-            {
-                name: controlName + ': ' + name,
-                read: true,
-                write: writable === true,
-                type: 'boolean',
-                role: role
-            },
+            common,
             states[name],
             function (name, value) {
                 setStateAck(name, value == 1);
+            });
+    }
+}
+
+function createPercentageControlStateObject(controlName, uuid, states, name, role, commonExt) {
+    if (states !== undefined && states.hasOwnProperty(name)) {
+        var common = {
+            name: controlName + ': ' + name,
+            read: true,
+            write: false,
+            type: 'number',
+            role: role,
+            unit: '%',
+            smartIgnore: true
+        };
+        if (commonExt && typeof commonExt === 'object') {
+            extend(true, common, commonExt);
+        }
+        createStateObject(
+            uuid + '.' + normalizeName(name),
+            common,
+            states[name],
+            function (name, value) {
+                setStateAck(name, Math.round(value * 100));
             });
     }
 }
@@ -1336,7 +1475,8 @@ function createListControlStateObject(controlName, uuid, states, name) {
                 read: true,
                 write: false,
                 type: 'array',
-                role: 'list'
+                role: 'list',
+                smartIgnore: true
             },
             states[name],
             function (name, value) {
@@ -1345,19 +1485,19 @@ function createListControlStateObject(controlName, uuid, states, name) {
     }
 }
 
-function createSwitchCommandStateObject(controlName, uuid, name) {
-    var obj = {
-        type: 'state',
-        common: {
-            name: controlName + ': ' + name,
-            read: false,
-            write: true,
-            type: 'boolean',
-            role: 'switch'
-        },
-        native: {}
+function createSwitchCommandStateObject(controlName, uuid, name, commonExt) {
+    var common = {
+        name: controlName + ': ' + name,
+        read: false,
+        write: true,
+        type: 'boolean',
+        role: 'switch',
+        smartIgnore: true
     };
-    adapter.setObject(uuid + '.' + normalizeName(name), obj);
+    if (commonExt && typeof commonExt === 'object') {
+        extend(true, common, commonExt);
+    }
+    createStateObject(uuid + '.' + normalizeName(name), common, uuid);
 }
 
 function normalizeName(name) {
@@ -1365,6 +1505,15 @@ function normalizeName(name) {
 }
 
 function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
+    if (commonInfo.hasOwnProperty('smartIgnore')) {
+        // interpret smartIgnore (our own extension of common) to generate smartName if needed
+        if (commonInfo.smartIgnore) {
+            commonInfo.smartName = 'ignore';
+        } else if (!commonInfo.hasOwnProperty('smartName')) {
+            commonInfo.smartName = null;
+        }
+        delete commonInfo.smartIgnore;
+    }
     var obj = {
         type: 'state',
         common: commonInfo,
@@ -1373,17 +1522,39 @@ function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
         }
     };
     adapter.setObject(id, obj);
-    addStateEventHandler(stateUuid, function (value) {
-        stateEventHandler(id, value);
-    });
+    if (stateEventHandler) {
+        addStateEventHandler(stateUuid, function (value) {
+            stateEventHandler(id, value);
+        });
+    }
 }
 
-function addStateEventHandler(uuid, eventHandler) {
+function addStateEventHandler(uuid, eventHandler, name /* optional */) {
     if (stateEventHandlers[uuid] === undefined) {
         stateEventHandlers[uuid] = [];
     }
     
-    stateEventHandlers[uuid].push(eventHandler);
+    if (name) {
+        removeStateEventHandler(uuid, name);
+    }
+    
+    stateEventHandlers[uuid].push({name: name, handler: eventHandler});
+}
+
+function removeStateEventHandler(uuid, name) {
+    if (stateEventHandlers[uuid] === undefined || !name) {
+        return false;
+    }
+    
+    var found = false;
+    for (var i in stateEventHandlers[uuid]) {
+        if (stateEventHandlers[uuid][i].name == name) {
+            stateEventHandlers[uuid].splice(i, 1);
+            found = true;
+        }
+    }
+
+    return found;
 }
 
 function addStateChangeListener(id, listener) {
@@ -1414,9 +1585,9 @@ function handleEvent(uuid, evt) {
         return;
     }
 
-    stateEventHandlerList.forEach(function (stateEventHandler) {
+    stateEventHandlerList.forEach(function (item) {
         try {
-            stateEventHandler(evt);
+            item.handler(evt);
         } catch (e) {
             adapter.log.error('Error while handling event UUID ' + uuid + ': ' + e);
         }
