@@ -48,7 +48,7 @@
         "messagebox":               true,
         "readme":                   "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
         "loglevel":                 "info",
-        "type":                     "hardware",
+        "type":                     "iot-systems",
         "keywords":                 ["loxone", "miniserver", "smarthome"],
         "icon":                     "loxone.png",
         "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png"
