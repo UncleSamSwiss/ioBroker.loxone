@@ -2,6 +2,8 @@
 
 # ioBroker adapter for Loxone Miniserver
 
+***This adapter requires at least nodejs 4.x!***
+
 Fetches all information available in Loxone Miniserver (and Loxone Miniserver Go) and provides changes in realtime.
 
 ## Install
