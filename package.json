@@ -36,5 +36,14 @@
   "dependencies": {
     "node-lox-ws-api": "^0.2.8",
     "sprintf-js": "^1.0.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "chai": "^3.4.1"
+  },
+  "main": "loxone.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha"
   }
+
 }
