@@ -1,9 +1,44 @@
 {
     "common": {
-        "name":                     "loxone",
-        "version":                  "0.0.2",
-        "title":                    "Loxone Miniserver Adapter",
-        "desc":                     "Communicates with a Loxone Miniserver.",
+        "name": "loxone",
+        "version": "0.2.0",
+        "news": {
+            "0.2.0": {
+                "en": "Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController",
+                "de": "Bessere Unterstützung für Alexa für die folgenden Controls: Alarm, AudioZone, Gate, Jalousie und LightController"
+            },
+            "0.1.1": {
+                "en": "Added support for synchronizing rooms and functions (categories) from Loxone Miniserver",
+                "de": "Unterstützung für die Synchronisation von Räumen und Gewerken (Kategorien) vom Loxone Miniserver"
+            },
+            "0.1.0": {
+                "en": "Added support for many more controls including commands from ioBroker to Loxone Miniserver",
+                "de": "Unterstützung für viele weitere Controls hinzugefügt; inklusive versenden von Befehlen an den Loxone Miniserver"
+            },
+            "0.0.3": {
+                "en": "Formatting, refactoring and Russian translations by Bluefox",
+                "de": "Formatierungen, refactoring und russische Übersetzungen durch Bluefox"
+            },
+            "0.0.2": {
+                "en": "Added creation of an empty device for all unsupported controls (helps figure out its configuration)",
+                "de": "Nicht unterstützte Controls werden nun als leeres Gerät hinzugefügt (hilft dessen Konfiguration herauszufinden)"
+            },
+            "0.0.1": {
+                "en": "initial commit",
+                "de": "initial commit"
+            }
+        },
+        "title": "Loxone Miniserver Adapter",
+        "titleLang": {
+            "en": "Loxone Miniserver Adapter",
+            "de": "Loxone Miniserver-Adapter",
+            "ru": "Драйвер для Loxone Miniserver"
+        },
+        "desc":                     {
+            "en": "Communicates with a Loxone Miniserver.",
+            "de": "Kommuniziert mit dem Loxone Miniserver.",
+            "ru": "Подключается к Loxone Miniserver и позволяет им управлять."
+        },
         "authors": [
             "UncleSamSwiss <samuel.weibel@gmail.com>"
         ],
@@ -22,7 +57,9 @@
       "host": "0.0.0.0",
       "port": 80,
       "username": "",
-      "password": ""
+      "password": "",
+      "syncRooms":  false,
+      "syncFunctions":  false
     },
     "objects": [
     ]

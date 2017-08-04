@@ -1,10 +1,10 @@
 {
   "name": "iobroker.loxone",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "Adapter for ioBroker that communicates with a Loxone Miniserver",
   "main": "loxone.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
@@ -33,17 +33,22 @@
   },
   "homepage": "https://github.com/UncleSamSwiss/ioBroker.loxone",
   "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+  "engines": {
+    "node": ">=1.0"
+  },
   "dependencies": {
-    "node-lox-ws-api": "^0.2.8",
-    "sprintf-js": "^1.0.3"
+    "extend": "^3.0.1",
+    "node-lox-ws-api": "^0.3.3",
+    "sprintf-js": "^1.1.0"
   },
   "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-replace": "^0.9.3",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-jscs": "^2.0.0",
+    "grunt-http": "^1.6.0",
     "mocha": "^2.3.4",
     "chai": "^3.4.1"
-  },
-  "main": "loxone.js",
-  "scripts": {
-    "test": "node node_modules/mocha/bin/mocha"
   }
 
 }
