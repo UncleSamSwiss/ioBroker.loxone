@@ -1,7 +1,7 @@
 {
     "common": {
         "name":                     "loxone",
-        "version":                  "0.0.1",
+        "version":                  "0.0.2",
         "title":                    "Loxone Miniserver Adapter",
         "desc":                     "Communicates with a Loxone Miniserver.",
         "authors": [
