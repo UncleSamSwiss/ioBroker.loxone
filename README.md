@@ -269,6 +269,13 @@ Provided by virtual push-button inputs.
 - `active` (rw) the current state of the pushbutton
 - `pulse` (wo) writing any value to this state will simulate the button being pushed only for a very short time
 
+### Slider
+
+Provided by analog virtual inputs.
+- `value` (rw) the current value of the slider
+- `value-formatted` (ro) if configured, the formatted value of the state (using the "Unit" format from Loxone Config)
+- `error` (ro) indicates an invalid value of the slider
+
 ### SmokeAlarm
 
 Provided by utility meters.
@@ -401,23 +408,23 @@ Native value from ioBroker &gt; Objects
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
 ## Changelog
-### 0.0.1
-* (UncleSamSwiss) Initial version
-
-### 0.0.2
-* (UncleSamSwiss) Added creation of an empty device for all unsupported controls (helps figure out its configuration)
-
-### 0.0.3
-* (Bluefox) Formatting, refactoring and Russian translations
-
-### 0.1.0
-* (UncleSamSwiss) Added support for many more controls including commands from ioBroker to Loxone Miniserver
+### 0.2.0
+* (UncleSamSwiss) Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController
 
 ### 0.1.1
 * (UncleSamSwiss) Added support for synchronizing rooms and functions (categories) from Loxone Miniserver
 
-### 0.2.0
-* (UncleSamSwiss) Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController
+### 0.1.0
+* (UncleSamSwiss) Added support for many more controls including commands from ioBroker to Loxone Miniserver
+
+### 0.0.3
+* (Bluefox) Formatting, refactoring and Russian translations
+
+### 0.0.2
+* (UncleSamSwiss) Added creation of an empty device for all unsupported controls (helps figure out its configuration)
+
+### 0.0.1
+* (UncleSamSwiss) Initial version
 
 ## Legal
 

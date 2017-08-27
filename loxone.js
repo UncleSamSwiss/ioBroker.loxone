@@ -1056,7 +1056,7 @@ function loadSliderControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['value', 'error']);
     
-    var common = { write: true };
+    var common = {write: true};
     if (control.hasOwnProperty('details')) {
         common.min = control.details.min;
         common.max = control.details.max;
