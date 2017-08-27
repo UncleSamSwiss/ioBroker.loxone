@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "news": {
+            "0.2.1": {
+                "en": "Added support for Slider control",
+                "de": "Unterstützung für Slider Control"
+            },
             "0.2.0": {
                 "en": "Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController",
                 "de": "Bessere Unterstützung für Alexa für die folgenden Controls: Alarm, AudioZone, Gate, Jalousie und LightController"
@@ -48,7 +52,7 @@
         "messagebox":               true,
         "readme":                   "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
         "loglevel":                 "info",
-        "type":                     "hardware",
+        "type":                     "iot-systems",
         "keywords":                 ["loxone", "miniserver", "smarthome"],
         "icon":                     "loxone.png",
         "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png"

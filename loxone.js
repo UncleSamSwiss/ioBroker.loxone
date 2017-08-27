@@ -1044,6 +1044,54 @@ function loadPushbuttonControl(type, uuid, control) {
     });
 }
 
+function loadSliderControl(type, uuid, control) {
+    adapter.setObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'sensor'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['value', 'error']);
+    
+    var common = {write: true};
+    if (control.hasOwnProperty('details')) {
+        common.min = control.details.min;
+        common.max = control.details.max;
+    }
+    
+    createSimpleControlStateObject(control.name, uuid, control.states, 'value', 'number', 'level', common);
+    addStateChangeListener(uuid + '.value', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, newValue);
+    });
+    
+    createBooleanControlStateObject(control.name, uuid, control.states, 'error', 'indicator.maintenance');
+    
+    if (!control.hasOwnProperty('details')) {
+        return;
+    }
+    
+    if (control.details.hasOwnProperty('format')) {
+        createStateObject(
+            uuid + '.value-formatted',
+            {
+                name: control.name + ': formatted value',
+                read: true,
+                write: false,
+                type: 'string',
+                role: 'text',
+                smartIgnore: true
+            },
+            control.states.value,
+            function (name, value) {
+                setFormattedStateAck(name, value, control.details.format);
+            });
+    }
+    
+}
+
 function loadSmokeAlarmControl(type, uuid, control) {
     adapter.setObject(uuid, {
         type: type,
