@@ -4,6 +4,8 @@
 
 [![NPM version](http://img.shields.io/npm/v/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Downloads](https://img.shields.io/npm/dm/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Travis](https://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone/) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/UncleSamSwiss/iobroker-loxone.svg)](https://ci.appveyor.com/project/UncleSamSwiss/iobroker-loxone) [![GitHub issues](https://img.shields.io/github/issues/UncleSamSwiss/ioBroker.loxone.svg)](https://github.com/UncleSamSwiss/ioBroker.loxone/issues)
 
+***This adapter requires at least nodejs 4.x!***
+
 Fetches all information available in Loxone Miniserver (and Loxone Miniserver Go) and provides changes in realtime.
 
 ## Install
@@ -215,7 +217,7 @@ Provided by virtual states as well as the Loxone Touch switch.
 
 Provided by door controllers.
 - `bell` (ro) whether the bell is ringing
-- `lastBellEvents` (ro) array containing the timestamps for each bell-activity that wasn’t answered
+- `lastBellEvents` (ro) array containing the timestamps for each bell-activity that wasnï¿½t answered
 - `version` (ro) Loxone Intercoms only - text containing the currently installed firmware
 versions
 - `answer` (wo) writing any value to this state will deactivate the bell
