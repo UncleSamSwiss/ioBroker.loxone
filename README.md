@@ -251,8 +251,8 @@ Provided by (hotel) lighting controllers.
     * 1..8: user defined scene (definition/learning of scenes has to be done with the Loxone tools)
     * 9: all on
 - `sceneList` (ro) list of all scenes
-- `plus` (ro) changes to the next scene
-- `minus` (ro) changes to the previous scene
+- `plus` (wo) changes to the next scene
+- `minus` (wo) changes to the previous scene
 
 This type of channel might contain other devices. See the respective chapter for more information.
 
@@ -368,7 +368,7 @@ The weather server information is provided as a device with multiple channels.
 The device is called `WeatherServer`.
 It contains:
 - the channel `Actual` with the current weather values
-- one channel for each forcast hour called `HourXX` where `XX` is the number of hours from now
+- one channel for each forecast hour called `HourXX` where `XX` is the number of hours from now
 
 Every channel contains the following states:
 - `barometricPressure`: numeric barometric pressure value
@@ -393,7 +393,7 @@ Every channel contains the following states:
 
 ## Compatibility
 
-Compatibility has been tested with Loxone Miniserver Go using Loxone Config 8.1.
+Compatibility has been tested with Loxone Miniserver Go using Loxone Config 8.3.
 
 ## Bug Reports and Feature Requests
 
@@ -410,6 +410,9 @@ Native value from ioBroker &gt; Objects
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
 ## Changelog
+### 0.2.1
+* (UncleSamSwiss) Added support for Slider control
+
 ### 0.2.0
 * (UncleSamSwiss) Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController
 
