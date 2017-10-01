@@ -14,6 +14,7 @@ var extend = require('extend');
 // create the adapter object
 var adapter = utils.adapter('loxone');
 
+var existingObjects = {};
 var stateChangeListeners = {};
 var stateEventHandlers = {};
 var operatingModes = {};
@@ -52,7 +53,10 @@ adapter.on('ready', function () {
             }
         }
         
-        main();
+        adapter.getAdapterObjects(function (objs) {
+            existingObjects = objs;
+            main();
+        });
     });
 });
 
@@ -175,7 +179,7 @@ function loadGlobalStates(globalStates) {
     };
     
     // special case for operating mode (text)
-    adapter.setObject(
+    updateObject(
         'operatingMode-text', {
             type: 'state',
             common: {
@@ -192,7 +196,7 @@ function loadGlobalStates(globalStates) {
 
     for (var globalStateName in globalStates) {
         var info = globalStateInfos.hasOwnProperty(globalStateName) ? globalStateInfos[globalStateName] : defaultInfo;
-        createStateObject(
+        updateStateObject(
             globalStateName,
             {
                 name: globalStateName,
@@ -227,7 +231,7 @@ function loadControls(controls) {
             
             if (!hasUnsupported) {
                 hasUnsupported = true;
-                adapter.setObject('Unsupported', {
+                updateObject('Unsupported', {
                     type: 'device',
                     common: {
                         name: 'Unsupported',
@@ -237,7 +241,7 @@ function loadControls(controls) {
                 });
             }
             
-            adapter.setObject('Unsupported.' + uuid, {
+            updateObject('Unsupported.' + uuid, {
                 type: 'state',
                 common: {
                     name: control.name,
@@ -297,7 +301,7 @@ function storeRoomAndCat(control, uuid) {
 
 // this function is called if the control has no type (currently seems to be only for window monitoring)
 function loadControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -310,7 +314,7 @@ function loadControl(type, uuid, control) {
 }
 
 function loadAlarmControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -362,7 +366,7 @@ function loadAlarmControl(type, uuid, control) {
 }
 
 function loadAudioZoneControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -436,7 +440,7 @@ function loadColorpickerControl(type, uuid, control) {
         throw 'Unsupported color picker type: ' + control.details.pickerType;
     }
 
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -451,7 +455,7 @@ function loadColorpickerControl(type, uuid, control) {
         return;
     }
     
-    createStateObject(
+    updateStateObject(
         uuid + '.hue',
         {
             name: control.name + ': hue',
@@ -468,7 +472,7 @@ function loadColorpickerControl(type, uuid, control) {
                 setStateAck(uuid + '.hue', match[1]);
             }
         });
-    createStateObject(
+    updateStateObject(
         uuid + '.saturation',
         {
             name: control.name + ': saturation',
@@ -485,7 +489,7 @@ function loadColorpickerControl(type, uuid, control) {
                 setStateAck(uuid + '.saturation', match[1]);
             }
         });
-    createStateObject(
+    updateStateObject(
         uuid + '.luminance',
         {
             name: control.name + ': luminance',
@@ -528,7 +532,7 @@ function loadColorpickerControl(type, uuid, control) {
 }
 
 function loadDimmerControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -561,7 +565,7 @@ function loadDimmerControl(type, uuid, control) {
 }
 
 function loadGateControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -644,7 +648,7 @@ function loadGateControl(type, uuid, control) {
 }
 
 function loadInfoOnlyDigitalControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -666,7 +670,7 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('text')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.active-text',
             {
                 name: control.name + ': active as text',
@@ -683,7 +687,7 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('image')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.active-image',
             {
                 name: control.name + ': active as image',
@@ -700,7 +704,7 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('color')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.active-color',
             {
                 name: control.name + ': active as color',
@@ -718,7 +722,7 @@ function loadInfoOnlyDigitalControl(type, uuid, control) {
 }
 
 function loadInfoOnlyAnalogControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -740,7 +744,7 @@ function loadInfoOnlyAnalogControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('format')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.value-formatted',
             {
                 name: control.name + ': formatted value',
@@ -758,7 +762,7 @@ function loadInfoOnlyAnalogControl(type, uuid, control) {
 }
 
 function loadIntercomControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -782,7 +786,7 @@ function loadIntercomControl(type, uuid, control) {
 }
 
 function loadJalousieControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -886,7 +890,7 @@ function loadJalousieControl(type, uuid, control) {
 }
 
 function loadLightControllerControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -908,7 +912,7 @@ function loadLightControllerControl(type, uuid, control) {
     });
     
     if (control.states.hasOwnProperty('sceneList')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.sceneList',
             {
                 name: control.name + ': sceneList',
@@ -956,7 +960,7 @@ function loadLightControllerControl(type, uuid, control) {
 }
 
 function loadMeterControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -980,7 +984,7 @@ function loadMeterControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('actualFormat')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.actual-formatted',
             {
                 name: control.name + ': formatted actual value',
@@ -997,7 +1001,7 @@ function loadMeterControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('totalFormat')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.total-formatted',
             {
                 name: control.name + ': formatted total value',
@@ -1015,7 +1019,7 @@ function loadMeterControl(type, uuid, control) {
 }
 
 function loadPushbuttonControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1045,7 +1049,7 @@ function loadPushbuttonControl(type, uuid, control) {
 }
 
 function loadSliderControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1074,7 +1078,7 @@ function loadSliderControl(type, uuid, control) {
     }
     
     if (control.details.hasOwnProperty('format')) {
-        createStateObject(
+        updateStateObject(
             uuid + '.value-formatted',
             {
                 name: control.name + ': formatted value',
@@ -1093,7 +1097,7 @@ function loadSliderControl(type, uuid, control) {
 }
 
 function loadSmokeAlarmControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1138,7 +1142,7 @@ function loadSmokeAlarmControl(type, uuid, control) {
 }
 
 function loadSwitchControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1163,7 +1167,7 @@ function loadSwitchControl(type, uuid, control) {
 }
 
 function loadTimedSwitchControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1195,7 +1199,7 @@ function loadTimedSwitchControl(type, uuid, control) {
 }
 
 function loadTrackerControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1210,7 +1214,7 @@ function loadTrackerControl(type, uuid, control) {
 }
 
 function loadWindowMonitorControl(type, uuid, control) {
-    adapter.setObject(uuid, {
+    updateObject(uuid, {
         type: type,
         common: {
             name: control.name,
@@ -1235,7 +1239,7 @@ function loadWindowMonitorControl(type, uuid, control) {
     for (var index in control.details.windows) {
         var window = control.details.windows[index];
         var id = uuid + '.' + (parseInt(index) + 1);
-        adapter.setObject(id, {
+        updateObject(id, {
             type: 'channel',
             common: {
                 name: control.name + ': ' + window.name,
@@ -1258,7 +1262,7 @@ function loadWindowMonitorControl(type, uuid, control) {
                 },
                 native: {}
             };
-            adapter.setObject(id + '.' + windowPosition, obj);
+            updateObject(id + '.' + windowPosition, obj);
         }
     }
 
@@ -1346,7 +1350,7 @@ function loadWeatherServer(data) {
     }
     
     var deviceName = 'WeatherServer';
-    adapter.setObject(deviceName, {
+    updateObject(deviceName, {
         type: 'device',
         common: {
             name: deviceName,
@@ -1356,7 +1360,7 @@ function loadWeatherServer(data) {
     });
     
     var setWeatherObject = function (channelName, id, name, type, role) {
-        adapter.setObject(deviceName + '.' + channelName + '.' + id, {
+        updateObject(deviceName + '.' + channelName + '.' + id, {
             type: 'state',
             common: {
                 name: name,
@@ -1370,7 +1374,7 @@ function loadWeatherServer(data) {
     };
     
     var setWeatherObjects = function (channelName) {
-        adapter.setObject(deviceName + '.' + channelName, {
+        updateObject(deviceName + '.' + channelName, {
             type: 'channel',
             common: {
                 name: channelName,
@@ -1459,7 +1463,7 @@ function createSimpleControlStateObject(controlName, uuid, states, name, type, r
         if (commonExt && typeof commonExt === 'object') {
             extend(true, common, commonExt);
         }
-        createStateObject(
+        updateStateObject(
             uuid + '.' + normalizeName(name),
             common,
             states[name],
@@ -1480,7 +1484,7 @@ function createBooleanControlStateObject(controlName, uuid, states, name, role, 
         if (commonExt && typeof commonExt === 'object') {
             extend(true, common, commonExt);
         }
-        createStateObject(
+        updateStateObject(
             uuid + '.' + normalizeName(name),
             common,
             states[name],
@@ -1504,7 +1508,7 @@ function createPercentageControlStateObject(controlName, uuid, states, name, rol
         if (commonExt && typeof commonExt === 'object') {
             extend(true, common, commonExt);
         }
-        createStateObject(
+        updateStateObject(
             uuid + '.' + normalizeName(name),
             common,
             states[name],
@@ -1516,7 +1520,7 @@ function createPercentageControlStateObject(controlName, uuid, states, name, rol
 
 function createListControlStateObject(controlName, uuid, states, name) {
     if (states !== undefined && states.hasOwnProperty(name)) {
-        createStateObject(
+        updateStateObject(
             uuid + '.' + normalizeName(name),
             {
                 name: controlName + ': ' + name,
@@ -1545,14 +1549,23 @@ function createSwitchCommandStateObject(controlName, uuid, name, commonExt) {
     if (commonExt && typeof commonExt === 'object') {
         extend(true, common, commonExt);
     }
-    createStateObject(uuid + '.' + normalizeName(name), common, uuid);
+    updateStateObject(uuid + '.' + normalizeName(name), common, uuid);
 }
 
 function normalizeName(name) {
     return name.trim().replace(/[^\wäöüÄÖÜäöüéàèêçß]+/g, '_');
 }
 
-function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
+function updateObject(id, obj) {
+    var fullId = adapter.namespace + '.' + id;
+    if (!adapter.config.syncNames && existingObjects.hasOwnProperty(fullId)) {
+        obj.common.name = existingObjects[fullId].common.name;
+    }
+    
+    adapter.setObject(id, obj);
+}
+
+function updateStateObject(id, commonInfo, stateUuid, stateEventHandler) {
     if (commonInfo.hasOwnProperty('smartIgnore')) {
         // interpret smartIgnore (our own extension of common) to generate smartName if needed
         if (commonInfo.smartIgnore) {
@@ -1569,7 +1582,7 @@ function createStateObject(id, commonInfo, stateUuid, stateEventHandler) {
             uuid: stateUuid
         }
     };
-    adapter.setObject(id, obj);
+    updateObject(id, obj);
     if (stateEventHandler) {
         addStateEventHandler(stateUuid, function (value) {
             stateEventHandler(id, value);

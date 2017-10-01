@@ -31,6 +31,16 @@
 
         // the function loadSettings has to exist ...
         function load(settings, onChange) {
+            // set defaults (if not available)
+            settings.host = settings.host || '0.0.0.0';
+            settings.port = settings.port || 80;
+            settings.username = settings.username || '';
+            settings.password = settings.password || '';
+            settings.syncNames = settings.syncNames || false;
+            settings.syncRooms = settings.syncRooms || false;
+            settings.syncFunctions = settings.syncFunctions || false;
+
+            // populate UI
             for (var key in settings) {
                 setValue(key, settings[key], onChange);
             }
@@ -93,6 +103,10 @@
                 <tr>
                     <td class="translate">Synchronize</td>
                     <td class="admin-icon"></td>
+                    <td><input type="checkbox" id="syncNames" value="true" class="value"> <label class="translate" for="syncNames">Names</label></td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
                     <td><input type="checkbox" id="syncRooms" value="true" class="value"> <label class="translate" for="syncRooms">Rooms</label></td>
                 </tr>
                 <tr>

@@ -62,6 +62,7 @@
       "port": 80,
       "username": "",
       "password": "",
+      "syncNames":  false,
       "syncRooms":  false,
       "syncFunctions":  false
     },

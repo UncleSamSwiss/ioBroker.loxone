@@ -44,6 +44,11 @@ Provide the password for the given username (see above).
 
 Please be aware that this password is stored unsecured inside ioBroker - therefore don't use the "admin" user!
 
+### Synchronize Names
+
+This will update names in ioBroker whenever they change in the Loxone configuration.
+If this is disabled, names will only be synchronized the first time a control is detected.
+
 ### Synchronize Rooms
 
 This will populate the enum.rooms enumeration with all rooms provided by the Loxone Miniserver and will link all controls.
