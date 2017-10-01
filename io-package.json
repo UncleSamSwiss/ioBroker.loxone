@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.2.1",
+        "version": "0.3.0",
         "news": {
+            "0.3.0": {
+                "en": "Control names only synchronized on the first time by default (configurable)",
+                "de": "Namen von Controls werden standardmässig nur noch beim ersten mal synchronisiert (konfigurierbar)"
+            },
             "0.2.1": {
                 "en": "Added support for Slider control",
                 "de": "Unterstützung für Slider Control"

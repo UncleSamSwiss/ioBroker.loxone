@@ -415,6 +415,9 @@ Native value from ioBroker &gt; Objects
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
 ## Changelog
+### 0.3.0
+* (UncleSamSwiss) Control names only synchronized on the first time by default (configurable); users can change control names the way they want
+
 ### 0.2.1
 * (UncleSamSwiss) Added support for Slider control
 
