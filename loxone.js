@@ -435,6 +435,129 @@ function loadAudioZoneControl(type, uuid, control) {
     });
 }
 
+function loadCentralAlarmControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'alarm'
+        },
+        native: control
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'armed', { smartIgnore: false });
+    addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, newValue ? 'on' : 'off');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'delayedOn');
+    addStateChangeListener(uuid + '.delayedOn', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'delayedon');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'quit');
+    });
+}
+
+function loadCentralAudioZoneControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'media.music'
+        },
+        native: control
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'control', { smartIgnore: false });
+    addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, newValue ? 'play' : 'pause');
+    });
+}
+
+function loadCentralGateControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'blind'
+        },
+        native: control
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'open');
+    addStateChangeListener(uuid + '.open', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'open');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'close');
+    addStateChangeListener(uuid + '.close', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'close');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'stop');
+    addStateChangeListener(uuid + '.stop', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'stop');
+    });
+}
+
+function loadCentralJalousieControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'blind'
+        },
+        native: control
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'autoActive');
+    addStateChangeListener(uuid + '.autoActive', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'auto');
+        } else {
+            client.send_cmd(control.uuidAction, 'NoAuto');
+        }
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'fullUp');
+    addStateChangeListener(uuid + '.fullUp', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'FullUp');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'fullDown');
+    addStateChangeListener(uuid + '.fullDown', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'FullDown');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'shade');
+    addStateChangeListener(uuid + '.shade', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'shade');
+    });
+}
+
+function loadCentralLightControllerControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'light'
+        },
+        native: control
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'control', { smartIgnore: false });
+    addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
+        if (newValue) {
+            client.send_cmd(control.uuidAction, 'on');
+        } else {
+            client.send_cmd(control.uuidAction, 'reset');
+        }
+    });
+}
+
 function loadColorpickerControl(type, uuid, control) {
     if (control.details.pickerType != 'Rgb') {
         throw 'Unsupported color picker type: ' + control.details.pickerType;
