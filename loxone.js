@@ -1083,6 +1083,198 @@ function loadLightControllerControl(type, uuid, control) {
     loadSubControls(uuid, control);
 }
 
+function loadLightControllerV2Control(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'light'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['activeMoods', 'moodList', 'favoriteMoods', 'additionalMoods']);
+    
+    if (control.states.hasOwnProperty('activeMoods') && control.states.hasOwnProperty('moodList') &&
+        control.states.hasOwnProperty('favoriteMoods') && control.states.hasOwnProperty('additionalMoods')) {
+        var idToMoodName = {};
+        var moodNameToId = {};
+        var activeMoods = [];
+        var favoriteMoods = [];
+        var additionalMoods = [];
+        var updateMoodsList = function (name, idList) {
+            if (Object.keys(idToMoodName).length == 0) {
+                return;
+            }
+            var list = [];
+            for (var index in idList) {
+                var id = idList[index];
+                if (idToMoodName.hasOwnProperty(id)) {
+                    list.push(idToMoodName[id]);
+                } else {
+                    list.push(id);
+                }
+            }
+            
+            setStateAck(uuid + '.' + name, list);
+        };
+        var updateActiveMoods = function () {
+            updateMoodsList('activeMoods', activeMoods);
+        };
+        var updateFavoriteMoods = function () {
+            updateMoodsList('favoriteMoods', favoriteMoods);
+        };
+        var updateAdditionalMoods = function () {
+            updateMoodsList('additionalMoods', additionalMoods);
+        };
+        updateStateObject(
+            uuid + '.moodList',
+            {
+                name: control.name + ': moodList',
+                read: true,
+                write: false,
+                type: 'array',
+                role: 'list',
+                smartIgnore: true
+            },
+            control.states.moodList,
+            function (name, value) {
+                var moodList = JSON.parse(value);
+                var list = [];
+                idToMoodName = {};
+                moodNameToId = {};
+                for (var index in moodList) {
+                    var mood = moodList[index];
+                    if (mood.hasOwnProperty('id') && mood.hasOwnProperty('name')) {
+                        idToMoodName[mood.id] = mood.name;
+                        moodNameToId[mood.name] = mood.id;
+                        list.push(mood.name);
+                    }
+                }
+                updateActiveMoods();
+                updateFavoriteMoods();
+                updateAdditionalMoods();
+
+                setStateAck(name, list);
+            });
+        updateStateObject(
+            uuid + '.activeMoods',
+            {
+                name: control.name + ': activeMoods',
+                read: true,
+                write: true,
+                type: 'array',
+                role: 'list',
+                smartIgnore: true
+            },
+            control.states.activeMoods,
+            function (name, value) {
+                activeMoods = JSON.parse(value);
+                updateActiveMoods();
+            });
+        addStateChangeListener(uuid + '.activeMoods', function (oldValue, newValue) {
+            if (!Array.isArray(newValue)) {
+                try {
+                    newValue = JSON.parse(newValue);
+                } catch (e) {
+                    // ignore error, continue below
+                }
+                if (!Array.isArray(newValue)) {
+                    newValue = newValue.split(',');
+                }
+            }
+            
+            var ids = [];
+            for (var i = 0; i < newValue.length; i++) {
+                var moodName = newValue[i];
+                if (!moodNameToId.hasOwnProperty(moodName)) {
+                    return;
+                }
+                ids.push(moodNameToId[moodName]);
+            }
+            if (ids.length == 0) {
+                adapter.log.error(uuid + ".activeMoods can't have zero IDs, discarding new value");
+                return;
+            }
+            
+            var addMoods = [];
+            var removeMoods = [];
+            var hasKeepMoods = false;
+            for (var i = 0; i < ids.length; i++) {
+                if (activeMoods.includes(ids[i])) {
+                    hasKeepMoods = true;
+                } else {
+                    addMoods.push(ids[i]);
+                }
+            }
+            for (var i = 0; i < activeMoods.length; i++) {
+                if (!ids.includes(activeMoods[i])) {
+                    removeMoods.push(activeMoods[i]);
+                }
+            }
+            if (hasKeepMoods) {
+                for (var i = 0; i < removeMoods.length; i++) {
+                    client.send_cmd(control.uuidAction, 'removeMood/' + removeMoods[i]);
+                }
+            } else {
+                var firstId = addMoods.shift();
+                client.send_cmd(control.uuidAction, 'changeTo/' + firstId);
+            }
+            
+            for (var i = 0; i < addMoods.length; i++) {
+                client.send_cmd(control.uuidAction, 'addMood/' + addMoods[i]);
+            }
+        });
+        updateStateObject(
+            uuid + '.favoriteMoods',
+            {
+                name: control.name + ': favoriteMoods',
+                read: true,
+                write: false,
+                type: 'array',
+                role: 'list',
+                smartIgnore: true
+            },
+            control.states.favoriteMoods,
+            function (name, value) {
+                favoriteMoods = JSON.parse(value);
+                updateFavoriteMoods();
+            });
+        updateStateObject(
+            uuid + '.additionalMoods',
+            {
+                name: control.name + ': additionalMoods',
+                read: true,
+                write: false,
+                type: 'array',
+                role: 'list',
+                smartIgnore: true
+            },
+            control.states.additionalMoods,
+            function (name, value) {
+                additionalMoods = JSON.parse(value);
+                updateAdditionalMoods();
+            });
+    }
+    
+    createSwitchCommandStateObject(control.name, uuid, 'plus');
+    addStateChangeListener(uuid + '.plus', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'plus');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'minus');
+    addStateChangeListener(uuid + '.minus', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'minus');
+    });
+    
+    // TODO: add Alexa support! (how???)
+    
+    // TODO: currently we don't support scene modifications ("learn" and "delete" commands),
+    // IMHO this should be done using the Loxone Web interface
+    
+    loadSubControls(uuid, control);
+}
+
 function loadMeterControl(type, uuid, control) {
     updateObject(uuid, {
         type: type,
