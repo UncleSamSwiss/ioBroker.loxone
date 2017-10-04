@@ -928,6 +928,7 @@ function loadJalousieControl(type, uuid, control) {
     createBooleanControlStateObject(control.name, uuid, control.states, 'autoAllowed', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'autoActive', 'indicator', {write: true});
     createBooleanControlStateObject(control.name, uuid, control.states, 'locked', 'indicator');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'infoText', 'string', 'text');
     
     
     addStateChangeListener(uuid + '.up', function (oldValue, newValue) {
