@@ -8,6 +8,7 @@ var utils = require(__dirname + '/lib/utils');
 
 // other dependencies:
 var loxoneWsApi = require('node-lox-ws-api');
+var colorConvert = require('color-convert');
 var sprintf = require("sprintf-js").sprintf;
 var extend = require('extend');
 
@@ -445,7 +446,7 @@ function loadCentralAlarmControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'armed', { smartIgnore: false });
+    createSwitchCommandStateObject(control.name, uuid, 'armed', {smartIgnore: false});
     addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, newValue ? 'on' : 'off');
     });
@@ -471,7 +472,7 @@ function loadCentralAudioZoneControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'control', { smartIgnore: false });
+    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
     addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, newValue ? 'play' : 'pause');
     });
@@ -548,7 +549,7 @@ function loadCentralLightControllerControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'control', { smartIgnore: false });
+    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
     addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
@@ -567,66 +568,95 @@ function loadColorpickerControl(type, uuid, control) {
         type: type,
         common: {
             name: control.name,
-            role: 'light.color.hsl'
+            role: 'light.color.rgb'
         },
         native: control
     });
     
     loadOtherControlStates(control.name, uuid, control.states, ['color', 'favorites']);
     
+    loadColorPickerControlBase(uuid, control);
+}
+
+function loadColorPickerV2Control(type, uuid, control) {
+    if (control.details.pickerType != 'Rgb') {
+        throw 'Unsupported color picker type: ' + control.details.pickerType;
+    }
+
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'light.color.rgb'
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['color', 'sequence', 'sequenceColorIdx']);
+    
+    loadColorPickerControlBase(uuid, control);
+}
+
+function loadColorPickerControlBase(uuid, control) {
     if (!control.states || !control.states.hasOwnProperty('color')) {
         return;
     }
     
     updateStateObject(
-        uuid + '.hue',
+        uuid + '.red',
         {
-            name: control.name + ': hue',
+            name: control.name + ': red',
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.hue',
+            role: 'level.color.red',
+            min: 0,
+            max: 255,
             smartIgnore: true
         },
         control.states.color,
         function (name, value) {
-            var match = value.toString().match(/hsv\((\d+),\d+,\d+\)/i);
-            if (match) {
-                setStateAck(uuid + '.hue', match[1]);
+            var rgb = loxoneColorToRgb(value);
+            if (rgb !== undefined) {
+                setStateAck(uuid + '.red', rgb[0]);
             }
         });
     updateStateObject(
-        uuid + '.saturation',
+        uuid + '.green',
         {
-            name: control.name + ': saturation',
+            name: control.name + ': green',
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.saturation',
+            role: 'level.color.green',
+            min: 0,
+            max: 255,
             smartIgnore: true
         },
         control.states.color,
         function (name, value) {
-            var match = value.toString().match(/hsv\(\d+,(\d+),\d+\)/i);
-            if (match) {
-                setStateAck(uuid + '.saturation', match[1]);
+            var rgb = loxoneColorToRgb(value);
+            if (rgb !== undefined) {
+                setStateAck(uuid + '.green', rgb[1]);
             }
         });
     updateStateObject(
-        uuid + '.luminance',
+        uuid + '.blue',
         {
-            name: control.name + ': luminance',
+            name: control.name + ': blue',
             read: true,
             write: true,
             type: 'number',
-            role: 'level.color.luminance',
+            role: 'level.color.blue',
+            min: 0,
+            max: 255,
             smartIgnore: true
         },
         control.states.color,
         function (name, value) {
-            var match = value.toString().match(/hsv\(\d+,\d+,(\d+)\)/i);
-            if (match) {
-                setStateAck(uuid + '.luminance', match[1]);
+            var rgb = loxoneColorToRgb(value);
+            if (rgb !== undefined) {
+                setStateAck(uuid + '.blue', rgb[2]);
             }
         });
     
@@ -637,10 +667,13 @@ function loadColorpickerControl(type, uuid, control) {
     var parentId = adapter.namespace + '.' + uuid;
     var updateColorValue = function () {
         adapter.getStates(uuid + '.*', function (err, states) {
-            var hue = parseInt(states[parentId + '.hue'].val);
-            var saturation = parseInt(states[parentId + '.saturation'].val);
-            var luminance = parseInt(states[parentId + '.luminance'].val);
-            client.send_cmd(control.uuidAction, sprintf('hsv(%d,%d,%d)', hue, saturation, luminance));
+            var red = parseInt(states[parentId + '.red'].val);
+            var green = parseInt(states[parentId + '.green'].val);
+            var blue = parseInt(states[parentId + '.blue'].val);
+            
+            var hsl = colorConvert.rgb.hsv(red, green, blue);
+            var command = sprintf('hsv(%d,%d,%d)', hsl[0], hsl[1], hsl[2]);
+            client.send_cmd(control.uuidAction, command);
         });
     };
     var startUpdateTimer = function (oldValue, newValue) {
@@ -649,9 +682,9 @@ function loadColorpickerControl(type, uuid, control) {
         }
         colorUpdateTimer = setTimeout(updateColorValue, 100);
     };
-    addStateChangeListener(uuid + '.hue', startUpdateTimer);
-    addStateChangeListener(uuid + '.saturation', startUpdateTimer);
-    addStateChangeListener(uuid + '.luminance', startUpdateTimer);
+    addStateChangeListener(uuid + '.red', startUpdateTimer);
+    addStateChangeListener(uuid + '.green', startUpdateTimer);
+    addStateChangeListener(uuid + '.blue', startUpdateTimer);
 }
 
 function loadDimmerControl(type, uuid, control) {
@@ -1103,7 +1136,7 @@ function loadLightControllerV2Control(type, uuid, control) {
         var favoriteMoods = [];
         var additionalMoods = [];
         var updateMoodsList = function (name, idList) {
-            if (Object.keys(idToMoodName).length == 0) {
+            if (Object.keys(idToMoodName).length === 0) {
                 return;
             }
             var list = [];
@@ -1192,7 +1225,7 @@ function loadLightControllerV2Control(type, uuid, control) {
                 }
                 ids.push(moodNameToId[moodName]);
             }
-            if (ids.length == 0) {
+            if (ids.length === 0) {
                 adapter.log.error(uuid + ".activeMoods can't have zero IDs, discarding new value");
                 return;
             }
@@ -1200,20 +1233,20 @@ function loadLightControllerV2Control(type, uuid, control) {
             var addMoods = [];
             var removeMoods = [];
             var hasKeepMoods = false;
-            for (var i = 0; i < ids.length; i++) {
+            for (i = 0; i < ids.length; i++) {
                 if (activeMoods.includes(ids[i])) {
                     hasKeepMoods = true;
                 } else {
                     addMoods.push(ids[i]);
                 }
             }
-            for (var i = 0; i < activeMoods.length; i++) {
+            for (i = 0; i < activeMoods.length; i++) {
                 if (!ids.includes(activeMoods[i])) {
                     removeMoods.push(activeMoods[i]);
                 }
             }
             if (hasKeepMoods) {
-                for (var i = 0; i < removeMoods.length; i++) {
+                for (i = 0; i < removeMoods.length; i++) {
                     client.send_cmd(control.uuidAction, 'removeMood/' + removeMoods[i]);
                 }
             } else {
@@ -1221,7 +1254,7 @@ function loadLightControllerV2Control(type, uuid, control) {
                 client.send_cmd(control.uuidAction, 'changeTo/' + firstId);
             }
             
-            for (var i = 0; i < addMoods.length; i++) {
+            for (i = 0; i < addMoods.length; i++) {
                 client.send_cmd(control.uuidAction, 'addMood/' + addMoods[i]);
             }
         });
@@ -1870,6 +1903,49 @@ function createSwitchCommandStateObject(controlName, uuid, name, commonExt) {
 
 function normalizeName(name) {
     return name.trim().replace(/[^\wäöüÄÖÜäöüéàèêçß]+/g, '_');
+}
+
+function loxoneColorToRgb(value) {
+    value = value.toString();
+    var match = value.match(/hsv\((\d+),(\d+),(\d+)\)/i);
+    if (match) {
+        var hue = parseInt(match[1]);
+        var sat = parseInt(match[2]);
+        var val = parseInt(match[3]);
+        
+        return colorConvert.hsv.rgb(hue, sat, val);
+    }
+    
+    match = value.match(/temp\((\d+),(\d+)\)/i);
+    if (match) {
+        var brightness = parseFloat(match[1]) / 100;
+        var temperature = parseFloat(match[2]) / 100;
+        
+        // based on http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
+        var red = 255;
+        var green = 255;
+        var blue = 255;
+
+        if (temperature <= 66) {
+            green = (99.4708025861 * Math.log(temperature)) - 161.1195681661;
+            if (temperature <= 19) {
+                blue = 0;
+            } else {
+                blue = (138.5177312231 * Math.log(temperature - 10)) - 305.0447927307;
+            }
+        } else {
+            red = 329.698727446 * Math.pow(temperature - 60, -0.1332047592);
+            green = 288.1221695283 * Math.pow(temperature - 60, -0.0755148492);
+        }
+        
+        red = Math.min(Math.max(red, 0), 255);
+        green = Math.min(Math.max(green, 0), 255);
+        blue = Math.min(Math.max(blue, 0), 255);
+        
+        return [Math.round(red), Math.round(green), Math.round(blue)];
+    }
+
+    return undefined;
 }
 
 function updateObject(id, obj) {
