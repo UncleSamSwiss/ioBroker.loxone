@@ -13,7 +13,7 @@ Fetches all information available in Loxone Miniserver (and Loxone Miniserver Go
 Install this adapter via ioBroker Admin:
 1. Open instance config dialog
 2. Enter the IP address or host name and HTTP port (80 by default) of your Loxone Miniserver
-3. Create a new user in the Loxone Miniserver (using the Loxone Config application) to which you only give read rights to all required variables.
+3. Create a new user in the Loxone Miniserver (using the Loxone Config application) to which you only give read and write rights to all required variables.
 4. Enter this user's name and its password in the config dialog
 5. Save the configuration
 6. Start the adapter
@@ -104,7 +104,7 @@ Behind the name of the state, you can see the type of the state:
 ### Alarm
 
 Provided by burgler alarm control.
-- `armed` (rw) boolean state (true / false) of the alarm
+- `armed` (rw) boolean state (true / false) of the alarm; writing `true` to this value will immediately turn the alarm on (without the predefined delay)
 - `nextLevel` (ro) the ID of the next alarm level
     * 1 = Silent
     * 2 = Acustic
@@ -126,6 +126,13 @@ Provided by burgler alarm control.
 - `armedDelayTotal` (ro) the total delay of the alarm control being armed
 - `sensors` (ro) the list of sensors
 - `disabledMove` (rw) the movement is disabled (true) or not (false)
+- `delayedOn` (wo) writing any value to this state arms the alarm with the configured delay
+- `quit` (wo) writing any value to this state acknowledges the alarm
+
+### Central Alarm
+
+Provided by central burgler alarm control.
+- `armed` (rw) boolean state (true / false) of the alarm; writing `true` to this value will immediately turn the alarm on (without the predefined delay)
 - `delayedOn` (wo) writing any value to this state arms the alarm with the configured delay
 - `quit` (wo) writing any value to this state acknowledges the alarm
 
@@ -171,12 +178,27 @@ Provided by Music Server Zone.
 - `prev` (wo) writing any value to this state moves to the previous track
 - `next` (wo) writing any value to this state moves to the next track
 
+### Central Audio
+
+Provided by central Music Server.
+- `control` (wo) sets the play state of all players (`true` = play, `false` = pause)
+
 ### Colorpicker
 
 This device only appears inside a LightController.
-- `hue` (rw) hue value of the color picker
-- `saturation` (rw) saturation value of the color picker
-- `luminance` (rw) luminance value (a.k.a. "value") of the color picker
+- `red` (rw) red value of the color picker
+- `green` (rw) green value of the color picker
+- `blue` (rw) blue value of the color picker
+
+Setting one or more of the above states from ioBroker will only send a command to the Miniserver after about 100 ms.
+This is to prevent the color from changing multiple times for a single user input.
+
+### Colorpicker V2
+
+This device only appears inside a Light Controller V2 in Loxone software version 9 and above.
+- `red` (rw) red value of the color picker
+- `green` (rw) green value of the color picker
+- `blue` (rw) blue value of the color picker
 
 Setting one or more of the above states from ioBroker will only send a command to the Miniserver after about 100 ms.
 This is to prevent the color from changing multiple times for a single user input.
@@ -195,12 +217,19 @@ Provided by dimmers.
 
 Provided by gate controls.
 - `position` (ro) the position from 1 = up to 0 = down
-- `active` (rw) current position for the dimmer
+- `active` (rw) current direction of the gate movement
     * -1 = close
     * 0 = not moving
     * 1 = open
 - `preventOpen` (ro) whether preventing opening of door
 - `preventClose` (ro) whether preventing closing of door
+
+### Central Gate
+
+Provided by central gate control.
+- `open` (wo) opens all gates
+- `close` (wo) closes all gates
+- `stop` (wo) stops all gate motors
 
 ### InfoOnlyDigital
 
@@ -244,13 +273,23 @@ Provided by different kinds of blinds (automatic and manual).
 - `autoAllowed` (ro) only used by ones with Autopilot
 - `autoActive` (rw) only used by ones with Autopilot
 - `locked` (ro) only by ones with Autopilot, this represents the output QI in Loxone Config
+- `infoText` (ro) informs e.g. on what caused the locked state, or what did cause the safety to become active.
 - `fullUp` (wo) writing any value to this state triggers a full up motion
 - `fullDown` (wo) writing any value to this state triggers a full down motion
 - `shade` (wo) writing any value to this state shades the Jalousie to the perfect position
 
-### LightController
+### Central Jalousie
+
+Provided by the central blinds control.
+- `autoActive` (rw) only used by ones with Autopilot
+- `fullUp` (wo) writing any value to this state triggers a full up motion
+- `fullDown` (wo) writing any value to this state triggers a full down motion
+- `shade` (wo) writing any value to this state shades of all blinds to the perfect position
+
+### Light Controller
 
 Provided by (hotel) lighting controllers.
+Scenes can only be modified in the Loxone applications, but can be selected in ioBroker.
 - `activeScene` (rw) current active scene number
     * 0: all off
     * 1..8: user defined scene (definition/learning of scenes has to be done with the Loxone tools)
@@ -260,6 +299,24 @@ Provided by (hotel) lighting controllers.
 - `minus` (wo) changes to the previous scene
 
 This type of channel might contain other devices. See the respective chapter for more information.
+
+### Light Controller V2
+
+Provided by (hotel) lighting controllers in Loxone software version 9 and above.
+Moods can only be modified in the Loxone applications, but can be selected and combined in ioBroker.
+- `moodList` (ro) list of all configured mood names
+- `activeMoods` (rw) currently active list of mood names
+- `favoriteMoods` (ro) list of the favorite mood names
+- `additionalMoods` (ro) list of the non-favorite mood names
+- `plus` (wo) changes to the next mood
+- `minus` (wo) changes to the previous mood
+
+This type of channel might contain other devices. See the respective chapter for more information.
+
+### Central Light Controller
+
+Provided by central lighting controller.
+- `control` (wo) turns all lights on or off
 
 ### Meter
 
@@ -398,7 +455,7 @@ Every channel contains the following states:
 
 ## Compatibility
 
-Compatibility has been tested with Loxone Miniserver Go using Loxone Config 8.3.
+Compatibility has been tested with Loxone Miniserver Go 9.0.9.26 using Loxone Config 9.0.9.26.
 
 ## Bug Reports and Feature Requests
 
@@ -415,6 +472,10 @@ Native value from ioBroker &gt; Objects
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
 ## Changelog
+### 0.4.0
+* (UncleSamSwiss) Improved support for Loxone Config 9
+* (UncleSamSwiss) Changed all color choosers (i.e. color lights) to use RGB (previously HSV/HSL was completely wrong)
+
 ### 0.3.0
 * (UncleSamSwiss) Control names only synchronized on the first time by default (configurable); users can change control names the way they want
 

@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.3.0",
+        "version": "0.4.0",
         "news": {
+            "0.4.0": {
+                "en": "Improved support for Loxone Config 9 and color pickers",
+                "de": "Verbesserte Unterstützung für Loxone Config 9 und Farbwähler"
+            },
             "0.3.0": {
                 "en": "Control names only synchronized on the first time by default (configurable)",
                 "de": "Namen von Controls werden standardmässig nur noch beim ersten mal synchronisiert (konfigurierbar)"

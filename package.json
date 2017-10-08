@@ -1,6 +1,6 @@
 {
   "name": "iobroker.loxone",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Adapter for ioBroker that communicates with a Loxone Miniserver",
   "main": "loxone.js",
   "scripts": {
@@ -39,8 +39,8 @@
   "dependencies": {
     "color-convert": "^1.9.0",
     "extend": "^3.0.1",
-    "node-lox-ws-api": "^0.3.3",
-    "sprintf-js": "^1.1.0"
+    "node-lox-ws-api": "^0.4.1",
+    "sprintf-js": "^1.1.1"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
