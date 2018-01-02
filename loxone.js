@@ -13,7 +13,7 @@ var sprintf = require("sprintf-js").sprintf;
 var extend = require('extend');
 
 // create the adapter object
-var adapter = utils.adapter('loxone');
+var adapter = utils.Adapter('loxone');
 
 var existingObjects = {};
 var stateChangeListeners = {};
