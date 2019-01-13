@@ -366,6 +366,51 @@ function loadAlarmControl(type, uuid, control) {
     // subControls are not needed because "sensors" already contains the information from the tracker
 }
 
+function loadAlarmClockControl(type, uuid, control) {
+    updateObject(uuid, {
+        type: type,
+        common: {
+            name: control.name,
+            role: 'alarm' // TODO: what's the best role here? ioBroker doc is not very clear on what's an "alarm"
+        },
+        native: control
+    });
+    
+    loadOtherControlStates(control.name, uuid, control.states, ['isEnabled', 'isAlarmActive', 'confirmationNeeded', 'ringingTime', 'ringDuration', 'prepareDuration', 'snoozeTime', 'snoozeDuration']);
+    
+    createBooleanControlStateObject(control.name, uuid, control.states, 'isEnabled', 'switch', {write: true, smartIgnore: false});
+    createBooleanControlStateObject(control.name, uuid, control.states, 'isAlarmActive', 'indicator');
+    createBooleanControlStateObject(control.name, uuid, control.states, 'confirmationNeeded', 'indicator');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'ringingTime', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'ringDuration', 'number', 'value.interval', {write: true});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'prepareDuration', 'number', 'value.interval', {write: true});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'snoozeTime', 'number', 'value.interval');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'snoozeDuration', 'number', 'value.interval', {write: true});
+    
+    addStateChangeListener(uuid + '.isEnabled', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'setActive/' + (newValue ? '0' : '1')); // yes, really, this is inverted!
+    });
+    addStateChangeListener(uuid + '.ringDuration', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'setRingDuration/' + newValue);
+    });
+    addStateChangeListener(uuid + '.prepareDuration', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'setPrepDuration/' + newValue);
+    });
+    addStateChangeListener(uuid + '.snoozeDuration', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'setSnoozeDuration/' + newValue);
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'snooze');
+    addStateChangeListener(uuid + '.snooze', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'snooze');
+    });
+    
+    createSwitchCommandStateObject(control.name, uuid, 'dismiss');
+    addStateChangeListener(uuid + '.dismiss', function (oldValue, newValue) {
+        client.send_cmd(control.uuidAction, 'dismiss');
+    });
+}
+
 function loadAudioZoneControl(type, uuid, control) {
     updateObject(uuid, {
         type: type,
