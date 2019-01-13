@@ -326,11 +326,20 @@ function loadAlarmControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['armed', 'nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'startTime', 'armedDelay', 'armedDelayTotal', 'sensors', 'disabledMove']);
 
+    var levelStates = {
+        '0': 'None',
+        '1': 'Silent',
+        '2': 'Acustic',
+        '3': 'Optical',
+        '4': 'Internal',
+        '5': 'External',
+        '6': 'Remote'
+    };
     createBooleanControlStateObject(control.name, uuid, control.states, 'armed', 'switch', {write: true, smartIgnore: false});
-    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value', {states: levelStates});
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value', {'states': levelStates});
     createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'armedDelayTotal', 'number', 'value.interval');
@@ -425,9 +434,28 @@ function loadAudioZoneControl(type, uuid, control) {
         ['serverState', 'playState', 'clientState', 'power', 'volume', 'maxVolume', 'volumeStep', 'shuffle', 'sourceList', 'repeat',
         'songName', 'duration', 'progress', 'album', 'artist', 'station', 'genre', 'cover', 'source']);
     
-    createSimpleControlStateObject(control.name, uuid, control.states, 'serverState', 'number', 'value');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'playState', 'number', 'value', {write: true});
-    createSimpleControlStateObject(control.name, uuid, control.states, 'clientState', 'number', 'value');
+    var serverStates = {
+        '-3': 'invalid zone',
+        '-2': 'not reachable',
+        '-1': 'unknown',
+        '0': 'offline',
+        '1': 'initializing',
+        '2': 'online'
+    };
+    var playStates = {
+        '-1': 'unknown',
+        '0': 'stopped',
+        '1': 'paused',
+        '2': 'playing'
+    };
+    var clientStates = {
+        '0': 'offline',
+        '1': 'initializing',
+        '2': 'online'
+    };
+    createSimpleControlStateObject(control.name, uuid, control.states, 'serverState', 'number', 'value', {'states': serverStates});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'playState', 'number', 'value', {write: true, states: playStates});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'clientState', 'number', 'value', {'states': clientStates});
     createBooleanControlStateObject(control.name, uuid, control.states, 'power', 'switch', {write: true, smartIgnore: false});
     createSimpleControlStateObject(control.name, uuid, control.states, 'volume', 'number', 'level.volume', {write: true});
     createSimpleControlStateObject(control.name, uuid, control.states, 'maxVolume', 'number', 'value');
@@ -777,8 +805,13 @@ function loadGateControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['position', 'active', 'preventOpen', 'preventClose']);
     
+    var activeStates = {
+        '-1': 'close',
+        '0': 'not moving',
+        '1': 'open'
+    };
     createPercentageControlStateObject(control.name, uuid, control.states, 'position', 'level', {write: true, smartIgnore: false});
-    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'value', {write: true});
+    createSimpleControlStateObject(control.name, uuid, control.states, 'active', 'number', 'value', {write: true, states: activeStates});
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventOpen', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'preventClose', 'indicator');
     
@@ -1502,14 +1535,41 @@ function loadSmokeAlarmControl(type, uuid, control) {
     
     loadOtherControlStates(control.name, uuid, control.states, ['nextLevel', 'nextLevelDelay', 'nextLevelDelayTotal', 'level', 'sensors', 'acousticAlarm', 'testAlarm', 'alarmCause', 'startTime', 'timeServiceMode']);
     
-    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value');
+    var levelStates = {
+        '0': 'None',
+        '1': 'Silent',
+        '2': 'Acustic',
+        '3': 'Optical',
+        '4': 'Internal',
+        '5': 'External',
+        '6': 'Remote'
+    };
+    var causeStates = {
+        '0': 'None',
+        '1': 'Smoke',
+        '2': 'Water',
+        '3': 'Smoke & Water',
+        '4': 'Temperature',
+        '5': 'Temperature & Smoke',
+        '6': 'Temperature & Water',
+        '7': 'Temperature & Smoke & Water',
+        '8': 'Arc Fault',
+        '9': 'Arc Fault & Smoke',
+        '10': 'Arc Fault & Water',
+        '11': 'Arc Fault & Smoke & Water',
+        '12': 'Arc Fault & Temperature',
+        '13': 'Arc Fault & Temperature & Smoke',
+        '14': 'Arc Fault & Temperature & Water',
+        '15': 'Arc Fault & Temperature & Smoke & Water'
+    };
+    createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevel', 'number', 'value', {states: levelStates});
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'nextLevelDelayTotal', 'number', 'value.interval');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'level', 'number', 'value', {states: levelStates});
     createListControlStateObject(control.name, uuid, control.states, 'sensors');
     createBooleanControlStateObject(control.name, uuid, control.states, 'acousticAlarm', 'indicator');
     createBooleanControlStateObject(control.name, uuid, control.states, 'testAlarm', 'indicator');
-    createSimpleControlStateObject(control.name, uuid, control.states, 'alarmCause', 'number', 'value');
+    createSimpleControlStateObject(control.name, uuid, control.states, 'alarmCause', 'number', 'value', {states: causeStates});
     createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
     createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'level.interval', {write: true});
     
