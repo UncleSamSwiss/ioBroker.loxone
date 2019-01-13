@@ -37,10 +37,10 @@
     "node": ">=1.0"
   },
   "dependencies": {
-    "color-convert": "^1.9.0",
-    "extend": "^3.0.1",
-    "node-lox-ws-api": "^0.4.1",
-    "sprintf-js": "^1.1.1"
+    "color-convert": "^1.9.3",
+    "extend": "^3.0.2",
+    "node-lox-ws-api": "^0.4.4",
+    "sprintf-js": "^1.1.2"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
