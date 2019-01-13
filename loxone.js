@@ -353,12 +353,12 @@ function loadAlarmControl(type, uuid, control) {
         }
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'delayedOn');
+    createButtonCommandStateObject(control.name, uuid, 'delayedOn');
     addStateChangeListener(uuid + '.delayedOn', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'delayedon/' + (newValue ? 1 : 0));
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    createButtonCommandStateObject(control.name, uuid, 'quit');
     addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'quit');
     });
@@ -400,12 +400,12 @@ function loadAlarmClockControl(type, uuid, control) {
         client.send_cmd(control.uuidAction, 'setSnoozeDuration/' + newValue);
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'snooze');
+    createButtonCommandStateObject(control.name, uuid, 'snooze');
     addStateChangeListener(uuid + '.snooze', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'snooze');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'dismiss');
+    createButtonCommandStateObject(control.name, uuid, 'dismiss');
     addStateChangeListener(uuid + '.dismiss', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'dismiss');
     });
@@ -471,11 +471,11 @@ function loadAudioZoneControl(type, uuid, control) {
         client.send_cmd(control.uuidAction, 'source/' + newValue);
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'prev');
+    createButtonCommandStateObject(control.name, uuid, 'prev');
     addStateChangeListener(uuid + '.prev', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'prev');
     });
-    createSwitchCommandStateObject(control.name, uuid, 'next');
+    createButtonCommandStateObject(control.name, uuid, 'next');
     addStateChangeListener(uuid + '.next', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'next');
     });
@@ -491,17 +491,17 @@ function loadCentralAlarmControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'armed', {smartIgnore: false});
+    createButtonCommandStateObject(control.name, uuid, 'armed', {smartIgnore: false});
     addStateChangeListener(uuid + '.armed', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, newValue ? 'on' : 'off');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'delayedOn');
+    createButtonCommandStateObject(control.name, uuid, 'delayedOn');
     addStateChangeListener(uuid + '.delayedOn', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'delayedon');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    createButtonCommandStateObject(control.name, uuid, 'quit');
     addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'quit');
     });
@@ -517,7 +517,7 @@ function loadCentralAudioZoneControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
+    createButtonCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
     addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, newValue ? 'play' : 'pause');
     });
@@ -533,17 +533,17 @@ function loadCentralGateControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'open');
+    createButtonCommandStateObject(control.name, uuid, 'open');
     addStateChangeListener(uuid + '.open', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'open');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'close');
+    createButtonCommandStateObject(control.name, uuid, 'close');
     addStateChangeListener(uuid + '.close', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'close');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'stop');
+    createButtonCommandStateObject(control.name, uuid, 'stop');
     addStateChangeListener(uuid + '.stop', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'stop');
     });
@@ -559,7 +559,7 @@ function loadCentralJalousieControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'autoActive');
+    createButtonCommandStateObject(control.name, uuid, 'autoActive');
     addStateChangeListener(uuid + '.autoActive', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'auto');
@@ -568,17 +568,17 @@ function loadCentralJalousieControl(type, uuid, control) {
         }
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'fullUp');
+    createButtonCommandStateObject(control.name, uuid, 'fullUp');
     addStateChangeListener(uuid + '.fullUp', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'FullUp');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'fullDown');
+    createButtonCommandStateObject(control.name, uuid, 'fullDown');
     addStateChangeListener(uuid + '.fullDown', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'FullDown');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'shade');
+    createButtonCommandStateObject(control.name, uuid, 'shade');
     addStateChangeListener(uuid + '.shade', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'shade');
     });
@@ -594,7 +594,7 @@ function loadCentralLightControllerControl(type, uuid, control) {
         native: control
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
+    createButtonCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
     addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
@@ -754,12 +754,12 @@ function loadDimmerControl(type, uuid, control) {
         client.send_cmd(control.uuidAction, newValue.toString());
     });
 
-    createSwitchCommandStateObject(control.name, uuid, 'on');
+    createButtonCommandStateObject(control.name, uuid, 'on');
     addStateChangeListener(uuid + '.on', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'on');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'off');
+    createButtonCommandStateObject(control.name, uuid, 'off');
     addStateChangeListener(uuid + '.off', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'off');
     });
@@ -978,7 +978,7 @@ function loadIntercomControl(type, uuid, control) {
     createListControlStateObject(control.name, uuid, control.states, 'lastBellEvents');
     createSimpleControlStateObject(control.name, uuid, control.states, 'version', 'string', 'text');
     
-    createSwitchCommandStateObject(control.name, uuid, 'answer');
+    createButtonCommandStateObject(control.name, uuid, 'answer');
     addStateChangeListener(uuid + '.answer', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'answer');
     });
@@ -1075,17 +1075,17 @@ function loadJalousieControl(type, uuid, control) {
            });
     }
     
-    createSwitchCommandStateObject(control.name, uuid, 'fullUp');
+    createButtonCommandStateObject(control.name, uuid, 'fullUp');
     addStateChangeListener(uuid + '.fullUp', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'FullUp');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'fullDown');
+    createButtonCommandStateObject(control.name, uuid, 'fullDown');
     addStateChangeListener(uuid + '.fullDown', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'FullDown');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'shade');
+    createButtonCommandStateObject(control.name, uuid, 'shade');
     addStateChangeListener(uuid + '.shade', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'shade');
     });
@@ -1135,18 +1135,18 @@ function loadLightControllerControl(type, uuid, control) {
             });
     }
     
-    createSwitchCommandStateObject(control.name, uuid, 'plus');
+    createButtonCommandStateObject(control.name, uuid, 'plus');
     addStateChangeListener(uuid + '.plus', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'plus');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'minus');
+    createButtonCommandStateObject(control.name, uuid, 'minus');
     addStateChangeListener(uuid + '.minus', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'minus');
     });
     
     // for Alexa support:
-    createSwitchCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
+    createButtonCommandStateObject(control.name, uuid, 'control', {smartIgnore: false});
     addStateChangeListener(uuid + '.control', function (oldValue, newValue) {
         if (newValue) {
             client.send_cmd(control.uuidAction, 'on');
@@ -1335,12 +1335,12 @@ function loadLightControllerV2Control(type, uuid, control) {
             });
     }
     
-    createSwitchCommandStateObject(control.name, uuid, 'plus');
+    createButtonCommandStateObject(control.name, uuid, 'plus');
     addStateChangeListener(uuid + '.plus', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'plus');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'minus');
+    createButtonCommandStateObject(control.name, uuid, 'minus');
     addStateChangeListener(uuid + '.minus', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'minus');
     });
@@ -1368,7 +1368,7 @@ function loadMeterControl(type, uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'actual', 'number', 'value.power.consumption');
     createSimpleControlStateObject(control.name, uuid, control.states, 'total', 'number', 'value.power.consumption');
     
-    createSwitchCommandStateObject(control.name, uuid, 'reset');
+    createButtonCommandStateObject(control.name, uuid, 'reset');
     addStateChangeListener(uuid + '.reset', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'reset');
     });
@@ -1436,7 +1436,7 @@ function loadPushbuttonControl(type, uuid, control) {
         }
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'pulse');
+    createButtonCommandStateObject(control.name, uuid, 'pulse');
     addStateChangeListener(uuid + '.pulse', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'pulse');
     });
@@ -1513,12 +1513,12 @@ function loadSmokeAlarmControl(type, uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'startTime', 'string', 'value.datetime');
     createSimpleControlStateObject(control.name, uuid, control.states, 'timeServiceMode', 'number', 'level.interval', {write: true});
     
-    createSwitchCommandStateObject(control.name, uuid, 'mute');
+    createButtonCommandStateObject(control.name, uuid, 'mute');
     addStateChangeListener(uuid + '.mute', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'mute');
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'quit');
+    createButtonCommandStateObject(control.name, uuid, 'quit');
     addStateChangeListener(uuid + '.quit', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'quit');
     });
@@ -1575,7 +1575,7 @@ function loadTimedSwitchControl(type, uuid, control) {
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelayTotal', 'number', 'value.interval');
     createSimpleControlStateObject(control.name, uuid, control.states, 'deactivationDelay', 'number', 'value.interval');
     
-    createSwitchCommandStateObject(control.name, uuid, 'active', {smartIgnore: type == 'channel'});
+    createButtonCommandStateObject(control.name, uuid, 'active', {smartIgnore: type == 'channel'});
     addStateChangeListener(uuid + '.active', function (oldValue, newValue) {
         if (newValue == oldValue) {
             return;
@@ -1586,7 +1586,7 @@ function loadTimedSwitchControl(type, uuid, control) {
         }
     });
     
-    createSwitchCommandStateObject(control.name, uuid, 'pulse');
+    createButtonCommandStateObject(control.name, uuid, 'pulse');
     addStateChangeListener(uuid + '.pulse', function (oldValue, newValue) {
         client.send_cmd(control.uuidAction, 'pulse');
     });
@@ -1931,13 +1931,13 @@ function createListControlStateObject(controlName, uuid, states, name) {
     }
 }
 
-function createSwitchCommandStateObject(controlName, uuid, name, commonExt) {
+function createButtonCommandStateObject(controlName, uuid, name, commonExt) {
     var common = {
         name: controlName + ': ' + name,
         read: false,
         write: true,
         type: 'boolean',
-        role: 'switch',
+        role: 'button',
         smartIgnore: true
     };
     if (commonExt && typeof commonExt === 'object') {
