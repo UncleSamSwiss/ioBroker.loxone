@@ -2055,11 +2055,18 @@ function loxoneColorToRgb(value) {
 
 function updateObject(id, obj) {
     var fullId = adapter.namespace + '.' + id;
-    if (!adapter.config.syncNames && existingObjects.hasOwnProperty(fullId)) {
-        obj.common.name = existingObjects[fullId].common.name;
+    if (existingObjects.hasOwnProperty(fullId)) {
+        var existingObject = existingObjects[fullId];
+        if (!adapter.config.syncNames) {
+            obj.common.name = existingObject.common.name;
+        }
+        if (obj.common.smartName != 'ignore' && existingObject.common.smartName != 'ignore') {
+            // keep the smartName (if it's not supposed to be ignored)
+            obj.common.smartName = existingObject.common.smartName;
+        }
     }
     
-    adapter.setObject(id, obj);
+    adapter.extendObject(id, obj);
 }
 
 function updateStateObject(id, commonInfo, stateUuid, stateEventHandler) {
