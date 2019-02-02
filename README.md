@@ -136,6 +136,20 @@ Provided by central burgler alarm control.
 - `delayedOn` (wo) writing any value to this state arms the alarm with the configured delay
 - `quit` (wo) writing any value to this state acknowledges the alarm
 
+### AlarmClock
+
+Provided by alarm clock control.
+- `isEnabled` (rw) boolean state (true / false) of the alarm clock
+- `isAlarmActive` (ro) boolean (true / false) whether the alarm is currently ringing
+- `confirmationNeeded` (ro) boolean (true / false) whether the user needs to confirm the alarm
+- `ringingTime` (ro) countdown in seconds how long the alarm clock will be ringing until it’s going to snooze again
+- `ringDuration` (rw) duration in seconds the alarm clock is ringing
+- `prepareDuration` (rw) preparation time in seconds
+- `snoozeTime` (ro) seconds until snoozing ends
+- `snoozeDuration` (rw) duration in seconds of snoozing
+- `snooze` (wo) writing any value to this state snoozes the current alarm
+- `dismiss` (wo) writing any value to this state dismisses the current alarm
+
 ### AudioZone
 
 Provided by Music Server Zone.
@@ -472,6 +486,13 @@ Native value from ioBroker &gt; Objects
 ![Details of missing LightController control](doc/details-missing-control-type.png)
 
 ## Changelog
+### 1.0.0
+* (UncleSamSwiss) Fixed issue that was resetting the custom settings and cloud smartName
+* (alladdin) Fixed connection issues with Loxone Miniserver 10
+* (UncleSamSwiss) Changed all write-only "switch"es to "button"s
+* (UncleSamSwiss) Added support for AlarmClock control
+* (Apollon77) Updated CI Testing
+
 ### 0.4.0
 * (UncleSamSwiss) Improved support for Loxone Config 9
 * (UncleSamSwiss) Changed all color choosers (i.e. color lights) to use RGB (previously HSV/HSL was completely wrong)

@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "0.4.0",
+        "version": "1.0.0",
         "news": {
+            "1.0.0": {
+                "en": "Fixed several important issues and added AlarmClock control",
+                "de": "Einige wichtige Fehler behoben und AlarmClock Control hinzugefügt"
+            },
             "0.4.0": {
                 "en": "Improved support for Loxone Config 9 and color pickers",
                 "de": "Verbesserte Unterstützung für Loxone Config 9 und Farbwähler"
