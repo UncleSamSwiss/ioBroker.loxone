@@ -2,7 +2,7 @@
 
 # ioBroker adapter for Loxone Miniserver
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Downloads](https://img.shields.io/npm/dm/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Travis](https://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone/) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/UncleSamSwiss/iobroker-loxone.svg)](https://ci.appveyor.com/project/UncleSamSwiss/iobroker-loxone) [![GitHub issues](https://img.shields.io/github/issues/UncleSamSwiss/ioBroker.loxone.svg)](https://github.com/UncleSamSwiss/ioBroker.loxone/issues)
+![Number of Installations](http://iobroker.live/badges/loxone-installed.svg) ![Number of Installations](http://iobroker.live/badges/loxone-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Downloads](https://img.shields.io/npm/dm/iobroker.loxone.svg)](https://www.npmjs.com/package/iobroker.loxone) [![Travis](https://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone/) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/UncleSamSwiss/iobroker-loxone.svg)](https://ci.appveyor.com/project/UncleSamSwiss/iobroker-loxone) [![GitHub issues](https://img.shields.io/github/issues/UncleSamSwiss/ioBroker.loxone.svg)](https://github.com/UncleSamSwiss/ioBroker.loxone/issues)
 
 ***This adapter requires at least nodejs 4.x!***
 
