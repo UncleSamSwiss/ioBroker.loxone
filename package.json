@@ -40,7 +40,8 @@
     "color-convert": "^1.9.3",
     "extend": "^3.0.2",
     "node-lox-ws-api": "^0.4.4",
-    "sprintf-js": "^1.1.2"
+    "sprintf-js": "^1.1.2",
+    "@iobroker/adapter-core": "^1.0.3"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
