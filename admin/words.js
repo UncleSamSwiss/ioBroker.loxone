@@ -2,17 +2,17 @@
 systemDictionary = {
   "Loxone Miniserver adapter settings": {
     "en": "Loxone Miniserver adapter settings",
-    "de": "Loxone Adapter Einstellungen A",
+    "de": "Loxone Adapter Einstellungen B",
     "ru": "Настройки драйвера Loxone Miniserver"
   },
   "Miniserver Hostname / IP": {
     "en": "Miniserver Hostname / IP",
-    "de": "Hostname / IP des Miniservers A",
+    "de": "Hostname / IP des Miniservers B",
     "ru": "IP / Hostname Минисервера"
   },
   "Miniserver Port": {
     "en": "Miniserver Port",
-    "de": "TCP Port des Miniservers A",
+    "de": "TCP Port des Miniservers B",
     "ru": "Порт Минисервера"
   },
   "Miniserver Username": {

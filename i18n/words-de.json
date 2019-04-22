@@ -1,7 +1,7 @@
 {
-    "admin/words.js#Loxone Miniserver adapter settings": "Loxone Adapter Einstellungen A",
-    "admin/words.js#Miniserver Hostname / IP": "Hostname / IP des Miniservers A",
-    "admin/words.js#Miniserver Port": "TCP Port des Miniservers A",
+    "admin/words.js#Loxone Miniserver adapter settings": "Loxone Adapter Einstellungen B",
+    "admin/words.js#Miniserver Hostname / IP": "Hostname / IP des Miniservers B",
+    "admin/words.js#Miniserver Port": "TCP Port des Miniservers B",
     "admin/words.js#Miniserver Username": "Benutzername des Miniservers",
     "admin/words.js#Miniserver Password": "Kennwort des Miniservers",
     "admin/words.js#Synchronize": "Synchronisieren",
