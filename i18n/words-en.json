@@ -10,5 +10,6 @@
   "admin/words.js#Functions": "Functions",
   "admin/words.js#tooltip_host": "IP address of Loxone miniservers or DNS name",
   "admin/words.js#new-translation-a": "English A",
-  "admin/words.js#new-translation-b": "English B"
+  "admin/words.js#new-translation-b": "English B",
+  "admin/words.js#new-translation-c": "English C"
 }
