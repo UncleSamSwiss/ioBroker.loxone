@@ -40,7 +40,8 @@ systemDictionary = {
     "ru": "комнат"
   },
   "new-translation-a": {
-    "en": "English A"
+    "en": "English A",
+    "de": "Deutsch A"
   },
   "new-translation-b": {
     "en": "English B"
