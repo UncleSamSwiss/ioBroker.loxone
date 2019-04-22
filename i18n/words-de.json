@@ -1,14 +1,12 @@
 {
-  "admin/words.js": {
-    "Loxone Miniserver adapter settings": "Loxone Miniserver Adapter-Einstellungen",
-    "Miniserver Hostname / IP": "Hostname /IP des Miniservers",
-    "Miniserver Port": "Port des Miniservers",
-    "Miniserver Username": "Benutzername des Miniservers",
-    "Miniserver Password": "Kennwort des Miniservers",
-    "Synchronize": "Synchronisieren",
-    "Names": "Namen",
-    "Rooms": "Räume",
-    "Functions": "Gewerke",
-    "tooltip_host": "IP Adresse von Loxone Miniserver oder DNS-Name"
-  }
+    "admin/words.js.Loxone Miniserver adapter settings": "Loxone Miniserver Adapter Einstellungen",
+    "admin/words.js.Miniserver Hostname / IP": "Hostname /IP des Miniservers",
+    "admin/words.js.Miniserver Port": "Port des Miniservers",
+    "admin/words.js.Miniserver Username": "Benutzername des Miniservers",
+    "admin/words.js.Miniserver Password": "Kennwort des Miniservers",
+    "admin/words.js.Synchronize": "Synchronisieren",
+    "admin/words.js.Names": "Namen",
+    "admin/words.js.Rooms": "Räume",
+    "admin/words.js.Functions": "Gewerke",
+    "admin/words.js.tooltip_host": "IP Adresse von Loxone Miniserver oder DNS-Name"
 }
