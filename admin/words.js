@@ -44,7 +44,8 @@ systemDictionary = {
     "de": "Deutsch A"
   },
   "new-translation-b": {
-    "en": "English B"
+    "en": "English B",
+    "de": "Deutsch B"
   },
   "new-translation-c": {
     "en": "English C"
