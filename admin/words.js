@@ -39,6 +39,9 @@ systemDictionary = {
     "de": "Räume",
     "ru": "комнат"
   },
+  "new-translation-a": {
+    "en": "English A"
+  },
   "Functions": {
     "en": "Functions",
     "de": "Gewerke",
