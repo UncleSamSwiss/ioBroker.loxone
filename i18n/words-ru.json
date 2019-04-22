@@ -1,13 +1,11 @@
 {
-  "admin/words.js": {
-    "Loxone Miniserver adapter settings": "Настройки драйвера Loxone Miniserver",
-    "Miniserver Hostname / IP": "IP / Hostname Минисервера",
-    "Miniserver Port": "Порт Минисервера",
-    "Miniserver Username": "Имя пользователя",
-    "Miniserver Password": "Пароль",
-    "Synchronize": "Синхронизация",
-    "Rooms": "комнат",
-    "Functions": "групп устройств",
-    "tooltip_host": "IP Адрес или DNS имя Loxone Miniserver"
-  }
+  "admin/words.js#Loxone Miniserver adapter settings": "Настройки драйвера Loxone Miniserver",
+  "admin/words.js#Miniserver Hostname / IP": "IP / Hostname Минисервера",
+  "admin/words.js#Miniserver Port": "Порт Минисервера",
+  "admin/words.js#Miniserver Username": "Имя пользователя",
+  "admin/words.js#Miniserver Password": "Пароль",
+  "admin/words.js#Synchronize": "Синхронизация",
+  "admin/words.js#Rooms": "комнат",
+  "admin/words.js#Functions": "групп устройств",
+  "admin/words.js#tooltip_host": "IP Адрес или DNS имя Loxone Miniserver"
 }
