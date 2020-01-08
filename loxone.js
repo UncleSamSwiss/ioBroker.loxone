@@ -732,7 +732,24 @@ function loadColorPickerControlBase(uuid, control) {
                 setStateAck(uuid + '.blue', rgb[2]);
             }
         });
-    
+    updateStateObject(
+        uuid + '.rgb',
+        {
+            name: control.name + ': RGB',
+            read: true,
+            write: false,
+            type: 'string',
+            role: 'level.color.rgb',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var rgb = loxoneColorToRgb(value);
+            if (rgb !== undefined) {
+                setStateAck(uuid + '.rgb', rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+            }
+        });
+        
     // we use a timer (100 ms) to update the three color values,
     // so if somebody sends us the three values (almost) at once,
     // we don't change the color three times using commands
