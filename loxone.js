@@ -2109,7 +2109,7 @@ function loxoneColorToRgb(value) {
 function loxoneColorToBrightnessTemperatur(value) {
     value = value.toString();
 
-    match = value.match(/temp\((\d+),(\d+)\)/i);
+    var match = value.match(/temp\((\d+),(\d+)\)/i);
     if (match) {
         var brightness = parseFloat(match[1]);
         var temperature = parseFloat(match[2]);
