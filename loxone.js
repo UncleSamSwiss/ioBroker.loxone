@@ -752,7 +752,7 @@ function loadColorPickerControlBase(uuid, control) {
     updateStateObject(
         uuid + '.level',
         {
-            name: control.name + ': Level (only with colorTemperatur)',
+            name: control.name + ': Level (only with colorTemperature)',
             read: true,
             write: false,
             type: 'number',
@@ -763,26 +763,26 @@ function loadColorPickerControlBase(uuid, control) {
         },
         control.states.color,
         function (name, value) {
-            var brightnessTemperatur = loxoneColorToBrightnessTemperatur(value);
-            if (brightnessTemperatur !== undefined) {
-                setStateAck(uuid + '.level', brightnessTemperatur[0]);
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.level', brightnessTemperature[0]);
             }
         });
     updateStateObject(
-        uuid + '.colorTemperatur',
+        uuid + '.colorTemperature',
         {
             name: control.name + ': The temperature of the light in °K',
             read: true,
             write: false,
             type: 'number',
-            role: 'level.color.temperatur',
+            role: 'level.color.temperature',
             smartIgnore: true
         },
         control.states.color,
         function (name, value) {
-            var brightnessTemperatur = loxoneColorToBrightnessTemperatur(value);
-            if (brightnessTemperatur !== undefined) {
-                setStateAck(uuid + '.colorTemperatur', brightnessTemperatur[1]);
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.colorTemperature', brightnessTemperature[1]);
             }
         });
         
@@ -2106,7 +2106,7 @@ function loxoneColorToRgb(value) {
     return undefined;
 }
 
-function loxoneColorToBrightnessTemperatur(value) {
+function loxoneColorToBrightnessTemperature(value) {
     value = value.toString();
 
     var match = value.match(/temp\((\d+),(\d+)\)/i);
