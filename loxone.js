@@ -749,6 +749,42 @@ function loadColorPickerControlBase(uuid, control) {
                 setStateAck(uuid + '.rgb', rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
             }
         });
+    updateStateObject(
+        uuid + '.level',
+        {
+            name: control.name + ': Level (only with colorTemperatur)',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.level',
+            min: 0,
+            max: 100,
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperatur = loxoneColorToBrightnessTemperatur(value);
+            if (brightnessTemperatur !== undefined) {
+                setStateAck(uuid + '.level', brightnessTemperatur[0]);
+            }
+        });
+    updateStateObject(
+        uuid + '.colorTemperatur',
+        {
+            name: control.name + ': The temperature of the light in °K',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.temperatur',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperatur = loxoneColorToBrightnessTemperatur(value);
+            if (brightnessTemperatur !== undefined) {
+                setStateAck(uuid + '.colorTemperatur', brightnessTemperatur[1]);
+            }
+        });
         
     // we use a timer (100 ms) to update the three color values,
     // so if somebody sends us the three values (almost) at once,
@@ -2065,6 +2101,20 @@ function loxoneColorToRgb(value) {
         blue = Math.min(Math.max(blue, 0), 255) * brightness;
         
         return [Math.round(red), Math.round(green), Math.round(blue)];
+    }
+
+    return undefined;
+}
+
+function loxoneColorToBrightnessTemperatur(value) {
+    value = value.toString();
+
+    match = value.match(/temp\((\d+),(\d+)\)/i);
+    if (match) {
+        var brightness = parseFloat(match[1]);
+        var temperature = parseFloat(match[2]);
+        
+        return [Math.round(brightness), Math.round(temperature)];
     }
 
     return undefined;
