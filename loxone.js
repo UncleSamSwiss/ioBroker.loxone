@@ -2060,9 +2060,9 @@ function loxoneColorToRgb(value) {
             green = 288.1221695283 * Math.pow(temperature - 60, -0.0755148492);
         }
         
-        red = Math.min(Math.max(red, 0), 255);
-        green = Math.min(Math.max(green, 0), 255);
-        blue = Math.min(Math.max(blue, 0), 255);
+        red = Math.min(Math.max(red, 0), 255) * brightness;
+        green = Math.min(Math.max(green, 0), 255) * brightness;
+        blue = Math.min(Math.max(blue, 0), 255) * brightness;
         
         return [Math.round(red), Math.round(green), Math.round(blue)];
     }
