@@ -799,7 +799,7 @@ function loadColorPickerControlBase(uuid, control) {
         function (name, value) {
             var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
-                setStateAck(uuid + '.colorTemperatureHue', (brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000);
+                setStateAck(uuid + '.colorTemperatureHue', Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
             }
         });
             
