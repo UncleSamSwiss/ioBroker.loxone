@@ -771,7 +771,7 @@ function loadColorPickerControlBase(uuid, control) {
     updateStateObject(
         uuid + '.colorTemperature',
         {
-            name: control.name + ': The temperature of the light in °K',
+            name: control.name + ': The temperature of the light in °K 2700-6500',
             read: true,
             write: false,
             type: 'number',
@@ -785,7 +785,24 @@ function loadColorPickerControlBase(uuid, control) {
                 setStateAck(uuid + '.colorTemperature', brightnessTemperature[1]);
             }
         });
-        
+    updateStateObject(
+        uuid + '.colorTemperatureHue',
+        {
+            name: control.name + ': The temperature of the light in °K scaled for Hue 2000-6500',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.temperature',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.colorTemperatureHue', (brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000);
+            }
+        });
+            
     // we use a timer (100 ms) to update the three color values,
     // so if somebody sends us the three values (almost) at once,
     // we don't change the color three times using commands
