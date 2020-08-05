@@ -1,6 +1,6 @@
 {
   "name": "iobroker.loxone",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Adapter for ioBroker that communicates with a Loxone Miniserver",
   "main": "loxone.js",
   "scripts": {
