@@ -71,7 +71,8 @@
         "type":                     "iot-systems",
         "keywords":                 ["loxone", "miniserver", "smarthome"],
         "icon":                     "loxone.png",
-        "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png"
+        "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png",
+        "materialize": true
     },
     "native": {
       "host": "0.0.0.0",
