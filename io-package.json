@@ -48,11 +48,11 @@
                 "de": "initial commit"
             }
         },
-        "title": "Loxone Miniserver Adapter",
+        "title": "Loxone Miniserver",
         "titleLang": {
-            "en": "Loxone Miniserver Adapter",
-            "de": "Loxone Miniserver-Adapter",
-            "ru": "Драйвер для Loxone Miniserver"
+            "en": "Loxone Miniserver",
+            "de": "Loxone Miniserver",
+            "ru": "Loxone Miniserver"
         },
         "desc":                     {
             "en": "Communicates with a Loxone Miniserver.",
@@ -62,7 +62,7 @@
         "authors": [
             "UncleSamSwiss <samuel.weibel@gmail.com>"
         ],
-        "license":                  "Apache 2.0",
+        "license":                  "Apache-2.0",
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
         "messagebox":               true,

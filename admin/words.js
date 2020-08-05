@@ -10,7 +10,7 @@ systemDictionary = {
     "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers", "ru": "Имя пользователя" },
     "Miniserver Password": { "en": "Miniserver Password", "de": "Kennwort des Miniservers", "ru": "Пароль" },
     "Synchronize": { "en": "Synchronize", "de": "Synchronisieren", "ru": "Синхронизация" },
-    "Names": { "en": "Names", "de": "Namen" },
+    "Names": { "en": "Names", "de": "Namen", "ru": "имена" },
     "Rooms": { "en": "Rooms", "de": "Räume", "ru": "комнат" },
     "Functions": { "en": "Functions", "de": "Gewerke", "ru": "групп устройств" },
     "tooltip_host": {
