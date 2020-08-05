@@ -732,7 +732,77 @@ function loadColorPickerControlBase(uuid, control) {
                 setStateAck(uuid + '.blue', rgb[2]);
             }
         });
-    
+    updateStateObject(
+        uuid + '.rgb',
+        {
+            name: control.name + ': RGB',
+            read: true,
+            write: false,
+            type: 'string',
+            role: 'level.color.rgb',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var rgb = loxoneColorToRgb(value);
+            if (rgb !== undefined) {
+                setStateAck(uuid + '.rgb', rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+            }
+        });
+    updateStateObject(
+        uuid + '.level',
+        {
+            name: control.name + ': Level (only with colorTemperature)',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.level',
+            min: 0,
+            max: 100,
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.level', brightnessTemperature[0]);
+            }
+        });
+    updateStateObject(
+        uuid + '.colorTemperature',
+        {
+            name: control.name + ': The temperature of the light in °K 2700-6500',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.temperature',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.colorTemperature', brightnessTemperature[1]);
+            }
+        });
+    updateStateObject(
+        uuid + '.colorTemperatureHue',
+        {
+            name: control.name + ': The temperature of the light in °K scaled for Hue 2000-6500',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level.color.temperature',
+            smartIgnore: true
+        },
+        control.states.color,
+        function (name, value) {
+            var brightnessTemperature = loxoneColorToBrightnessTemperature(value);
+            if (brightnessTemperature !== undefined) {
+                setStateAck(uuid + '.colorTemperatureHue', Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
+            }
+        });
+            
     // we use a timer (100 ms) to update the three color values,
     // so if somebody sends us the three values (almost) at once,
     // we don't change the color three times using commands
@@ -2043,11 +2113,25 @@ function loxoneColorToRgb(value) {
             green = 288.1221695283 * Math.pow(temperature - 60, -0.0755148492);
         }
         
-        red = Math.min(Math.max(red, 0), 255);
-        green = Math.min(Math.max(green, 0), 255);
-        blue = Math.min(Math.max(blue, 0), 255);
+        red = Math.min(Math.max(red, 0), 255) * brightness;
+        green = Math.min(Math.max(green, 0), 255) * brightness;
+        blue = Math.min(Math.max(blue, 0), 255) * brightness;
         
         return [Math.round(red), Math.round(green), Math.round(blue)];
+    }
+
+    return undefined;
+}
+
+function loxoneColorToBrightnessTemperature(value) {
+    value = value.toString();
+
+    var match = value.match(/temp\((\d+),(\d+)\)/i);
+    if (match) {
+        var brightness = parseFloat(match[1]);
+        var temperature = parseFloat(match[2]);
+        
+        return [Math.round(brightness), Math.round(temperature)];
     }
 
     return undefined;
