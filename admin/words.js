@@ -1,21 +1,41 @@
-﻿// Dictionary (systemDictionary is global variable from adapter-settings.js)
+/*global systemDictionary:true */
+'use strict';
+
 systemDictionary = {
-    "Loxone Miniserver adapter settings": {
-        "en": "Loxone Miniserver adapter settings",
-        "de": "Loxone Miniserver Adapter-Einstellungen",
-        "ru": "Настройки драйвера Loxone Miniserver"
+    'loxone adapter settings': {
+        en: 'Adapter settings for loxone',
+        de: 'Adaptereinstellungen für loxone',
+        ru: 'Настройки адаптера для loxone',
+        pt: 'Configurações do adaptador para loxone',
+        nl: 'Adapterinstellingen voor loxone',
+        fr: "Paramètres d'adaptateur pour loxone",
+        it: "Impostazioni dell'adattatore per loxone",
+        es: 'Ajustes del adaptador para loxone',
+        pl: 'Ustawienia adaptera dla loxone',
+        'zh-cn': 'loxone的适配器设置',
     },
-    "Miniserver Hostname / IP": { "en": "Miniserver Hostname / IP", "de": "Hostname /IP des Miniservers", "ru": "IP / Hostname Минисервера" },
-    "Miniserver Port": { "en": "Miniserver Port", "de": "Port des Miniservers", "ru": "Порт Минисервера" },
-    "Miniserver Username": { "en": "Miniserver Username", "de": "Benutzername des Miniservers", "ru": "Имя пользователя" },
-    "Miniserver Password": { "en": "Miniserver Password", "de": "Kennwort des Miniservers", "ru": "Пароль" },
-    "Synchronize": { "en": "Synchronize", "de": "Synchronisieren", "ru": "Синхронизация" },
-    "Names": { "en": "Names", "de": "Namen", "ru": "имена" },
-    "Rooms": { "en": "Rooms", "de": "Räume", "ru": "комнат" },
-    "Functions": { "en": "Functions", "de": "Gewerke", "ru": "групп устройств" },
-    "tooltip_host": {
-        "en": "IP address of Loxone miniservers or DNS name", 
-        "de": "IP Adresse von Loxone Miniserver oder DNS-Name",
-        "ru": "IP Адрес или DNS имя Loxone Miniserver"
+    option1: {
+        en: 'option1',
+        de: 'Option 1',
+        ru: 'Опция 1',
+        pt: 'Opção 1',
+        nl: 'Optie 1',
+        fr: 'Option 1',
+        it: 'opzione 1',
+        es: 'Opción 1',
+        pl: 'opcja 1',
+        'zh-cn': '选项1',
+    },
+    option2: {
+        en: 'option2',
+        de: 'Option 2',
+        ru: 'option2',
+        pt: 'opção 2',
+        nl: 'Optie 2',
+        fr: 'Option 2',
+        it: 'opzione 2',
+        es: 'opcion 2',
+        pl: 'Opcja 2',
+        'zh-cn': '选项2',
     },
 };
