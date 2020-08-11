@@ -22,6 +22,7 @@ appveyor.yaml
 src/
 tsconfig.json
 tsconfig.*.json
+*.d.ts
 
 # ESLint configuration
 .eslintrc.json
