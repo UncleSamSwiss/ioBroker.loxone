@@ -27,6 +27,7 @@ declare global {
 class Loxone extends utils.Adapter {
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
+            dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : __dirname + '/../',
             ...options,
             name: 'loxone',
         });

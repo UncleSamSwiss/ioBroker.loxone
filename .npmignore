@@ -1,10 +1,13 @@
 .git
 .idea
+.github
 node_modules/
 nbproject/
 .vs*/
+.devcontainer/
 *.code-workspace
 Thumbs.db
+.prettierrc.js
 gulpfile.js
 
 # CI test files
@@ -25,7 +28,7 @@ tsconfig.*.json
 .eslintrc.js
 
 # Sourcemaps
-maps/
+**/*.js.map
 
 # npm package files
 iobroker.*.tgz
