@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "1.1.0",
+        "version": "2.0.0",
         "news": {
+            "2.0.0": {
+                "en": "Updated to the latest development tools and changed to the TypeScript language",
+                "de": "Auf die neusten Entwicklungstools aktualisiert und umgestellt auf TypeScript"
+            },
             "1.1.0": {
                 "en": "Added support for Miniserver Gen 2 and RGB in LightControllerV2",
                 "de": "Unterstützung für Miniserver Gen 2 und RGB im LightControllerV2 hinzugefügt"

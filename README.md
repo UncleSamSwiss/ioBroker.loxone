@@ -541,6 +541,10 @@ Native value from ioBroker &gt; Objects
 
 ## Changelog
 
+### 2.0.0
+
+-   (UncleSamSwiss) Updated to the latest development tools and changed to the TypeScript language
+
 ### 1.1.0
 
 -   (UncleSamSwiss) Added support for Miniserver Gen 2
