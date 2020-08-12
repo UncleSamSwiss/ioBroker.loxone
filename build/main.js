@@ -220,14 +220,7 @@ class Loxone extends utils.Adapter {
                     continue;
                 }
                 try {
-                    const type = control.type || 'None';
-                    if (type !== 'Alarm') {
-                        continue;
-                    }
-                    const module = yield Promise.resolve().then(() => require(`./controls/${type}`));
-                    const controlObject = new module[type](this);
-                    yield controlObject.loadAsync('device', uuid, control);
-                    this.storeRoomAndCat(control, uuid);
+                    yield this.loadControlAsync('device', uuid, control);
                 }
                 catch (e) {
                     this.log.error('Unsupported control type ' + control.type + ': ' + e);
@@ -275,8 +268,7 @@ class Loxone extends utils.Adapter {
                         uuid = parentUuid + '.' + uuid.replace('/', '-');
                     }
                     subControl.name = control.name + ': ' + subControl.name;
-                    eval('load' + subControl.type + "Control('channel', uuid, subControl)");
-                    this.storeRoomAndCat(subControl, uuid);
+                    yield this.loadControlAsync('channel', uuid, subControl);
                 }
                 catch (e) {
                     this.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
@@ -284,19 +276,25 @@ class Loxone extends utils.Adapter {
             }
         });
     }
-    storeRoomAndCat(control, uuid) {
-        if (control.hasOwnProperty('room')) {
-            if (!this.foundRooms.hasOwnProperty(control.room)) {
-                this.foundRooms[control.room] = [];
+    loadControlAsync(controlType, uuid, control) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const type = control.type || 'None';
+            const module = yield Promise.resolve().then(() => require(`./controls/${type}`));
+            const controlObject = new module[type](this);
+            yield controlObject.loadAsync(controlType, uuid, control);
+            if (control.hasOwnProperty('room')) {
+                if (!this.foundRooms.hasOwnProperty(control.room)) {
+                    this.foundRooms[control.room] = [];
+                }
+                this.foundRooms[control.room].push(uuid);
             }
-            this.foundRooms[control.room].push(uuid);
-        }
-        if (control.hasOwnProperty('cat')) {
-            if (!this.foundCats.hasOwnProperty(control.cat)) {
-                this.foundCats[control.cat] = [];
+            if (control.hasOwnProperty('cat')) {
+                if (!this.foundCats.hasOwnProperty(control.cat)) {
+                    this.foundCats[control.cat] = [];
+                }
+                this.foundCats[control.cat].push(uuid);
             }
-            this.foundCats[control.cat].push(uuid);
-        }
+        });
     }
     handleEvent(uuid, evt) {
         const stateEventHandlerList = this.stateEventHandlers[uuid];
@@ -390,6 +388,12 @@ class Loxone extends utils.Adapter {
     setStateAck(id, value) {
         this.currentStateValues[this.namespace + '.' + id] = value;
         this.setState(id, { val: value, ack: true });
+    }
+    getCachedStateValue(id) {
+        if (this.currentStateValues.hasOwnProperty(id)) {
+            return this.currentStateValues[id];
+        }
+        return undefined;
     }
 }
 exports.Loxone = Loxone;

@@ -4,8 +4,7 @@
 
 import * as utils from '@iobroker/adapter-core';
 import * as loxoneWsApi from 'node-lox-ws-api';
-//import * as colorConvert from 'color-convert';
-import { ControlBase } from './controls/ControlBase';
+import { ControlBase, ControlType } from './controls/ControlBase';
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -26,15 +25,17 @@ declare global {
 export type FlatStateValue = string | number | boolean;
 export type StateValue = FlatStateValue | any[] | Record<string, any>;
 
-export type StateChangeListener = (oldValue: StateValue | null | undefined, newValue: StateValue | null) => void;
-export type StateEventHandler = (/*id: string, TODO: chekc if OK*/ value: any) => void;
+export type OldStateValue = StateValue | null | undefined;
+export type CurrentStateValue = StateValue | null;
+export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
+export type StateEventHandler = (value: any) => void;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
 export type NamedStateEventHandler = (id: string, value: any) => void;
 
 export class Loxone extends utils.Adapter {
     private client?: any;
     private existingObjects: Record<string, ioBroker.Object> = {};
-    private currentStateValues: Record<string, StateValue | null> = {};
+    private currentStateValues: Record<string, CurrentStateValue> = {};
     private operatingModes: any = {};
     private foundRooms: Record<string, string[]> = {};
     private foundCats: Record<string, string[]> = {};
@@ -283,11 +284,7 @@ export class Loxone extends utils.Adapter {
             }
 
             try {
-                const type = control.type || 'None';
-                const module = await import(`./controls/${type}`);
-                const controlObject: ControlBase = new module[type](this);
-                await controlObject.loadAsync('device', uuid, control);
-                this.storeRoomAndCat(control, uuid);
+                await this.loadControlAsync('device', uuid, control);
             } catch (e) {
                 this.log.error('Unsupported control type ' + control.type + ': ' + e);
 
@@ -318,7 +315,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
+    public async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
         if (!control.hasOwnProperty('subControls')) {
             return;
         }
@@ -335,15 +332,20 @@ export class Loxone extends utils.Adapter {
                     uuid = parentUuid + '.' + uuid.replace('/', '-');
                 }
                 subControl.name = control.name + ': ' + subControl.name;
-                eval('load' + subControl.type + "Control('channel', uuid, subControl)");
-                this.storeRoomAndCat(subControl, uuid);
+
+                await this.loadControlAsync('channel', uuid, subControl);
             } catch (e) {
                 this.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
             }
         }
     }
 
-    private storeRoomAndCat(control: any, uuid: string): void {
+    private async loadControlAsync(controlType: ControlType, uuid: string, control: any): Promise<void> {
+        const type = control.type || 'None';
+        const module = await import(`./controls/${type}`);
+        const controlObject: ControlBase = new module[type](this);
+        await controlObject.loadAsync(controlType, uuid, control);
+
         if (control.hasOwnProperty('room')) {
             if (!this.foundRooms.hasOwnProperty(control.room)) {
                 this.foundRooms[control.room as string] = [];
@@ -462,9 +464,17 @@ export class Loxone extends utils.Adapter {
         this.stateChangeListeners[this.namespace + '.' + id] = listener;
     }
 
-    public setStateAck(id: string, value: StateValue | null): void {
+    public setStateAck(id: string, value: CurrentStateValue): void {
         this.currentStateValues[this.namespace + '.' + id] = value;
         this.setState(id, { val: value, ack: true });
+    }
+
+    public getCachedStateValue(id: string): OldStateValue {
+        if (this.currentStateValues.hasOwnProperty(id)) {
+            return this.currentStateValues[id];
+        }
+
+        return undefined;
     }
 }
 

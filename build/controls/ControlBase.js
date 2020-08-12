@@ -10,9 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ControlBase = void 0;
+const sprintf_js_1 = require("sprintf-js");
 class ControlBase {
     constructor(adapter) {
         this.adapter = adapter;
+    }
+    loadSubControlsAsync(parentUuid, control) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.adapter.loadSubControlsAsync(parentUuid, control);
+        });
     }
     addStateChangeListener(id, listener) {
         this.adapter.addStateChangeListener(id, listener);
@@ -20,11 +26,24 @@ class ControlBase {
     addStateEventHandler(uuid, eventHandler, name) {
         this.adapter.addStateEventHandler(uuid, eventHandler, name);
     }
+    removeStateEventHandler(uuid, name) {
+        return this.adapter.removeStateEventHandler(uuid, name);
+    }
     sendCommand(uuid, action) {
         this.adapter.sendCommand(uuid, action);
     }
     setStateAck(id, value) {
         this.adapter.setStateAck(id, value);
+    }
+    setFormattedStateAck(id, value, format) {
+        value = sprintf_js_1.sprintf(format, value);
+        this.setStateAck(id, value);
+    }
+    convertStateToInt(value) {
+        return !value ? 0 : parseInt(value.toString());
+    }
+    getCachedStateValue(id) {
+        return this.adapter.getCachedStateValue(id);
     }
     updateObjectAsync(id, obj) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -99,6 +118,27 @@ class ControlBase {
                     smartIgnore: true,
                 }, states[name], (name, value) => {
                     this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                });
+            }
+        });
+    }
+    createPercentageControlStateObjectAsync(controlName, uuid, states, name, role, commonExt) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (states !== undefined && states.hasOwnProperty(name)) {
+                let common = {
+                    name: controlName + ': ' + name,
+                    read: true,
+                    write: false,
+                    type: 'number',
+                    role: role,
+                    unit: '%',
+                    smartIgnore: true,
+                };
+                if (commonExt && typeof commonExt === 'object') {
+                    common = Object.assign({ common }, commonExt);
+                }
+                yield this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], (name, value) => {
+                    this.setStateAck(name, Math.round(this.convertStateToInt(value)));
                 });
             }
         });

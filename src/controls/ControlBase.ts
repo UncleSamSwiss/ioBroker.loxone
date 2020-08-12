@@ -1,8 +1,22 @@
-import { Loxone, NamedStateEventHandler, StateChangeListener, StateEventHandler, StateValue } from '../main';
+import { sprintf } from 'sprintf-js';
+import {
+    CurrentStateValue,
+    Loxone,
+    NamedStateEventHandler,
+    OldStateValue,
+    StateChangeListener,
+    StateEventHandler,
+} from '../main';
+
+export type ControlType = 'device' | 'channel';
 
 export abstract class ControlBase {
     protected constructor(protected readonly adapter: Loxone) {}
-    abstract loadAsync(type: string, uuid: string, control: any): Promise<void>;
+    abstract loadAsync(type: ControlType, uuid: string, control: any): Promise<void>;
+
+    protected async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
+        return await this.adapter.loadSubControlsAsync(parentUuid, control);
+    }
 
     protected addStateChangeListener(id: string, listener: StateChangeListener): void {
         this.adapter.addStateChangeListener(id, listener);
@@ -12,12 +26,29 @@ export abstract class ControlBase {
         this.adapter.addStateEventHandler(uuid, eventHandler, name);
     }
 
+    protected removeStateEventHandler(uuid: string, name: string): boolean {
+        return this.adapter.removeStateEventHandler(uuid, name);
+    }
+
     protected sendCommand(uuid: string, action: string): void {
         this.adapter.sendCommand(uuid, action);
     }
 
-    protected setStateAck(id: string, value: StateValue | null): void {
+    protected setStateAck(id: string, value: CurrentStateValue): void {
         this.adapter.setStateAck(id, value);
+    }
+
+    protected setFormattedStateAck(id: string, value: CurrentStateValue, format: string): void {
+        value = sprintf(format, value);
+        this.setStateAck(id, value);
+    }
+
+    protected convertStateToInt(value: OldStateValue): number {
+        return !value ? 0 : parseInt(value.toString());
+    }
+
+    protected getCachedStateValue(id: string): OldStateValue {
+        return this.adapter.getCachedStateValue(id);
     }
 
     protected async updateObjectAsync(id: string, obj: ioBroker.PartialObject): Promise<void> {
@@ -106,7 +137,7 @@ export abstract class ControlBase {
                 uuid + '.' + this.normalizeName(name),
                 common,
                 states[name],
-                (name: string, value: StateValue | null) => {
+                (name: string, value: CurrentStateValue) => {
                     this.setStateAck(name, value == 1);
                 },
             );
@@ -131,8 +162,40 @@ export abstract class ControlBase {
                     smartIgnore: true,
                 },
                 states[name],
-                (name: string, value: StateValue | null) => {
+                (name: string, value: CurrentStateValue) => {
                     this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                },
+            );
+        }
+    }
+
+    protected async createPercentageControlStateObjectAsync(
+        controlName: string,
+        uuid: string,
+        states: any,
+        name: string,
+        role: string,
+        commonExt?: any,
+    ): Promise<void> {
+        if (states !== undefined && states.hasOwnProperty(name)) {
+            let common = {
+                name: controlName + ': ' + name,
+                read: true,
+                write: false,
+                type: 'number',
+                role: role,
+                unit: '%',
+                smartIgnore: true,
+            };
+            if (commonExt && typeof commonExt === 'object') {
+                common = { common, ...commonExt };
+            }
+            await this.updateStateObjectAsync(
+                uuid + '.' + this.normalizeName(name),
+                common,
+                states[name],
+                (name: string, value: CurrentStateValue) => {
+                    this.setStateAck(name, Math.round(this.convertStateToInt(value)));
                 },
             );
         }
