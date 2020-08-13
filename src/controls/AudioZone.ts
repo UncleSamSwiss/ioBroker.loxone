@@ -82,7 +82,7 @@ export class AudioZone extends ControlBase {
         );
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'power', 'switch', {
             write: true,
-            smartIgnore: false,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createSimpleControlStateObjectAsync(
             control.name,

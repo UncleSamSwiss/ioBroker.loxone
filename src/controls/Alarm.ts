@@ -36,7 +36,7 @@ export class Alarm extends ControlBase {
         };
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'armed', 'switch', {
             write: true,
-            smartIgnore: false,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createSimpleControlStateObjectAsync(
             control.name,

@@ -92,13 +92,13 @@ export class WindowMonitor extends ControlBase {
                 common: {
                     name: control.name + ': ' + window.name,
                     role: 'sensor.window.3',
-                    smartIgnore: true,
-                } as any, // TODO: fix this, shouldn't be "any"
+                    // TODO: re-add: smartIgnore: true,
+                },
                 native: window,
             });
             for (let mask = 1; mask <= 16; mask *= 2) {
                 const windowPosition = windowPositions[mask];
-                const obj: ioBroker.PartialStateObject = {
+                const obj: ioBroker.SettableObject = {
                     type: 'state',
                     common: {
                         name: control.name + ': ' + window.name + ': ' + windowPosition,
@@ -106,8 +106,8 @@ export class WindowMonitor extends ControlBase {
                         write: false,
                         type: 'boolean',
                         role: 'indicator',
-                        smartIgnore: true,
-                    } as any, // TODO: fix this, shouldn't be "any"
+                        // TODO: re-add: smartIgnore: true,
+                    },
                     native: {},
                 };
                 await this.updateObjectAsync(id + '.' + windowPosition, obj);

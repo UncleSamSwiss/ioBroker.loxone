@@ -16,7 +16,7 @@ export class Pushbutton extends ControlBase {
 
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'active', 'switch', {
             write: true,
-            smartIgnore: type == 'channel',
+            // TODO: re-add: smartIgnore: type == 'channel',
         });
 
         this.addStateChangeListener(uuid + '.active', (oldValue: OldStateValue, newValue: CurrentStateValue) => {

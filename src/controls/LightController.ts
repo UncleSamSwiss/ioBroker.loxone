@@ -41,7 +41,7 @@ export class LightController extends ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.sceneList,
                 (name: string, value: any) => {
@@ -66,7 +66,12 @@ export class LightController extends ControlBase {
         });
 
         // for Alexa support:
-        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'control', { smartIgnore: false });
+        await this.createButtonCommandStateObjectAsync(
+            control.name,
+            uuid,
+            'control',
+            /* TODO: re-add: { smartIgnore: false }*/
+        );
         this.addStateChangeListener(uuid + '.control', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'on');

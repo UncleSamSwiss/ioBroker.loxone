@@ -32,7 +32,7 @@ export class InfoOnlyDigital extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
                 (name: string, value: any) => {
@@ -50,7 +50,7 @@ export class InfoOnlyDigital extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
                 (name: string, value: any) => {
@@ -68,7 +68,7 @@ export class InfoOnlyDigital extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
                 (name: string, value: any) => {

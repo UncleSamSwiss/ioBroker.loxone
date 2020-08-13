@@ -48,7 +48,6 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, control.states.moodList, (name, value) => {
                     const moodList = JSON.parse(value);
                     const list = [];
@@ -73,7 +72,6 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: true,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, control.states.activeMoods, (name, value) => {
                     this.activeMoods = JSON.parse(value);
                     this.updateActiveMoods();
@@ -141,7 +139,6 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, control.states.favoriteMoods, (id, value) => {
                     this.favoriteMoods = JSON.parse(value);
                     this.updateFavoriteMoods();
@@ -152,7 +149,6 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, control.states.additionalMoods, (name, value) => {
                     this.additionalMoods = JSON.parse(value);
                     this.updateAdditionalMoods();

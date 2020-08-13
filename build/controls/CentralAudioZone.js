@@ -22,7 +22,7 @@ class CentralAudioZone extends control_base_1.ControlBase {
                 },
                 native: control,
             });
-            this.createButtonCommandStateObjectAsync(control.name, uuid, 'control', { smartIgnore: false });
+            this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
             this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {
                 this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
             });

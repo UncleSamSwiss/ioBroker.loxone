@@ -67,7 +67,6 @@ class AudioZone extends control_base_1.ControlBase {
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'clientState', 'number', 'value', { states: clientStates });
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'power', 'switch', {
                 write: true,
-                smartIgnore: false,
             });
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'volume', 'number', 'level.volume', { write: true });
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'maxVolume', 'number', 'value');

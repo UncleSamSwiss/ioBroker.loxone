@@ -35,7 +35,10 @@ export class Jalousie extends ControlBase {
             control.states,
             'position',
             'level.blind',
-            { write: true, smartIgnore: false },
+            {
+                write: true,
+                // TODO: re-add: smartIgnore: false
+            },
         );
         await this.createPercentageControlStateObjectAsync(
             control.name,

@@ -21,7 +21,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 role: 'level.color.red',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -41,7 +41,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 role: 'level.color.green',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -61,7 +61,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 role: 'level.color.blue',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -79,7 +79,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 write: false,
                 type: 'string',
                 role: 'level.color.rgb',
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -99,7 +99,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 role: 'level.color.level',
                 min: 0,
                 max: 100,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -117,7 +117,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {
@@ -135,7 +135,7 @@ export abstract class ColorpickerBase extends ControlBase {
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
             (name: string, value: CurrentStateValue) => {

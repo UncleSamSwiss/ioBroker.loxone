@@ -26,7 +26,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.red',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
@@ -41,7 +40,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.green',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
@@ -56,7 +54,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.blue',
                 min: 0,
                 max: 255,
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
@@ -69,7 +66,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'level.color.rgb',
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
@@ -84,7 +80,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.level',
                 min: 0,
                 max: 100,
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
@@ -97,7 +92,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
@@ -110,7 +104,6 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-                smartIgnore: true,
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {

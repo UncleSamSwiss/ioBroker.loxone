@@ -12,7 +12,12 @@ export class CentralLightController extends ControlBase {
             native: control,
         });
 
-        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'control', { smartIgnore: false });
+        await this.createButtonCommandStateObjectAsync(
+            control.name,
+            uuid,
+            'control',
+            /* TODO: re-add: { smartIgnore: false }, */
+        );
         this.addStateChangeListener(uuid + '.control', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'on');

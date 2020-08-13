@@ -57,7 +57,6 @@ class WindowMonitor extends control_base_1.ControlBase {
                     common: {
                         name: control.name + ': ' + window.name,
                         role: 'sensor.window.3',
-                        smartIgnore: true,
                     },
                     native: window,
                 });
@@ -71,7 +70,6 @@ class WindowMonitor extends control_base_1.ControlBase {
                             write: false,
                             type: 'boolean',
                             role: 'indicator',
-                            smartIgnore: true,
                         },
                         native: {},
                     };

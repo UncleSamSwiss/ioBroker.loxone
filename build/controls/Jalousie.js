@@ -38,7 +38,9 @@ class Jalousie extends control_base_1.ControlBase {
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'down', 'indicator', {
                 write: true,
             });
-            yield this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level.blind', { write: true, smartIgnore: false });
+            yield this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level.blind', {
+                write: true,
+            });
             yield this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'shadePosition', 'level');
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'safetyActive', 'indicator');
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'autoAllowed', 'indicator');

@@ -25,7 +25,7 @@ export class AlarmClock extends ControlBase {
 
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'isEnabled', 'switch', {
             write: true,
-            smartIgnore: false,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createBooleanControlStateObjectAsync(
             control.name,

@@ -26,7 +26,7 @@ export class Gate extends ControlBase {
         };
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level', {
             write: true,
-            smartIgnore: false,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createSimpleControlStateObjectAsync(
             control.name,

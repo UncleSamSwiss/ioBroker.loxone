@@ -22,7 +22,7 @@ class CentralLightController extends control_base_1.ControlBase {
                 },
                 native: control,
             });
-            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'control', { smartIgnore: false });
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
             this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'on');

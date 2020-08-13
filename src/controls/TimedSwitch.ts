@@ -35,7 +35,7 @@ export class TimedSwitch extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'active', {
-            smartIgnore: type == 'channel',
+            // TODO: re-add: smartIgnore: type == 'channel',
         });
         this.addStateChangeListener(uuid + '.active', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue == oldValue) {

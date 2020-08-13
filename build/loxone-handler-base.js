@@ -115,7 +115,6 @@ class LoxoneHandlerBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, states[name], (name, value) => {
                     this.setStateAck(name, !value ? [] : value.toString().split('|'));
                 });

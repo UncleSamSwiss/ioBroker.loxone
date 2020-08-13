@@ -48,13 +48,13 @@ export abstract class LoxoneHandlerBase {
         return this.adapter.getCachedStateValue(id);
     }
 
-    protected async updateObjectAsync(id: string, obj: ioBroker.PartialObject): Promise<void> {
+    protected async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {
         await this.adapter.updateObjectAsync(id, obj);
     }
 
     protected async updateStateObjectAsync(
         id: string,
-        commonInfo: any,
+        commonInfo: ioBroker.StateCommon,
         stateUuid: string,
         stateEventHandler?: NamedStateEventHandler,
     ): Promise<void> {
@@ -85,9 +85,9 @@ export abstract class LoxoneHandlerBase {
         uuid: string,
         states: any,
         name: string,
-        type: string,
+        type: ioBroker.CommonType,
         role: string,
-        commonExt?: any,
+        commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
             let common = {
@@ -116,14 +116,14 @@ export abstract class LoxoneHandlerBase {
         states: any,
         name: string,
         role: string,
-        commonExt?: any,
+        commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
             let common = {
                 name: controlName + ': ' + name,
                 read: true,
                 write: false,
-                type: 'boolean',
+                type: 'boolean' as ioBroker.CommonType,
                 role: role,
                 smartIgnore: true,
             };
@@ -156,7 +156,7 @@ export abstract class LoxoneHandlerBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 states[name],
                 (name: string, value: CurrentStateValue) => {
@@ -172,14 +172,14 @@ export abstract class LoxoneHandlerBase {
         states: any,
         name: string,
         role: string,
-        commonExt?: any,
+        commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
             let common = {
                 name: controlName + ': ' + name,
                 read: true,
                 write: false,
-                type: 'number',
+                type: 'number' as ioBroker.CommonType,
                 role: role,
                 unit: '%',
                 smartIgnore: true,
@@ -202,13 +202,13 @@ export abstract class LoxoneHandlerBase {
         controlName: string,
         uuid: string,
         name: string,
-        commonExt?: any,
+        commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         let common = {
             name: controlName + ': ' + name,
             read: false,
             write: true,
-            type: 'boolean',
+            type: 'boolean' as ioBroker.CommonType,
             role: 'button',
             smartIgnore: true,
         };

@@ -45,7 +45,6 @@ class Alarm extends control_base_1.ControlBase {
             };
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'armed', 'switch', {
                 write: true,
-                smartIgnore: false,
             });
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'nextLevel', 'number', 'value', { states: levelStates });
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'nextLevelDelay', 'number', 'value.interval');

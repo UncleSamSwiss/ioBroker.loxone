@@ -34,7 +34,6 @@ class AlarmClock extends control_base_1.ControlBase {
             ]);
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'isEnabled', 'switch', {
                 write: true,
-                smartIgnore: false,
             });
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'isAlarmActive', 'indicator');
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'confirmationNeeded', 'indicator');

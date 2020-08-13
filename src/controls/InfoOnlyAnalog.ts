@@ -32,7 +32,7 @@ export class InfoOnlyAnalog extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.value,
                 (name: string, value: any) => {

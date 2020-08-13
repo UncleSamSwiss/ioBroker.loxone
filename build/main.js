@@ -389,35 +389,33 @@ class Loxone extends utils.Adapter {
     }
     updateObjectAsync(id, obj) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: fix
-            /*
             const fullId = this.namespace + '.' + id;
             if (this.existingObjects.hasOwnProperty(fullId)) {
                 const existingObject = this.existingObjects[fullId];
                 if (!this.config.syncNames && obj.common) {
                     obj.common.name = existingObject.common.name;
                 }
+                /* TODO: re-add:
                 if (obj.common.smartName != 'ignore' && existingObject.common.smartName != 'ignore') {
                     // keep the smartName (if it's not supposed to be ignored)
                     obj.common.smartName = existingObject.common.smartName;
-                }
-            }*/
+                }*/
+            }
             yield this.extendObjectAsync(id, obj);
         });
     }
     updateStateObjectAsync(id, commonInfo, stateUuid, stateEventHandler) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* TODO: re-add:
             if (commonInfo.hasOwnProperty('smartIgnore')) {
                 // interpret smartIgnore (our own extension of common) to generate smartName if needed
                 if (commonInfo.smartIgnore) {
                     commonInfo.smartName = 'ignore';
-                }
-                else if (!commonInfo.hasOwnProperty('smartName')) {
+                } else if (!commonInfo.hasOwnProperty('smartName')) {
                     commonInfo.smartName = null;
                 }
                 delete commonInfo.smartIgnore;
-            }
-            // TODO: fix this, shouldn't be "any"
+            }*/
             const obj = {
                 type: 'state',
                 common: commonInfo,

@@ -12,7 +12,12 @@ export class CentralAlarm extends ControlBase {
             native: control,
         });
 
-        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'armed', { smartIgnore: false });
+        await this.createButtonCommandStateObjectAsync(
+            control.name,
+            uuid,
+            'armed',
+            /* TODO: re-add: { smartIgnore: false }, */
+        );
         this.addStateChangeListener(uuid + '.armed', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
         });

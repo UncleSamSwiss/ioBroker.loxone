@@ -35,7 +35,6 @@ class Gate extends control_base_1.ControlBase {
             };
             yield this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level', {
                 write: true,
-                smartIgnore: false,
             });
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'active', 'number', 'value', { write: true, states: activeStates });
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'preventOpen', 'indicator');

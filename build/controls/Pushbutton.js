@@ -25,7 +25,6 @@ class Pushbutton extends control_base_1.ControlBase {
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['active']);
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'active', 'switch', {
                 write: true,
-                smartIgnore: type == 'channel',
             });
             this.addStateChangeListener(uuid + '.active', (oldValue, newValue) => {
                 if (newValue == oldValue) {

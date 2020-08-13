@@ -43,7 +43,7 @@ export class LightControllerV2 extends ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.moodList,
                 (name: string, value: any) => {
@@ -74,7 +74,7 @@ export class LightControllerV2 extends ControlBase {
                     write: true,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.activeMoods,
                 (name: string, value: any) => {
@@ -149,7 +149,7 @@ export class LightControllerV2 extends ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.favoriteMoods,
                 (id: string, value: any) => {
@@ -165,7 +165,7 @@ export class LightControllerV2 extends ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.additionalMoods,
                 (name: string, value: any) => {

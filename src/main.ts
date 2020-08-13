@@ -466,30 +466,30 @@ export class Loxone extends utils.Adapter {
         this.client.send_cmd(uuid, action);
     }
 
-    public async updateObjectAsync(id: string, obj: ioBroker.PartialObject): Promise<void> {
-        // TODO: fix
-        /*
+    public async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {
         const fullId = this.namespace + '.' + id;
         if (this.existingObjects.hasOwnProperty(fullId)) {
             const existingObject = this.existingObjects[fullId];
             if (!this.config.syncNames && obj.common) {
                 obj.common.name = existingObject.common.name;
             }
+            /* TODO: re-add:
             if (obj.common.smartName != 'ignore' && existingObject.common.smartName != 'ignore') {
                 // keep the smartName (if it's not supposed to be ignored)
                 obj.common.smartName = existingObject.common.smartName;
-            }
-        }*/
+            }*/
+        }
 
         await this.extendObjectAsync(id, obj);
     }
 
     public async updateStateObjectAsync(
         id: string,
-        commonInfo: any,
+        commonInfo: ioBroker.StateCommon,
         stateUuid: string,
         stateEventHandler?: NamedStateEventHandler,
     ): Promise<void> {
+        /* TODO: re-add:
         if (commonInfo.hasOwnProperty('smartIgnore')) {
             // interpret smartIgnore (our own extension of common) to generate smartName if needed
             if (commonInfo.smartIgnore) {
@@ -498,9 +498,8 @@ export class Loxone extends utils.Adapter {
                 commonInfo.smartName = null;
             }
             delete commonInfo.smartIgnore;
-        }
-        // TODO: fix this, shouldn't be "any"
-        const obj: any = {
+        }*/
+        const obj: ioBroker.SettableObjectWorker<ioBroker.StateObject> = {
             type: 'state',
             common: commonInfo,
             native: {

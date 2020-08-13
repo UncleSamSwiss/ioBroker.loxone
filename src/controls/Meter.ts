@@ -48,7 +48,7 @@ export class Meter extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.actual,
                 (name: string, value: any) => {
@@ -66,7 +66,7 @@ export class Meter extends ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                    smartIgnore: true,
+                    // TODO: re-add: smartIgnore: true,
                 },
                 control.states.total,
                 (name: string, value: any) => {

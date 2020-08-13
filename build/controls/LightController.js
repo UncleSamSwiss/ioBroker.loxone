@@ -40,7 +40,6 @@ class LightController extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                    smartIgnore: true,
                 }, control.states.sceneList, (name, value) => {
                     // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                     if (value.hasOwnProperty('text')) {
@@ -60,7 +59,7 @@ class LightController extends control_base_1.ControlBase {
                 this.sendCommand(control.uuidAction, 'minus');
             });
             // for Alexa support:
-            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'control', { smartIgnore: false });
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
             this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'on');
