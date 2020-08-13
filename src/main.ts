@@ -91,9 +91,6 @@ export class Loxone extends utils.Adapter {
 
         this.client.on('authorized', () => {
             this.log.debug('authorized');
-
-            // set the connection indicator
-            this.setState('info.connection', true, true);
         });
 
         this.client.on('auth_failed', () => {
@@ -136,7 +133,16 @@ export class Loxone extends utils.Adapter {
         this.client.on('get_structure_file', async (data: any) => {
             this.log.silly('get_structure_file ' + JSON.stringify(data));
             this.log.info('got structure file; last modified on ' + data.lastModified);
-            await this.loadStructureFileAsync(data);
+
+            try {
+                await this.loadStructureFileAsync(data);
+                this.log.debug('structure file successfully loaded');
+
+                // we are ready, let's set the connection indicator
+                this.setState('info.connection', true, true);
+            } catch (error) {
+                this.log.error(`Couldn't load structure file: ${error}`);
+            }
         });
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
@@ -160,11 +166,10 @@ export class Loxone extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
-            // Here you must clear all timeouts or intervals that may still be active
-            // clearTimeout(timeout1);
-            // clearTimeout(timeout2);
-            // ...
-            // clearInterval(interval1);
+            if (this.client) {
+                this.client.close();
+                delete this.client;
+            }
 
             callback();
         } catch (e) {

@@ -55,8 +55,6 @@ class Loxone extends utils.Adapter {
             });
             this.client.on('authorized', () => {
                 this.log.debug('authorized');
-                // set the connection indicator
-                this.setState('info.connection', true, true);
             });
             this.client.on('auth_failed', () => {
                 this.log.error('Miniserver connect failed');
@@ -89,7 +87,15 @@ class Loxone extends utils.Adapter {
             this.client.on('get_structure_file', (data) => __awaiter(this, void 0, void 0, function* () {
                 this.log.silly('get_structure_file ' + JSON.stringify(data));
                 this.log.info('got structure file; last modified on ' + data.lastModified);
-                yield this.loadStructureFileAsync(data);
+                try {
+                    yield this.loadStructureFileAsync(data);
+                    this.log.debug('structure file successfully loaded');
+                    // we are ready, let's set the connection indicator
+                    this.setState('info.connection', true, true);
+                }
+                catch (error) {
+                    this.log.error(`Couldn't load structure file: ${error}`);
+                }
             }));
             const handleAnyEvent = (uuid, evt) => {
                 this.log.silly('received update event: ' + JSON.stringify(evt) + ':' + uuid);
@@ -109,11 +115,10 @@ class Loxone extends utils.Adapter {
      */
     onUnload(callback) {
         try {
-            // Here you must clear all timeouts or intervals that may still be active
-            // clearTimeout(timeout1);
-            // clearTimeout(timeout2);
-            // ...
-            // clearInterval(interval1);
+            if (this.client) {
+                this.client.close();
+                delete this.client;
+            }
             callback();
         }
         catch (e) {
