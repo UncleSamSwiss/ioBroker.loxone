@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LightControllerV2 = void 0;
-const ControlBase_1 = require("./ControlBase");
-class LightControllerV2 extends ControlBase_1.ControlBase {
+const control_base_1 = require("./control-base");
+class LightControllerV2 extends control_base_1.ControlBase {
     constructor() {
         super(...arguments);
         this.activeMoods = [];

@@ -1,7 +1,7 @@
 import * as colorConvert from 'color-convert';
 import { RGB } from 'color-convert/conversions';
 import { CurrentStateValue } from '../main';
-import { ControlBase } from './ControlBase';
+import { ControlBase } from './control-base';
 
 export abstract class ColorpickerBase extends ControlBase {
     private colorUpdateTimer?: NodeJS.Timeout;

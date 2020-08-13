@@ -1,4 +1,4 @@
-import { ControlBase, ControlType } from './ControlBase';
+import { ControlBase, ControlType } from './control-base';
 
 /**
  * This class is used if the control has no type (currently seems to be only for window monitoring).

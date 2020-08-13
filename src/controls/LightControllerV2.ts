@@ -1,5 +1,5 @@
 import { CurrentStateValue, OldStateValue } from '../main';
-import { ControlBase, ControlType } from './ControlBase';
+import { ControlBase, ControlType } from './control-base';
 
 export class LightControllerV2 extends ControlBase {
     private activeMoods: string[] = [];

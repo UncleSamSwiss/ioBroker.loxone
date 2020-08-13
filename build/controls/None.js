@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.None = void 0;
-const ControlBase_1 = require("./ControlBase");
+const control_base_1 = require("./control-base");
 /**
  * This class is used if the control has no type (currently seems to be only for window monitoring).
  * It will just load the simple default states.
  */
-class None extends ControlBase_1.ControlBase {
+class None extends control_base_1.ControlBase {
     loadAsync(type, uuid, control) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.updateObjectAsync(uuid, {

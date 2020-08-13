@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
 const loxoneWsApi = require("node-lox-ws-api");
+const weather_server_handler_1 = require("./weather-server-handler");
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign(Object.assign({ dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : __dirname + '/../' }, options), { name: 'loxone' }));
@@ -25,6 +26,8 @@ class Loxone extends utils.Adapter {
         this.foundCats = {};
         this.stateChangeListeners = {};
         this.stateEventHandlers = {};
+        this.cacheEvents = false;
+        this.eventsCache = {};
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -47,7 +50,6 @@ class Loxone extends utils.Adapter {
             this.setState('info.connection', false, true);
             // connect to Loxone Miniserver
             this.client = new loxoneWsApi(this.config.host + ':' + this.config.port, this.config.username, this.config.password, true, 'AES-256-CBC');
-            this.client.connect();
             this.client.on('connect', () => {
                 this.log.info('Miniserver connected');
             });
@@ -97,6 +99,8 @@ class Loxone extends utils.Adapter {
             this.client.on('update_event_text', handleAnyEvent);
             this.client.on('update_event_daytimer', handleAnyEvent);
             this.client.on('update_event_weather', handleAnyEvent);
+            this.cacheEvents = true;
+            this.client.connect();
             this.subscribeStates('*');
         });
     }
@@ -139,10 +143,17 @@ class Loxone extends utils.Adapter {
             this.operatingModes = data.operatingModes;
             yield this.loadGlobalStatesAsync(data.globalStates);
             yield this.loadControlsAsync(data.controls);
-            // TODO: implement:
-            /*this.loadEnums(data.rooms, 'enum.rooms', this.config.syncRooms);
-            this.loadEnums(data.cats, 'enum.functions', this.config.syncFunctions);
-            this.loadWeatherServer(data.weatherServer);*/
+            yield this.loadEnumsAsync(data.rooms, 'enum.rooms', this.foundRooms, this.config.syncRooms);
+            yield this.loadEnumsAsync(data.cats, 'enum.functions', this.foundCats, this.config.syncFunctions);
+            yield this.loadWeatherServerAsync(data.weatherServer);
+            // replay all cached events (and clear them)
+            if (this.cacheEvents) {
+                this.cacheEvents = false;
+                for (const uuid in this.eventsCache) {
+                    this.handleEvent(uuid, this.eventsCache[uuid]);
+                }
+                this.eventsCache = {};
+            }
         });
     }
     loadGlobalStatesAsync(globalStates) {
@@ -296,7 +307,69 @@ class Loxone extends utils.Adapter {
             }
         });
     }
+    loadEnumsAsync(values, enumName, found, enabled) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!enabled) {
+                return;
+            }
+            for (const uuid in values) {
+                if (!found.hasOwnProperty(uuid)) {
+                    // don't sync room/cat if we have no control that is using it
+                    continue;
+                }
+                const members = [];
+                for (const i in found[uuid]) {
+                    members.push(this.namespace + '.' + found[uuid][i]);
+                }
+                const item = values[uuid];
+                const obj = {
+                    type: 'enum',
+                    common: {
+                        name: item.name,
+                        members: members,
+                    },
+                    native: item,
+                };
+                yield this.updateEnumObjectAsync(enumName + '.' + item.name, obj);
+            }
+        });
+    }
+    updateEnumObjectAsync(id, newObj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: the parameter newObj should be an EnumObject, but currently that doesn't exist in the type definition
+            // similar to hm-rega.js:
+            let obj = yield this.getForeignObjectAsync(id);
+            let changed = false;
+            if (!obj) {
+                obj = newObj;
+                changed = true;
+            }
+            else if (newObj && newObj.common && newObj.common.members) {
+                obj.common = obj.common || {};
+                obj.common.members = obj.common.members || [];
+                for (let m = 0; m < newObj.common.members.length; m++) {
+                    if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
+                        changed = true;
+                        obj.common.members.push(newObj.common.members[m]);
+                    }
+                }
+            }
+            if (changed) {
+                yield this.setForeignObjectAsync(id, obj);
+            }
+        });
+    }
+    loadWeatherServerAsync(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const handler = new weather_server_handler_1.WeatherServerHandler(this);
+            yield handler.loadAsync(data);
+        });
+    }
     handleEvent(uuid, evt) {
+        if (this.cacheEvents) {
+            this.eventsCache[uuid] = evt;
+            return;
+        }
         const stateEventHandlerList = this.stateEventHandlers[uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug('Unknown event UUID: ' + uuid);

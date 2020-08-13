@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorpickerBase = void 0;
 const colorConvert = require("color-convert");
-const ControlBase_1 = require("./ControlBase");
-class ColorpickerBase extends ControlBase_1.ControlBase {
+const control_base_1 = require("./control-base");
+class ColorpickerBase extends control_base_1.ControlBase {
     loadColorPickerControlBaseAsync(uuid, control) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!control.states || !control.states.hasOwnProperty('color')) {

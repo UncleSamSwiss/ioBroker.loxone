@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CentralAudioZone = void 0;
-const ControlBase_1 = require("./ControlBase");
-class CentralAudioZone extends ControlBase_1.ControlBase {
+const control_base_1 = require("./control-base");
+class CentralAudioZone extends control_base_1.ControlBase {
     loadAsync(type, uuid, control) {
         return __awaiter(this, void 0, void 0, function* () {
             this.updateObjectAsync(uuid, {

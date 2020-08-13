@@ -6,13 +6,10 @@ import {
     OldStateValue,
     StateChangeListener,
     StateEventHandler,
-} from '../main';
+} from './main';
 
-export type ControlType = 'device' | 'channel';
-
-export abstract class ControlBase {
+export abstract class LoxoneHandlerBase {
     protected constructor(protected readonly adapter: Loxone) {}
-    abstract loadAsync(type: ControlType, uuid: string, control: any): Promise<void>;
 
     protected async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
@@ -102,7 +99,7 @@ export abstract class ControlBase {
                 smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
-                common = { common, ...commonExt };
+                common = { ...common, ...commonExt };
             }
             await this.updateStateObjectAsync(
                 uuid + '.' + this.normalizeName(name),
@@ -131,7 +128,7 @@ export abstract class ControlBase {
                 smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
-                common = { common, ...commonExt };
+                common = { ...common, ...commonExt };
             }
             await this.updateStateObjectAsync(
                 uuid + '.' + this.normalizeName(name),
@@ -188,7 +185,7 @@ export abstract class ControlBase {
                 smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
-                common = { common, ...commonExt };
+                common = { ...common, ...commonExt };
             }
             await this.updateStateObjectAsync(
                 uuid + '.' + this.normalizeName(name),
@@ -216,7 +213,7 @@ export abstract class ControlBase {
             smartIgnore: true,
         };
         if (commonExt && typeof commonExt === 'object') {
-            common = { common, ...commonExt };
+            common = { ...common, ...commonExt };
         }
         await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, uuid);
     }

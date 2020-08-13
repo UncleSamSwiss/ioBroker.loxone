@@ -1,5 +1,5 @@
 import { ColorpickerBase } from './ColorpickerBase';
-import { ControlType } from './ControlBase';
+import { ControlType } from './control-base';
 
 export class Colorpicker extends ColorpickerBase {
     async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {

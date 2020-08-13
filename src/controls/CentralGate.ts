@@ -1,4 +1,4 @@
-import { ControlBase, ControlType } from './ControlBase';
+import { ControlBase, ControlType } from './control-base';
 
 export class CentralGate extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
