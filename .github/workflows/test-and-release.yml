@@ -24,6 +24,7 @@ jobs:
                   echo "github.ref=${{ github.ref }}"
                   echo "github.event.base_ref=${{ github.event.base_ref }}"
                   echo "github.event.head_commit.message=${{ github.event.head_commit.message }}"
+                  cat "${{ github.event_path }}"
 
     # Performs quick checks before the expensive test runs
     check-and-lint:
