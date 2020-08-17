@@ -14,6 +14,17 @@ on:
     pull_request: {}
 
 jobs:
+    # debug only:
+    print-context:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Print context
+              run: |
+                  echo "github.event_name=${{ github.event_name }}"
+                  echo "github.ref=${{ github.ref }}"
+                  echo "github.event.base_ref=${{ github.event.base_ref }}"
+                  echo "github.event.head_commit.message=${{ github.event.head_commit.message }}"
+
     # Performs quick checks before the expensive test runs
     check-and-lint:
         if: contains(github.event.head_commit.message, '[skip ci]') == false
