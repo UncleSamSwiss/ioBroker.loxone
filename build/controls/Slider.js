@@ -20,7 +20,7 @@ class Slider extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'sensor',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['value', 'error']);
             const common = { write: true };

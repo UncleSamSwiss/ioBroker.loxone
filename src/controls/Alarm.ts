@@ -1,15 +1,16 @@
 import { CurrentStateValue, OldStateValue } from '../main';
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class Alarm extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
-            type: type as any,
+            type: type,
             common: {
                 name: control.name,
                 role: 'alarm',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

@@ -1,12 +1,13 @@
 import * as colorConvert from 'color-convert';
 import { RGB } from 'color-convert/conversions';
 import { CurrentStateValue } from '../main';
+import { Control } from '../structure-file';
 import { ControlBase } from './control-base';
 
 export abstract class ColorpickerBase extends ControlBase {
     private colorUpdateTimer?: NodeJS.Timeout;
 
-    async loadColorPickerControlBaseAsync(uuid: string, control: any): Promise<void> {
+    async loadColorPickerControlBaseAsync(uuid: string, control: Control): Promise<void> {
         if (!control.states || !control.states.hasOwnProperty('color')) {
             return;
         }

@@ -20,7 +20,7 @@ class WindowMonitor extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'sensor',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
                 'windowStates',
@@ -49,8 +49,9 @@ class WindowMonitor extends control_base_1.ControlBase {
                 8: 'locked',
                 16: 'unlocked',
             };
-            for (const index in control.details.windows) {
-                const window = control.details.windows[index];
+            const windows = control.details.windows;
+            for (const index in windows) {
+                const window = windows[index];
                 const id = uuid + '.' + (parseInt(index) + 1);
                 yield this.updateObjectAsync(id, {
                     type: 'channel',

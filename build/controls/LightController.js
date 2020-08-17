@@ -20,7 +20,7 @@ class LightController extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'light',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['activeScene', 'sceneList']);
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'activeScene', 'number', 'level', { write: true });

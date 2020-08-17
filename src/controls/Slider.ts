@@ -1,23 +1,24 @@
 import { CurrentStateValue, OldStateValue } from '../main';
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class Slider extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
                 role: 'sensor',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['value', 'error']);
 
-        const common: any = { write: true };
+        const common: Partial<ioBroker.StateCommon> = { write: true };
         if (control.hasOwnProperty('details')) {
-            common.min = control.details.min;
-            common.max = control.details.max;
+            common.min = control.details.min as number;
+            common.max = control.details.max as number;
         }
 
         await this.createSimpleControlStateObjectAsync(
@@ -58,7 +59,7 @@ export class Slider extends ControlBase {
                 },
                 control.states.value,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.format);
+                    this.setFormattedStateAck(name, value, control.details.format as string);
                 },
             );
         }

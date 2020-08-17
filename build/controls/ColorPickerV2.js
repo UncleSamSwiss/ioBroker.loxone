@@ -23,7 +23,7 @@ class ColorPickerV2 extends ColorpickerBase_1.ColorpickerBase {
                     name: control.name,
                     role: 'light.color.rgb',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
                 'color',

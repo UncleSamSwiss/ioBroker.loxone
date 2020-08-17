@@ -20,7 +20,7 @@ class CentralGate extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'blind',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
             this.addStateChangeListener(uuid + '.open', () => {

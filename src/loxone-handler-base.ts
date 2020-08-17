@@ -7,11 +7,12 @@ import {
     StateChangeListener,
     StateEventHandler,
 } from './main';
+import { Control, ControlStates } from './structure-file';
 
 export abstract class LoxoneHandlerBase {
     protected constructor(protected readonly adapter: Loxone) {}
 
-    protected async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
+    protected async loadSubControlsAsync(parentUuid: string, control: Control): Promise<void> {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
     }
 
@@ -64,7 +65,7 @@ export abstract class LoxoneHandlerBase {
     protected async loadOtherControlStatesAsync(
         controlName: string,
         uuid: string,
-        states: any,
+        states: ControlStates,
         skipKeys: string[],
     ): Promise<void> {
         if (states === undefined) {
@@ -83,7 +84,7 @@ export abstract class LoxoneHandlerBase {
     protected async createSimpleControlStateObjectAsync(
         controlName: string,
         uuid: string,
-        states: any,
+        states: ControlStates,
         name: string,
         type: ioBroker.CommonType,
         role: string,
@@ -113,7 +114,7 @@ export abstract class LoxoneHandlerBase {
     protected async createBooleanControlStateObjectAsync(
         controlName: string,
         uuid: string,
-        states: any,
+        states: ControlStates,
         name: string,
         role: string,
         commonExt?: Partial<ioBroker.StateCommon>,
@@ -144,7 +145,7 @@ export abstract class LoxoneHandlerBase {
     protected async createListControlStateObjectAsync(
         controlName: string,
         uuid: string,
-        states: any,
+        states: ControlStates,
         name: string,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
@@ -169,7 +170,7 @@ export abstract class LoxoneHandlerBase {
     protected async createPercentageControlStateObjectAsync(
         controlName: string,
         uuid: string,
-        states: any,
+        states: ControlStates,
         name: string,
         role: string,
         commonExt?: Partial<ioBroker.StateCommon>,

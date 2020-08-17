@@ -1,10 +1,11 @@
 import { sprintf } from 'sprintf-js';
 import { LoxoneHandlerBase } from './loxone-handler-base';
 import { Loxone } from './main';
+import { Format, WeatherServer } from './structure-file';
 
 export class WeatherServerHandler extends LoxoneHandlerBase {
     private readonly deviceName = 'WeatherServer';
-    private format: Record<string, string> = {};
+    private format!: Format;
     private weatherTypeTexts: Record<string, string> = {};
     private forecastChannelsCount = 0;
 
@@ -12,7 +13,7 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
         super(adapter);
     }
 
-    public async loadAsync(data: any): Promise<void> {
+    public async loadAsync(data: WeatherServer): Promise<void> {
         if (data === undefined || !data.hasOwnProperty('states') || !data.states.hasOwnProperty('actual')) {
             return;
         }
@@ -27,7 +28,7 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
                 name: deviceName,
                 role: 'weather',
             },
-            native: data,
+            native: { data: data as any },
         });
 
         await this.setWeatherObjectsAsync('Actual');

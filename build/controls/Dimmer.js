@@ -20,7 +20,7 @@ class Dimmer extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'light',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['position', 'min', 'max', 'step']);
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'position', 'number', 'level.dimmer', { write: true });

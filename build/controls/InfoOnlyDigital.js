@@ -20,7 +20,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'switch',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['active']);
             if (!control.hasOwnProperty('states') || !control.states.hasOwnProperty('active')) {
@@ -31,6 +31,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                 return;
             }
             if (control.details.hasOwnProperty('text')) {
+                const text = control.details.text;
                 yield this.updateStateObjectAsync(uuid + '.active-text', {
                     name: control.name + ': active as text',
                     read: true,
@@ -38,10 +39,11 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? control.details.text.on : control.details.text.off);
+                    this.setStateAck(name, value == 1 ? text.on : text.off);
                 });
             }
             if (control.details.hasOwnProperty('image')) {
+                const image = control.details.text;
                 yield this.updateStateObjectAsync(uuid + '.active-image', {
                     name: control.name + ': active as image',
                     read: true,
@@ -49,10 +51,11 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? control.details.image.on : control.details.image.off);
+                    this.setStateAck(name, value == 1 ? image.on : image.off);
                 });
             }
             if (control.details.hasOwnProperty('color')) {
+                const color = control.details.text;
                 yield this.updateStateObjectAsync(uuid + '.active-color', {
                     name: control.name + ': active as color',
                     read: true,
@@ -60,7 +63,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? control.details.color.on : control.details.color.off);
+                    this.setStateAck(name, value == 1 ? color.on : color.off);
                 });
             }
         });

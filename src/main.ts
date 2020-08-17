@@ -5,6 +5,7 @@
 import * as utils from '@iobroker/adapter-core';
 import * as loxoneWsApi from 'node-lox-ws-api';
 import { ControlBase, ControlType } from './controls/control-base';
+import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 
 // Augment the adapter.config object with the actual types
@@ -37,7 +38,7 @@ export class Loxone extends utils.Adapter {
     private client?: any;
     private existingObjects: Record<string, ioBroker.Object> = {};
     private currentStateValues: Record<string, CurrentStateValue> = {};
-    private operatingModes: any = {};
+    private operatingModes: OperatingModes = {};
     private foundRooms: Record<string, string[]> = {};
     private foundCats: Record<string, string[]> = {};
 
@@ -130,7 +131,7 @@ export class Loxone extends utils.Adapter {
             this.log.silly('keepalive (' + time + 'ms)');
         });
 
-        this.client.on('get_structure_file', async (data: any) => {
+        this.client.on('get_structure_file', async (data: StructureFile) => {
             this.log.silly('get_structure_file ' + JSON.stringify(data));
             this.log.info('got structure file; last modified on ' + data.lastModified);
 
@@ -146,7 +147,7 @@ export class Loxone extends utils.Adapter {
         });
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
-            this.log.silly('received update event: ' + JSON.stringify(evt) + ':' + uuid);
+            this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.handleEvent(uuid, evt);
         };
 
@@ -186,7 +187,7 @@ export class Loxone extends utils.Adapter {
             return;
         }
 
-        this.log.silly('stateChange ' + id + ' ' + JSON.stringify(state));
+        this.log.silly(`stateChange ${id} ${JSON.stringify(state)}`);
         if (!this.stateChangeListeners.hasOwnProperty(id)) {
             this.log.error('Unsupported state change: ' + id);
             return;
@@ -195,7 +196,7 @@ export class Loxone extends utils.Adapter {
         this.stateChangeListeners[id](this.currentStateValues[id], state.val);
     }
 
-    private async loadStructureFileAsync(data: any): Promise<void> {
+    private async loadStructureFileAsync(data: StructureFile): Promise<void> {
         this.stateEventHandlers = {};
         this.foundRooms = {};
         this.foundCats = {};
@@ -217,7 +218,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async loadGlobalStatesAsync(globalStates: Record<string, any>): Promise<void> {
+    private async loadGlobalStatesAsync(globalStates: GlobalStates): Promise<void> {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
@@ -295,7 +296,7 @@ export class Loxone extends utils.Adapter {
         this.setStateAck(name + '-text', this.operatingModes[value]);
     }
 
-    private async loadControlsAsync(controls: any): Promise<void> {
+    private async loadControlsAsync(controls: Controls): Promise<void> {
         let hasUnsupported = false;
         for (const uuid in controls) {
             const control = controls[uuid];
@@ -306,7 +307,7 @@ export class Loxone extends utils.Adapter {
             try {
                 await this.loadControlAsync('device', uuid, control);
             } catch (e) {
-                this.log.error('Unsupported control type ' + control.type + ': ' + e);
+                this.log.error(`Unsupported control type ${control.type}: ${e}`);
 
                 if (!hasUnsupported) {
                     hasUnsupported = true;
@@ -316,7 +317,7 @@ export class Loxone extends utils.Adapter {
                             name: 'Unsupported',
                             role: 'info',
                         },
-                        native: control,
+                        native: {},
                     });
                 }
 
@@ -329,13 +330,13 @@ export class Loxone extends utils.Adapter {
                         type: 'string',
                         role: 'text',
                     },
-                    native: control,
+                    native: { control: control as any },
                 });
             }
         }
     }
 
-    public async loadSubControlsAsync(parentUuid: string, control: any): Promise<void> {
+    public async loadSubControlsAsync(parentUuid: string, control: Control): Promise<void> {
         if (!control.hasOwnProperty('subControls')) {
             return;
         }
@@ -355,12 +356,12 @@ export class Loxone extends utils.Adapter {
 
                 await this.loadControlAsync('channel', uuid, subControl);
             } catch (e) {
-                this.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
+                this.log.error(`Unsupported sub-control type ${subControl.type}: ${e}`);
             }
         }
     }
 
-    private async loadControlAsync(controlType: ControlType, uuid: string, control: any): Promise<void> {
+    private async loadControlAsync(controlType: ControlType, uuid: string, control: Control): Promise<void> {
         const type = control.type || 'None';
         const module = await import(`./controls/${type}`);
         const controlObject: ControlBase = new module[type](this);
@@ -441,7 +442,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async loadWeatherServerAsync(data: any): Promise<void> {
+    private async loadWeatherServerAsync(data: WeatherServer): Promise<void> {
         const handler = new WeatherServerHandler(this);
         await handler.loadAsync(data);
     }
@@ -462,7 +463,7 @@ export class Loxone extends utils.Adapter {
             try {
                 item.handler(evt);
             } catch (e) {
-                this.log.error('Error while handling event UUID ' + uuid + ': ' + e);
+                this.log.error(`Error while handling event UUID ${uuid}: ${e}`);
             }
         });
     }

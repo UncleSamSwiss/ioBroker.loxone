@@ -1,14 +1,15 @@
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class Meter extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
                 role: 'sensor',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['actual', 'total']);
@@ -52,7 +53,7 @@ export class Meter extends ControlBase {
                 },
                 control.states.actual,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.actualFormat);
+                    this.setFormattedStateAck(name, value, control.details.actualFormat as string);
                 },
             );
         }
@@ -70,7 +71,7 @@ export class Meter extends ControlBase {
                 },
                 control.states.total,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.totalFormat);
+                    this.setFormattedStateAck(name, value, control.details.totalFormat as string);
                 },
             );
         }

@@ -98,7 +98,7 @@ class Loxone extends utils.Adapter {
                 }
             }));
             const handleAnyEvent = (uuid, evt) => {
-                this.log.silly('received update event: ' + JSON.stringify(evt) + ':' + uuid);
+                this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
                 this.handleEvent(uuid, evt);
             };
             this.client.on('update_event_value', handleAnyEvent);
@@ -133,7 +133,7 @@ class Loxone extends utils.Adapter {
         if (!id || !state || state.ack) {
             return;
         }
-        this.log.silly('stateChange ' + id + ' ' + JSON.stringify(state));
+        this.log.silly(`stateChange ${id} ${JSON.stringify(state)}`);
         if (!this.stateChangeListeners.hasOwnProperty(id)) {
             this.log.error('Unsupported state change: ' + id);
             return;
@@ -239,7 +239,7 @@ class Loxone extends utils.Adapter {
                     yield this.loadControlAsync('device', uuid, control);
                 }
                 catch (e) {
-                    this.log.error('Unsupported control type ' + control.type + ': ' + e);
+                    this.log.error(`Unsupported control type ${control.type}: ${e}`);
                     if (!hasUnsupported) {
                         hasUnsupported = true;
                         yield this.updateObjectAsync('Unsupported', {
@@ -248,7 +248,7 @@ class Loxone extends utils.Adapter {
                                 name: 'Unsupported',
                                 role: 'info',
                             },
-                            native: control,
+                            native: {},
                         });
                     }
                     yield this.updateObjectAsync('Unsupported.' + uuid, {
@@ -260,7 +260,7 @@ class Loxone extends utils.Adapter {
                             type: 'string',
                             role: 'text',
                         },
-                        native: control,
+                        native: { control: control },
                     });
                 }
             }
@@ -287,7 +287,7 @@ class Loxone extends utils.Adapter {
                     yield this.loadControlAsync('channel', uuid, subControl);
                 }
                 catch (e) {
-                    this.log.error('Unsupported sub-control type ' + subControl.type + ': ' + e);
+                    this.log.error(`Unsupported sub-control type ${subControl.type}: ${e}`);
                 }
             }
         });
@@ -385,7 +385,7 @@ class Loxone extends utils.Adapter {
                 item.handler(evt);
             }
             catch (e) {
-                this.log.error('Error while handling event UUID ' + uuid + ': ' + e);
+                this.log.error(`Error while handling event UUID ${uuid}: ${e}`);
             }
         });
     }

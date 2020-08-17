@@ -1,14 +1,15 @@
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class WindowMonitor extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
                 role: 'sensor',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
@@ -84,8 +85,9 @@ export class WindowMonitor extends ControlBase {
             8: 'locked',
             16: 'unlocked',
         };
-        for (const index in control.details.windows) {
-            const window = control.details.windows[index];
+        const windows = control.details.windows as any;
+        for (const index in windows) {
+            const window = windows[index];
             const id = uuid + '.' + (parseInt(index) + 1);
             await this.updateObjectAsync(id, {
                 type: 'channel',

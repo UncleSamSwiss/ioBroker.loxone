@@ -1,8 +1,9 @@
+import { Control } from '../structure-file';
 import { ColorpickerBase } from './ColorpickerBase';
 import { ControlType } from './control-base';
 
 export class Colorpicker extends ColorpickerBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         if (control.details.pickerType != 'Rgb') {
             throw 'Unsupported color picker type: ' + control.details.pickerType;
         }
@@ -13,7 +14,7 @@ export class Colorpicker extends ColorpickerBase {
                 name: control.name,
                 role: 'light.color.rgb',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['color', 'favorites']);

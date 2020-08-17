@@ -17,7 +17,6 @@ class WeatherServerHandler extends loxone_handler_base_1.LoxoneHandlerBase {
         super(adapter);
         this.adapter = adapter;
         this.deviceName = 'WeatherServer';
-        this.format = {};
         this.weatherTypeTexts = {};
         this.forecastChannelsCount = 0;
     }
@@ -35,7 +34,7 @@ class WeatherServerHandler extends loxone_handler_base_1.LoxoneHandlerBase {
                     name: deviceName,
                     role: 'weather',
                 },
-                native: data,
+                native: { data: data },
             });
             yield this.setWeatherObjectsAsync('Actual');
             this.addStateEventHandler(data.states.actual, (value) => {

@@ -20,7 +20,7 @@ class Gate extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'blind',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
                 'position',

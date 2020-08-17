@@ -1,14 +1,15 @@
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class InfoOnlyAnalog extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
                 role: 'sensor',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['value']);
@@ -36,7 +37,7 @@ export class InfoOnlyAnalog extends ControlBase {
                 },
                 control.states.value,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.format);
+                    this.setFormattedStateAck(name, value, control.details.format as string);
                 },
             );
         }

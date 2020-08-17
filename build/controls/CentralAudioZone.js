@@ -20,7 +20,7 @@ class CentralAudioZone extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'media.music',
                 },
-                native: control,
+                native: { control: control },
             });
             this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
             this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {

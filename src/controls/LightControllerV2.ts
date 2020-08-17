@@ -1,4 +1,5 @@
 import { CurrentStateValue, OldStateValue } from '../main';
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class LightControllerV2 extends ControlBase {
@@ -11,7 +12,7 @@ export class LightControllerV2 extends ControlBase {
 
     private uuid = '';
 
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         this.uuid = uuid;
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -19,7 +20,7 @@ export class LightControllerV2 extends ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

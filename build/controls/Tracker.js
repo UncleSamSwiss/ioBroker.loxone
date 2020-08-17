@@ -20,7 +20,7 @@ class Tracker extends control_base_1.ControlBase {
                     name: control.name,
                     role: 'info',
                 },
-                native: control,
+                native: { control: control },
             });
             yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['entries']);
             yield this.createListControlStateObjectAsync(control.name, uuid, control.states, 'entries');

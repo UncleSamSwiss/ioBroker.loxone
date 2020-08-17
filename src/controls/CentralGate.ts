@@ -1,14 +1,15 @@
+import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class CentralGate extends ControlBase {
-    async loadAsync(type: ControlType, uuid: string, control: any): Promise<void> {
+    async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
                 role: 'blind',
             },
-            native: control,
+            native: { control: control as any },
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
