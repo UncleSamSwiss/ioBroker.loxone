@@ -1,13 +1,3 @@
----
-
-**IMPORTANT UPDATE**
-
-Development of this adapter will restart in **August 2020**. Stay tuned!
-
-I will start by resolving the most pressing issues followed by a new major release that brings the adapter up to the latest development standards.
-
----
-
 ![Logo](admin/loxone.png)
 
 # ioBroker.loxone
