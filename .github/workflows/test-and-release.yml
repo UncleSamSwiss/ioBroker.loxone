@@ -25,6 +25,30 @@ jobs:
                   echo "github.event.base_ref=${{ github.event.base_ref }}"
                   echo "github.event.head_commit.message=${{ github.event.head_commit.message }}"
                   cat "${{ github.event_path }}"
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJson(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump job context
+              env:
+                  JOB_CONTEXT: ${{ toJson(job) }}
+              run: echo "$JOB_CONTEXT"
+            - name: Dump steps context
+              env:
+                  STEPS_CONTEXT: ${{ toJson(steps) }}
+              run: echo "$STEPS_CONTEXT"
+            - name: Dump runner context
+              env:
+                  RUNNER_CONTEXT: ${{ toJson(runner) }}
+              run: echo "$RUNNER_CONTEXT"
+            - name: Dump strategy context
+              env:
+                  STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+              run: echo "$STRATEGY_CONTEXT"
+            - name: Dump matrix context
+              env:
+                  MATRIX_CONTEXT: ${{ toJson(matrix) }}
+              run: echo "$MATRIX_CONTEXT"
 
     # Performs quick checks before the expensive test runs
     check-and-lint:
