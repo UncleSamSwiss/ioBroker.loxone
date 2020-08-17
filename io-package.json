@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "loxone",
-        "version": "1.1.0",
+        "version": "2.0.0",
         "news": {
+            "2.0.0": {
+                "en": "Updated to the latest development tools and changed to the TypeScript language",
+                "de": "Auf die neusten Entwicklungstools aktualisiert und umgestellt auf TypeScript"
+            },
             "1.1.0": {
                 "en": "Added support for Miniserver Gen 2 and RGB in LightControllerV2",
                 "de": "Unterstützung für Miniserver Gen 2 und RGB im LightControllerV2 hinzugefügt"
@@ -52,37 +56,82 @@
         "titleLang": {
             "en": "Loxone Miniserver",
             "de": "Loxone Miniserver",
-            "ru": "Loxone Miniserver"
+            "ru": "Loxone Miniserver",
+            "pt": "Loxone Miniserver",
+            "nl": "Loxone Miniserver",
+            "fr": "Loxone Miniserver",
+            "it": "Loxone Miniserver",
+            "es": "Miniserver de Loxone",
+            "pl": "Loxone Miniserver",
+            "zh-cn": "Loxone迷你服务器"
         },
-        "desc":                     {
+        "desc": {
             "en": "Communicates with a Loxone Miniserver.",
-            "de": "Kommuniziert mit dem Loxone Miniserver.",
-            "ru": "Подключается к Loxone Miniserver и позволяет им управлять."
+            "de": "Kommuniziert mit einem Loxone Miniserver.",
+            "ru": "Общается с Loxone Miniserver.",
+            "pt": "Comunica-se com um Loxone Miniserver.",
+            "nl": "Communiceert met een Loxone Miniserver.",
+            "fr": "Communique avec un Miniserver Loxone.",
+            "it": "Comunica con un Loxone Miniserver.",
+            "es": "Se comunica con un miniserver Loxone.",
+            "pl": "Komunikuje się z Loxone Miniserver.",
+            "zh-cn": "与Loxone小型服务器通信。"
         },
-        "authors": [
-            "UncleSamSwiss <samuel.weibel@gmail.com>"
-        ],
-        "license":                  "Apache-2.0",
-        "platform":                 "Javascript/Node.js",
-        "mode":                     "daemon",
-        "messagebox":               true,
-        "readme":                   "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
-        "loglevel":                 "info",
-        "type":                     "iot-systems",
-        "keywords":                 ["loxone", "miniserver", "smarthome"],
-        "icon":                     "loxone.png",
-        "extIcon":                  "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png",
-        "materialize": true
+        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
+        "keywords": ["loxone", "miniserver", "smarthome"],
+        "license": "Apache-2.0",
+        "platform": "Javascript/Node.js",
+        "main": "build/main.js",
+        "icon": "loxone.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png",
+        "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "iot-systems",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "push",
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=1.4.2"
+            }
+        ]
     },
+    "encryptedNative": ["password"],
+    "protectedNative": ["password"],
     "native": {
-      "host": "0.0.0.0",
-      "port": 80,
-      "username": "",
-      "password": "",
-      "syncNames":  false,
-      "syncRooms":  false,
-      "syncFunctions":  false
+        "host": "0.0.0.0",
+        "port": 80,
+        "username": "",
+        "password": "",
+        "syncNames": false,
+        "syncRooms": false,
+        "syncFunctions": false
     },
-    "objects": [
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Connected to Miniserver",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
     ]
 }

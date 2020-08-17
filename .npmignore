@@ -1,9 +1,42 @@
-Gruntfile.js
-tasks
-node_modules
-.idea
 .git
-/node_modules
-test
+.idea
+.github
+node_modules/
+nbproject/
+.vs*/
+.devcontainer/
+*.code-workspace
+Thumbs.db
+.prettierrc.js
+gulpfile.js
+
+# CI test files
+test/
+travis/
 .travis.yml
 appveyor.yml
+.travis.yaml
+appveyor.yaml
+
+# TypeScript sources and project configuration
+src/
+tsconfig.json
+tsconfig.*.json
+*.d.ts
+
+# ESLint configuration
+.eslintrc.json
+.eslintrc.js
+
+# Sourcemaps
+**/*.js.map
+
+# npm package files
+iobroker.*.tgz
+package-lock.json
+
+# i18n intermediate files
+admin/i18n
+
+# maintenance scripts
+maintenance/**

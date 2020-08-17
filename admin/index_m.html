@@ -1,120 +1,110 @@
 <html>
-<head>
-    <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css" />
+    <head>
+        <!-- Load ioBroker scripts and styles-->
+        <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+        <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css" />
 
-    <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+        <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
-    <script type="text/javascript" src="../../js/translate.js"></script>
-    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
-    <script type="text/javascript" src="words.js"></script>
+        <script type="text/javascript" src="../../js/translate.js"></script>
+        <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+        <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-    <script type="text/javascript">
-        var bridges = [];
+        <!-- Load our own files -->
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <script type="text/javascript" src="words.js"></script>
 
-        function setValue(id, value, onChange) {
-            // example: select elements with id=key and class=value and insert value
-            if ($('#' + id + '.value').attr('type') === 'checkbox') {
-                $('#' + id + '.value').prop('checked', value).change(function() {
-                    onChange();
+        <script type="text/javascript">
+            // This will be called by the admin adapter when the settings page loads
+            function load(settings, onChange) {
+                // example: select elements with id=key and class=value and insert value
+                if (!settings) return;
+                $('.value').each(function () {
+                    var $key = $(this);
+                    var id = $key.attr('id');
+                    if ($key.attr('type') === 'checkbox') {
+                        // do not call onChange direct, because onChange could expect some arguments
+                        $key.prop('checked', settings[id]).on('change', () => onChange());
+                    } else {
+                        // do not call onChange direct, because onChange could expect some arguments
+                        $key.val(settings[id])
+                            .on('change', () => onChange())
+                            .on('keyup', () => onChange());
+                    }
                 });
-            } else {
-                $('#' + id + '.value').val(value).change(function() {
-                    onChange();
-                }).keyup(function() {
-                    $(this).trigger('change');
+                onChange(false);
+                // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
+                if (M) M.updateTextFields();
+            }
+
+            // This will be called by the admin adapter when the user presses the save button
+            function save(callback) {
+                // example: select elements with class=value and build settings object
+                var obj = {};
+                $('.value').each(function () {
+                    var $this = $(this);
+                    if ($this.attr('type') === 'checkbox') {
+                        obj[$this.attr('id')] = $this.prop('checked');
+                    } else {
+                        obj[$this.attr('id')] = $this.val();
+                    }
                 });
+                callback(obj);
             }
-        }
+        </script>
+    </head>
 
-        // the function loadSettings has to exist ...
-        function load(settings, onChange) {
-            // set defaults (if not available)
-            settings.host = settings.host || '0.0.0.0';
-            settings.port = settings.port || 80;
-            settings.username = settings.username || '';
-            settings.password = settings.password || '';
-            settings.syncNames = settings.syncNames || false;
-            settings.syncRooms = settings.syncRooms || false;
-            settings.syncFunctions = settings.syncFunctions || false;
+    <body>
+        <div class="m adapter-container">
+            <div class="row">
+                <div class="col s12 m4 l2">
+                    <img src="loxone.png" class="logo" />
+                </div>
+            </div>
 
-            // populate UI
-            for (var key in settings) {
-                setValue(key, settings[key], onChange);
-            }
-            onChange(false);
-        }
+            <div class="row">
+                <div class="col s6 input-field">
+                    <input type="text" class="value" id="host" />
+                    <label for="host" class="translate">Miniserver Hostname / IP</label>
+                </div>
 
-        // ... and the function save has to exist.
-        // you have to make sure the callback is called with the settings object as first param!
-        function save(callback) {
-            // example: select elements with class=value and build settings object
-            var obj = {};
-            $('.value').each(function () {
-                var $this = $(this);
-                if ($this.attr('type') === 'checkbox') {
-                    obj[$this.attr('id')] = $this.prop('checked');
-                } else {
-                    obj[$this.attr('id')] = $this.val();
-                }
-            });
-            $('.check').each(function () {
-                var $this = $(this);
-                obj[$this.attr('id')] = $this.is('checked');
-            });
-            callback(obj);
-        }
-    </script> 
+                <div class="col s6 input-field">
+                    <input type="text" class="value" id="port" />
+                    <label for="port" class="translate">Miniserver Port</label>
+                </div>
+            </div>
 
-    <style>
-        #settings tr {
-            line-height: 2.5em;
-        }
-    </style>
-</head>     
-<body>
-    <!-- you have to put your config page in a div with id adapter-container -->
-    <div id="adapter-container">
-        <table><tr><td><img src="loxone.png" width="64" height="64"></td><td><h3 class="translate">Loxone Miniserver adapter settings</h3></td></tr></table>
-        <div id="settings">
-            <table>
-                <tr>
-                    <td><label class="translate" for="host">Miniserver Hostname / IP</label></td>
-                    <td class="admin-icon"></td>
-                    <td><input type="text" id="host" class="value"></td>
-                </tr>
-                <tr>
-                    <td><label class="translate" for="port">Miniserver Port</label></td>
-                    <td class="admin-icon"></td>
-                    <td><input type="text" id="port" class="value"></td>
-                </tr>
-                <tr>
-                    <td><label class="translate" for="username">Miniserver Username</label></td>
-                    <td class="admin-icon"></td>
-                    <td><input type="text" id="username" class="value"></td>
-                </tr>
-                <tr>
-                    <td><label class="translate" for="password">Miniserver Password</label></td>
-                    <td class="admin-icon"></td>
-                    <td><input type="password" id="password" class="value"></td>
-                </tr>
-                <tr>
-                    <td class="translate">Synchronize</td>
-                    <td class="admin-icon"></td>
-                    <td><input type="checkbox" id="syncNames" value="true" class="value"> <label class="translate" for="syncNames">Names</label></td>
-                </tr>
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                    <td><input type="checkbox" id="syncRooms" value="true" class="value"> <label class="translate" for="syncRooms">Rooms</label></td>
-                </tr>
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                    <td><input type="checkbox" id="syncFunctions" value="true" class="value"> <label class="translate" for="syncFunctions">Functions</label></td>
-                </tr>
-            </table>
+            <div class="row">
+                <div class="col s6 input-field">
+                    <input type="text" class="value" id="username" />
+                    <label for="username" class="translate">Miniserver Username</label>
+                </div>
+
+                <div class="col s6 input-field">
+                    <input type="password" class="value" id="password" />
+                    <label for="password" class="translate">Miniserver Password</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s3 translate">Synchronize</div>
+
+                <div class="col s3 input-field">
+                    <input type="checkbox" class="value" id="syncNames" />
+                    <label for="syncNames" class="translate">Names</label>
+                </div>
+
+                <div class="col s3 input-field">
+                    <input type="checkbox" class="value" id="syncRooms" />
+                    <label for="syncRooms" class="translate">Rooms</label>
+                </div>
+
+                <div class="col s3 input-field">
+                    <input type="checkbox" class="value" id="syncFunctions" />
+                    <label for="syncFunctions" class="translate">Functions</label>
+                </div>
+            </div>
         </div>
-    </div>
-</body>
-</html> 
+    </body>
+</html>
