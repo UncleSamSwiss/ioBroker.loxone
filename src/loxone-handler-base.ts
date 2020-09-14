@@ -45,6 +45,10 @@ export abstract class LoxoneHandlerBase {
         return !value ? 0 : parseInt(value.toString());
     }
 
+    protected convertStateToFloat(value: OldStateValue): number {
+        return !value ? 0 : parseFloat(value.toString());
+    }
+
     protected getCachedStateValue(id: string): OldStateValue {
         return this.adapter.getCachedStateValue(id);
     }
@@ -193,7 +197,7 @@ export abstract class LoxoneHandlerBase {
                 common,
                 states[name],
                 (name: string, value: CurrentStateValue) => {
-                    this.setStateAck(name, Math.round(this.convertStateToInt(value)));
+                    this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
                 },
             );
         }
