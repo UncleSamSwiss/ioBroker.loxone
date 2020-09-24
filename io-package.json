@@ -1,55 +1,163 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "news": {
+            "2.0.1": {
+                "en": "Fixed minor issues",
+                "de": "Kleine Bugfixes",
+                "ru": "Исправлены мелкие проблемы",
+                "pt": "Problemas menores corrigidos",
+                "nl": "Kleine problemen opgelost",
+                "fr": "Correction de problèmes mineurs",
+                "it": "Risolti problemi minori",
+                "es": "Problemas menores solucionados",
+                "pl": "Naprawiono drobne problemy",
+                "zh-cn": "修正了小问题"
+            },
             "2.0.0": {
                 "en": "Updated to the latest development tools and changed to the TypeScript language",
-                "de": "Auf die neusten Entwicklungstools aktualisiert und umgestellt auf TypeScript"
+                "de": "Auf die neusten Entwicklungstools aktualisiert und umgestellt auf TypeScript",
+                "ru": "Обновлено до последних средств разработки и переведено на язык TypeScript.",
+                "pt": "Atualizado para as ferramentas de desenvolvimento mais recentes e alterado para a linguagem TypeScript",
+                "nl": "Bijgewerkt naar de nieuwste ontwikkeltools en gewijzigd naar de TypeScript-taal",
+                "fr": "Mis à jour avec les derniers outils de développement et changé pour le langage TypeScript",
+                "it": "Aggiornato agli ultimi strumenti di sviluppo e modificato nel linguaggio TypeScript",
+                "es": "Actualizado a las últimas herramientas de desarrollo y cambiado al lenguaje TypeScript",
+                "pl": "Zaktualizowano do najnowszych narzędzi programistycznych i zmieniono na język TypeScript",
+                "zh-cn": "更新为最新的开发工具，并更改为TypeScript语言"
             },
             "1.1.0": {
                 "en": "Added support for Miniserver Gen 2 and RGB in LightControllerV2",
-                "de": "Unterstützung für Miniserver Gen 2 und RGB im LightControllerV2 hinzugefügt"
+                "de": "Unterstützung für Miniserver Gen 2 und RGB im LightControllerV2 hinzugefügt",
+                "ru": "Добавлена ​​поддержка Miniserver Gen 2 и RGB в LightControllerV2.",
+                "pt": "Adicionado suporte para Miniserver Gen 2 e RGB no LightControllerV2",
+                "nl": "Ondersteuning toegevoegd voor Miniserver Gen 2 en RGB in LightControllerV2",
+                "fr": "Ajout de la prise en charge de Miniserver Gen 2 et RGB dans LightControllerV2",
+                "it": "Aggiunto supporto per Miniserver Gen 2 e RGB in LightControllerV2",
+                "es": "Se agregó soporte para Miniserver Gen 2 y RGB en LightControllerV2",
+                "pl": "Dodano obsługę Miniserver Gen 2 i RGB w LightControllerV2",
+                "zh-cn": "在LightControllerV2中增加了对Miniserver Gen 2和RGB的支持"
             },
             "1.0.0": {
                 "en": "Fixed several important issues and added AlarmClock control",
-                "de": "Einige wichtige Fehler behoben und AlarmClock Control hinzugefügt"
+                "de": "Einige wichtige Fehler behoben und AlarmClock Control hinzugefügt",
+                "ru": "Исправлено несколько важных проблем и добавлен элемент управления AlarmClock.",
+                "pt": "Vários problemas importantes foram corrigidos e adicionado o controle AlarmClock",
+                "nl": "Verschillende belangrijke problemen opgelost en AlarmClock-besturing toegevoegd",
+                "fr": "Correction de plusieurs problèmes importants et ajout du contrôle AlarmClock",
+                "it": "Risolti diversi problemi importanti e aggiunto il controllo AlarmClock",
+                "es": "Se corrigieron varios problemas importantes y se agregó el control de AlarmClock",
+                "pl": "Naprawiono kilka ważnych problemów i dodano kontrolę AlarmClock",
+                "zh-cn": "修复了几个重要问题并添加了AlarmClock控件"
             },
             "0.4.0": {
                 "en": "Improved support for Loxone Config 9 and color pickers",
-                "de": "Verbesserte Unterstützung für Loxone Config 9 und Farbwähler"
+                "de": "Verbesserte Unterstützung für Loxone Config 9 und Farbwähler",
+                "ru": "Улучшена поддержка Loxone Config 9 и палитры цветов.",
+                "pt": "Suporte aprimorado para Loxone Config 9 e seletores de cores",
+                "nl": "Verbeterde ondersteuning voor Loxone Config 9 en kleurkiezers",
+                "fr": "Prise en charge améliorée de Loxone Config 9 et des sélecteurs de couleurs",
+                "it": "Supporto migliorato per Loxone Config 9 e selettori di colori",
+                "es": "Soporte mejorado para Loxone Config 9 y selectores de color",
+                "pl": "Ulepszona obsługa Loxone Config 9 i selektorów kolorów",
+                "zh-cn": "改进了对Loxone Config 9和颜色选择器的支持"
             },
             "0.3.0": {
                 "en": "Control names only synchronized on the first time by default (configurable)",
-                "de": "Namen von Controls werden standardmässig nur noch beim ersten mal synchronisiert (konfigurierbar)"
+                "de": "Namen von Controls werden standardmässig nur noch beim ersten mal synchronisiert (konfigurierbar)",
+                "ru": "Имена элементов управления по умолчанию синхронизируются только в первый раз (настраивается)",
+                "pt": "Nomes de controle sincronizados apenas na primeira vez por padrão (configurável)",
+                "nl": "Besturingsnamen worden standaard alleen de eerste keer gesynchroniseerd (configureerbaar)",
+                "fr": "Noms de contrôle synchronisés uniquement la première fois par défaut (configurable)",
+                "it": "I nomi dei controlli vengono sincronizzati solo la prima volta per impostazione predefinita (configurabile)",
+                "es": "Los nombres de los controles solo se sincronizan la primera vez de forma predeterminada (configurable)",
+                "pl": "Nazwy kontrolne są domyślnie synchronizowane tylko za pierwszym razem (konfigurowalne)",
+                "zh-cn": "默认情况下，控件名称仅在第一次时同步（可配置）"
             },
             "0.2.1": {
                 "en": "Added support for Slider control",
-                "de": "Unterstützung für Slider Control"
+                "de": "Unterstützung für Slider Control",
+                "ru": "Добавлена ​​поддержка управления Slider.",
+                "pt": "Adicionado suporte para controle deslizante",
+                "nl": "Ondersteuning toegevoegd voor schuifregelaar",
+                "fr": "Ajout de la prise en charge du contrôle Slider",
+                "it": "Aggiunto supporto per il controllo Slider",
+                "es": "Soporte agregado para control deslizante",
+                "pl": "Dodano obsługę sterowania suwakiem",
+                "zh-cn": "增加了对Slider控件的支持"
             },
             "0.2.0": {
                 "en": "Added proper support for Alexa for the following controls: Alarm, AudioZone, Gate, Jalousie and LightController",
-                "de": "Bessere Unterstützung für Alexa für die folgenden Controls: Alarm, AudioZone, Gate, Jalousie und LightController"
+                "de": "Bessere Unterstützung für Alexa für die folgenden Controls: Alarm, AudioZone, Gate, Jalousie und LightController",
+                "ru": "Добавлена ​​правильная поддержка Alexa для следующих элементов управления: Alarm, AudioZone, Gate, Jalousie и LightController.",
+                "pt": "Adicionado suporte adequado para Alexa para os seguintes controles: Alarm, AudioZone, Gate, Jalousie e LightController",
+                "nl": "Goede ondersteuning toegevoegd voor Alexa voor de volgende bedieningselementen: Alarm, AudioZone, Gate, Jalousie en LightController",
+                "fr": "Ajout d'un support approprié pour Alexa pour les contrôles suivants: Alarm, AudioZone, Gate, Jalousie et LightController",
+                "it": "Aggiunto supporto appropriato per Alexa per i seguenti controlli: Alarm, AudioZone, Gate, Jalousie e LightController",
+                "es": "Se agregó el soporte adecuado para Alexa para los siguientes controles: Alarma, AudioZone, Gate, Jalousie y LightController",
+                "pl": "Dodano odpowiednią obsługę Alexy dla następujących elementów sterujących: Alarm, AudioZone, Gate, Jalousie i LightController",
+                "zh-cn": "为以下控件添加了对Alexa的适当支持：警报，AudioZone，Gate，Jalousie和LightController"
             },
             "0.1.1": {
                 "en": "Added support for synchronizing rooms and functions (categories) from Loxone Miniserver",
-                "de": "Unterstützung für die Synchronisation von Räumen und Gewerken (Kategorien) vom Loxone Miniserver"
+                "de": "Unterstützung für die Synchronisation von Räumen und Gewerken (Kategorien) vom Loxone Miniserver",
+                "ru": "Добавлена ​​поддержка синхронизации комнат и функций (категорий) из Loxone Miniserver.",
+                "pt": "Adicionado suporte para sincronizar salas e funções (categorias) do Miniserver Loxone",
+                "nl": "Ondersteuning toegevoegd voor het synchroniseren van kamers en functies (categorieën) van Loxone Miniserver",
+                "fr": "Ajout de la prise en charge de la synchronisation des pièces et des fonctions (catégories) à partir de Loxone Miniserver",
+                "it": "Aggiunto supporto per la sincronizzazione di stanze e funzioni (categorie) da Loxone Miniserver",
+                "es": "Se agregó soporte para sincronizar salas y funciones (categorías) de Loxone Miniserver",
+                "pl": "Dodano obsługę synchronizacji pomieszczeń i funkcji (kategorii) z Loxone Miniserver",
+                "zh-cn": "从Loxone Miniserver添加了对同步房间和功能（类别）的支持"
             },
             "0.1.0": {
                 "en": "Added support for many more controls including commands from ioBroker to Loxone Miniserver",
-                "de": "Unterstützung für viele weitere Controls hinzugefügt; inklusive versenden von Befehlen an den Loxone Miniserver"
+                "de": "Unterstützung für viele weitere Controls hinzugefügt; inklusive versenden von Befehlen an den Loxone Miniserver",
+                "ru": "Добавлена ​​поддержка многих других элементов управления, включая команды от ioBroker до Loxone Miniserver.",
+                "pt": "Adicionado suporte para muitos mais controles, incluindo comandos de ioBroker para Loxone Miniserver",
+                "nl": "Ondersteuning toegevoegd voor veel meer bedieningselementen, waaronder opdrachten van ioBroker tot Loxone Miniserver",
+                "fr": "Ajout de la prise en charge de nombreux autres contrôles, y compris des commandes d'ioBroker à Loxone Miniserver",
+                "it": "Aggiunto il supporto per molti altri controlli inclusi i comandi da ioBroker a Loxone Miniserver",
+                "es": "Se agregó soporte para muchos más controles, incluidos los comandos de ioBroker a Loxone Miniserver",
+                "pl": "Dodano obsługę wielu innych elementów sterujących, w tym poleceń od ioBroker do Loxone Miniserver",
+                "zh-cn": "增加了对更多控件的支持，包括从ioBroker到Loxone Miniserver的命令"
             },
             "0.0.3": {
                 "en": "Formatting, refactoring and Russian translations by Bluefox",
-                "de": "Formatierungen, refactoring und russische Übersetzungen durch Bluefox"
+                "de": "Formatierungen, refactoring und russische Übersetzungen durch Bluefox",
+                "ru": "Форматирование, рефакторинг и русский перевод от Bluefox",
+                "pt": "Formatação, refatoração e traduções em russo por Bluefox",
+                "nl": "Opmaak, refactoring en Russische vertalingen door Bluefox",
+                "fr": "Formatage, refactoring et traductions russes par Bluefox",
+                "it": "Formattazione, refactoring e traduzioni in russo di Bluefox",
+                "es": "Formateo, refactorización y traducciones al ruso por Bluefox",
+                "pl": "Formatowanie, refaktoryzacja i tłumaczenia na język rosyjski przez Bluefox",
+                "zh-cn": "Bluefox的格式，重构和俄语翻译"
             },
             "0.0.2": {
                 "en": "Added creation of an empty device for all unsupported controls (helps figure out its configuration)",
-                "de": "Nicht unterstützte Controls werden nun als leeres Gerät hinzugefügt (hilft dessen Konfiguration herauszufinden)"
+                "de": "Nicht unterstützte Controls werden nun als leeres Gerät hinzugefügt (hilft dessen Konfiguration herauszufinden)",
+                "ru": "Добавлено создание пустого устройства для всех неподдерживаемых элементов управления (помогает разобраться в его конфигурации)",
+                "pt": "Adicionada a criação de um dispositivo vazio para todos os controles não suportados (ajuda a descobrir sua configuração)",
+                "nl": "Aanmaak toegevoegd van een leeg apparaat voor alle niet-ondersteunde besturingselementen (helpt bij het bepalen van de configuratie)",
+                "fr": "Ajout de la création d'un appareil vide pour tous les contrôles non pris en charge (aide à comprendre sa configuration)",
+                "it": "Aggiunta la creazione di un dispositivo vuoto per tutti i controlli non supportati (aiuta a capire la sua configurazione)",
+                "es": "Se agregó la creación de un dispositivo vacío para todos los controles no compatibles (ayuda a determinar su configuración)",
+                "pl": "Dodano tworzenie pustego urządzenia dla wszystkich nieobsługiwanych elementów sterujących (pomaga ustalić jego konfigurację)",
+                "zh-cn": "为所有不受支持的控件添加了一个空设备的创建（帮助找出其配置）"
             },
             "0.0.1": {
                 "en": "initial commit",
-                "de": "initial commit"
+                "de": "initial commit",
+                "ru": "начальная фиксация",
+                "pt": "commit inicial",
+                "nl": "eerste vastlegging",
+                "fr": "engagement initial",
+                "it": "commit iniziale",
+                "es": "Compromiso inicial",
+                "pl": "wstępne zatwierdzenie",
+                "zh-cn": "初次提交"
             }
         },
         "title": "Loxone Miniserver",
@@ -77,8 +185,14 @@
             "pl": "Komunikuje się z Loxone Miniserver.",
             "zh-cn": "与Loxone小型服务器通信。"
         },
-        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
-        "keywords": ["loxone", "miniserver", "smarthome"],
+        "authors": [
+            "UncleSamSwiss <samuel.weibel@gmail.com>"
+        ],
+        "keywords": [
+            "loxone",
+            "miniserver",
+            "smarthome"
+        ],
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
@@ -99,8 +213,12 @@
             }
         ]
     },
-    "encryptedNative": ["password"],
-    "protectedNative": ["password"],
+    "encryptedNative": [
+        "password"
+    ],
+    "protectedNative": [
+        "password"
+    ],
     "native": {
         "host": "0.0.0.0",
         "port": 80,

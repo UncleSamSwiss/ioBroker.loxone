@@ -532,6 +532,12 @@ Native value from ioBroker &gt; Objects
 
 ## Changelog
 
+### 2.0.1 (2020-09-24)
+
+-   (UncleSamSwiss) Fixed percentage states always showing 0% (#49)
+-   (UncleSamSwiss) Fixed analog virtual inputs wouldn't set the value 0 from ioBroker (#47)
+-   (UncleSamSwiss) Added translations to package information.
+
 ### 2.0.0
 
 -   (UncleSamSwiss) Updated to the latest development tools and changed to the TypeScript language
