@@ -7,7 +7,7 @@
 ![Number of Installations (latest)](http://iobroker.live/badges/loxone-installed.svg)
 ![Number of Installations (stable)](http://iobroker.live/badges/loxone-stable.svg)
 [![Dependency Status](https://img.shields.io/david/UncleSamSwiss/iobroker.loxone.svg)](https://david-dm.org/UncleSamSwiss/iobroker.loxone)
-[![Known Vulnerabilities](https://snyk.io/test/github/UncleSamSwiss/ioBroker.loxone/badge.svg)](https://snyk.io/test/github/UncleSamSwiss/ioBroker.loxone)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/loxone/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
 
 [![NPM](https://nodei.co/npm/iobroker.loxone.png?downloads=true)](https://nodei.co/npm/iobroker.loxone/)
 
