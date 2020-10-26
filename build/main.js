@@ -327,15 +327,16 @@ class Loxone extends utils.Adapter {
                     members.push(this.namespace + '.' + found[uuid][i]);
                 }
                 const item = values[uuid];
+                const name = item.name.replace(/[\][*.,;'"`<>\\?]+/g, '_');
                 const obj = {
                     type: 'enum',
                     common: {
-                        name: item.name,
+                        name: name,
                         members: members,
                     },
                     native: item,
                 };
-                yield this.updateEnumObjectAsync(enumName + '.' + item.name, obj);
+                yield this.updateEnumObjectAsync(enumName + '.' + name, obj);
             }
         });
     }

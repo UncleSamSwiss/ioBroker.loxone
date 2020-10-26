@@ -406,16 +406,17 @@ export class Loxone extends utils.Adapter {
             }
 
             const item = values[uuid];
+            const name = item.name.replace(/[\][*.,;'"`<>\\?]+/g, '_');
             const obj = {
                 type: 'enum',
                 common: {
-                    name: item.name,
+                    name: name,
                     members: members,
                 },
                 native: item,
             };
 
-            await this.updateEnumObjectAsync(enumName + '.' + item.name, obj);
+            await this.updateEnumObjectAsync(enumName + '.' + name, obj);
         }
     }
 
