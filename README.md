@@ -11,8 +11,7 @@
 
 [![NPM](https://nodei.co/npm/iobroker.loxone.png?downloads=true)](https://nodei.co/npm/iobroker.loxone/)
 
-**Tests:** [![Travis-CI](http://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone/master.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone)
-![Test and Release](https://github.com/UncleSamSwiss/ioBroker.loxone/workflows/Test%20and%20Release/badge.svg)
+**Tests:** ![Test and Release](https://github.com/UncleSamSwiss/ioBroker.loxone/workflows/Test%20and%20Release/badge.svg)
 
 ## loxone adapter for ioBroker
 
