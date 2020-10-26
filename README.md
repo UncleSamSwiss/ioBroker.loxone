@@ -442,7 +442,8 @@ Provided by stairwell and multifunction switches.
     -   0 = the output is turned off
     -   -1 = the output is permanently on
     -   otherwise it will count down from deactivationDelayTotal
--   `active` (wo) enables or disables the switch (without deactivation delay)
+-   `on` (wo) writing any value to this state enables the switch permanently without deactivation delay
+-   `off` (wo) writing any value to this state disables the switch
 -   `pulse` (wo) pulses the switch:
     -   deactivationDelay = 0
         -   Will start the countdown, from deactivationDelayTotal to 0
