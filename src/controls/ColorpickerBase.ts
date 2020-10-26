@@ -151,13 +151,14 @@ export abstract class ColorpickerBase extends ControlBase {
         // so if somebody sends us the three values (almost) at once,
         // we don't change the color three times using commands
         const parentId = this.adapter.namespace + '.' + uuid;
-        const updateColorValue = (): void => {
-            const red = this.convertStateToInt(this.getCachedStateValue(parentId + '.red'));
-            const green = this.convertStateToInt(this.getCachedStateValue(parentId + '.green'));
-            const blue = this.convertStateToInt(this.getCachedStateValue(parentId + '.blue'));
+        const updateColorValue = async (): Promise<void> => {
+            const states = await this.adapter.getStatesAsync(uuid + '.*');
+            const red = this.convertStateToInt(states[parentId + '.red'].val);
+            const green = this.convertStateToInt(states[parentId + '.green'].val);
+            const blue = this.convertStateToInt(states[parentId + '.blue'].val);
 
-            const hsl = colorConvert.rgb.hsv([red, green, blue]);
-            const command = `hsv(${hsl[0]},${hsl[1]},${hsl[2]}`;
+            const hsv = colorConvert.rgb.hsv([red, green, blue]);
+            const command = `hsv(${hsv[0]},${hsv[1]},${hsv[2]}`;
             this.sendCommand(control.uuidAction, command);
         };
         const startUpdateTimer = (): void => {
