@@ -54,8 +54,6 @@ The user only needs read access to the variables you want to use from ioBroker.
 
 Provide the password for the given username (see above).
 
-Please be aware that this password is stored unsecured inside ioBroker - therefore don't use the "admin" user!
-
 ### Synchronize Names
 
 This will update names in ioBroker whenever they change in the Loxone configuration.
@@ -546,6 +544,7 @@ Native value from ioBroker &gt; Objects
 
 ### 2.0.0
 
+- **BREAKING:** Since the password is now encrypted, you will need to enter the password again after an update to this version!
 -   (UncleSamSwiss) Updated to the latest development tools and changed to the TypeScript language
 
 ### 1.1.0
