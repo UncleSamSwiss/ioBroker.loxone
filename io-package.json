@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.0.1",
+        "version": "2.0.2",
         "news": {
+            "2.0.2": {
+                "en": "Fixed minor issues",
+                "de": "Kleine Bugfixes",
+                "ru": "Исправлены мелкие проблемы",
+                "pt": "Problemas menores corrigidos",
+                "nl": "Kleine problemen opgelost",
+                "fr": "Correction de problèmes mineurs",
+                "it": "Risolti problemi minori",
+                "es": "Problemas menores solucionados",
+                "pl": "Naprawiono drobne problemy",
+                "zh-cn": "修正了小问题"
+            },
             "2.0.1": {
                 "en": "Fixed minor issues",
                 "de": "Kleine Bugfixes",

@@ -533,6 +533,12 @@ Native value from ioBroker &gt; Objects
 
 ## Changelog
 
+### 2.0.2 (2020-10-26)
+
+-   (UncleSamSwiss) Fixed color picker updates (#52)
+-   (UncleSamSwiss) TimedSwitch to have `on`/`off` instead of `active` (#53)
+-   (UncleSamSwiss) Cleaning illegal characters for room and function names (#54)
+
 ### 2.0.1 (2020-09-24)
 
 -   (UncleSamSwiss) Fixed percentage states always showing 0% (#49)
