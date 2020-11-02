@@ -307,7 +307,7 @@ export class Loxone extends utils.Adapter {
             try {
                 await this.loadControlAsync('device', uuid, control);
             } catch (e) {
-                this.log.error(`Unsupported control type ${control.type}: ${e}`);
+                this.log.info(`Currently unsupported control type ${control.type}: ${e}`);
 
                 if (!hasUnsupported) {
                     hasUnsupported = true;
@@ -356,7 +356,7 @@ export class Loxone extends utils.Adapter {
 
                 await this.loadControlAsync('channel', uuid, subControl);
             } catch (e) {
-                this.log.error(`Unsupported sub-control type ${subControl.type}: ${e}`);
+                this.log.info(`Currently unsupported sub-control type ${subControl.type}: ${e}`);
             }
         }
     }
