@@ -95,7 +95,7 @@ export class Loxone extends utils.Adapter {
         });
 
         this.client.on('auth_failed', () => {
-            this.log.error('Miniserver connect failed');
+            this.log.error('Miniserver auth failed');
         });
 
         this.client.on('connect_failed', () => {
