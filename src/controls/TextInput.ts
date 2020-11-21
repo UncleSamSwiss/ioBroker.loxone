@@ -1,5 +1,5 @@
 import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
+import { Control, ControlStates } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class TextInput extends ControlBase {
@@ -52,4 +52,36 @@ export class TextInput extends ControlBase {
             );
         }
     }
+
+    protected async createTextInputStateObjectAsync(
+        controlName: string,
+        uuid: string,
+        states: ControlStates,
+        name: string,
+        type: ioBroker.CommonType,
+        role: string,
+        commonExt?: Partial<ioBroker.StateCommon>,
+    ): Promise<void> {
+        if (states !== undefined && states.hasOwnProperty(name)) {
+            let common = {
+                name: controlName + ': ' + name,
+                read: false,
+                write: true,
+                type: type,
+                role: role,
+                //smartIgnore: true,
+            };
+            if (commonExt && typeof commonExt === 'object') {
+                common = { ...common, ...commonExt };
+            }
+            await this.updateStateObjectAsync(
+                uuid + '.' + this.normalizeName(name),
+                common,
+                states[name],
+                this.setStateAck.bind(this),
+            );
+        }
+    }    
+
+    
 }
