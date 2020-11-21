@@ -31,7 +31,7 @@ export class Slider extends ControlBase {
             common,
         );
         this.addStateChangeListener(uuid + '.value', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, (newValue || '').toString());
+            this.sendCommand(control.uuidAction, (newValue || '0').toString());
         });
 
         await this.createBooleanControlStateObjectAsync(

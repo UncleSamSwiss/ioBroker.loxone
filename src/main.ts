@@ -95,7 +95,7 @@ export class Loxone extends utils.Adapter {
         });
 
         this.client.on('auth_failed', () => {
-            this.log.error('Miniserver connect failed');
+            this.log.error('Miniserver auth failed');
         });
 
         this.client.on('connect_failed', () => {
@@ -307,7 +307,7 @@ export class Loxone extends utils.Adapter {
             try {
                 await this.loadControlAsync('device', uuid, control);
             } catch (e) {
-                this.log.error(`Unsupported control type ${control.type}: ${e}`);
+                this.log.info(`Currently unsupported control type ${control.type}: ${e}`);
 
                 if (!hasUnsupported) {
                     hasUnsupported = true;
@@ -356,7 +356,7 @@ export class Loxone extends utils.Adapter {
 
                 await this.loadControlAsync('channel', uuid, subControl);
             } catch (e) {
-                this.log.error(`Unsupported sub-control type ${subControl.type}: ${e}`);
+                this.log.info(`Currently unsupported sub-control type ${subControl.type}: ${e}`);
             }
         }
     }
@@ -406,16 +406,17 @@ export class Loxone extends utils.Adapter {
             }
 
             const item = values[uuid];
+            const name = item.name.replace(/[\][*.,;'"`<>\\?]+/g, '_');
             const obj = {
                 type: 'enum',
                 common: {
-                    name: item.name,
+                    name: name,
                     members: members,
                 },
                 native: item,
             };
 
-            await this.updateEnumObjectAsync(enumName + '.' + item.name, obj);
+            await this.updateEnumObjectAsync(enumName + '.' + name, obj);
         }
     }
 

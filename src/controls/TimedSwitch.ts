@@ -1,4 +1,3 @@
-import { CurrentStateValue, OldStateValue } from '../main';
 import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
@@ -35,17 +34,14 @@ export class TimedSwitch extends ControlBase {
             'value.interval',
         );
 
-        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'active', {
-            // TODO: re-add: smartIgnore: type == 'channel',
+        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
+        this.addStateChangeListener(uuid + '.on', () => {
+            this.sendCommand(control.uuidAction, 'on');
         });
-        this.addStateChangeListener(uuid + '.active', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue == oldValue) {
-                return;
-            } else if (newValue) {
-                this.sendCommand(control.uuidAction, 'on');
-            } else {
-                this.sendCommand(control.uuidAction, 'off');
-            }
+
+        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
+        this.addStateChangeListener(uuid + '.off', () => {
+            this.sendCommand(control.uuidAction, 'off');
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');

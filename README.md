@@ -7,12 +7,11 @@
 ![Number of Installations (latest)](http://iobroker.live/badges/loxone-installed.svg)
 ![Number of Installations (stable)](http://iobroker.live/badges/loxone-stable.svg)
 [![Dependency Status](https://img.shields.io/david/UncleSamSwiss/iobroker.loxone.svg)](https://david-dm.org/UncleSamSwiss/iobroker.loxone)
-[![Known Vulnerabilities](https://snyk.io/test/github/UncleSamSwiss/ioBroker.loxone/badge.svg)](https://snyk.io/test/github/UncleSamSwiss/ioBroker.loxone)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/loxone/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
 
 [![NPM](https://nodei.co/npm/iobroker.loxone.png?downloads=true)](https://nodei.co/npm/iobroker.loxone/)
 
-**Tests:** [![Travis-CI](http://img.shields.io/travis/UncleSamSwiss/ioBroker.loxone/master.svg)](https://travis-ci.org/UncleSamSwiss/ioBroker.loxone)
-![Test and Release](https://github.com/UncleSamSwiss/ioBroker.loxone/workflows/Test%20and%20Release/badge.svg)
+**Tests:** ![Test and Release](https://github.com/UncleSamSwiss/ioBroker.loxone/workflows/Test%20and%20Release/badge.svg)
 
 ## loxone adapter for ioBroker
 
@@ -54,8 +53,6 @@ The user only needs read access to the variables you want to use from ioBroker.
 ### Miniserver Password
 
 Provide the password for the given username (see above).
-
-Please be aware that this password is stored unsecured inside ioBroker - therefore don't use the "admin" user!
 
 ### Synchronize Names
 
@@ -442,7 +439,8 @@ Provided by stairwell and multifunction switches.
     -   0 = the output is turned off
     -   -1 = the output is permanently on
     -   otherwise it will count down from deactivationDelayTotal
--   `active` (wo) enables or disables the switch (without deactivation delay)
+-   `on` (wo) writing any value to this state enables the switch permanently without deactivation delay
+-   `off` (wo) writing any value to this state disables the switch
 -   `pulse` (wo) pulses the switch:
     -   deactivationDelay = 0
         -   Will start the countdown, from deactivationDelayTotal to 0
@@ -532,8 +530,21 @@ Native value from ioBroker &gt; Objects
 
 ## Changelog
 
+### 2.0.2 (2020-10-26)
+
+-   (UncleSamSwiss) Fixed color picker updates (#52)
+-   (UncleSamSwiss) TimedSwitch to have `on`/`off` instead of `active` (#53)
+-   (UncleSamSwiss) Cleaning illegal characters for room and function names (#54)
+
+### 2.0.1 (2020-09-24)
+
+-   (UncleSamSwiss) Fixed percentage states always showing 0% (#49)
+-   (UncleSamSwiss) Fixed analog virtual inputs wouldn't set the value 0 from ioBroker (#47)
+-   (UncleSamSwiss) Added translations to package information.
+
 ### 2.0.0
 
+- **BREAKING:** Since the password is now encrypted, you will need to enter the password again after an update to this version!
 -   (UncleSamSwiss) Updated to the latest development tools and changed to the TypeScript language
 
 ### 1.1.0

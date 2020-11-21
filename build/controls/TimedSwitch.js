@@ -28,19 +28,13 @@ class TimedSwitch extends control_base_1.ControlBase {
             ]);
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'deactivationDelayTotal', 'number', 'value.interval');
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'deactivationDelay', 'number', 'value.interval');
-            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'active', {
-            // TODO: re-add: smartIgnore: type == 'channel',
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
+            this.addStateChangeListener(uuid + '.on', () => {
+                this.sendCommand(control.uuidAction, 'on');
             });
-            this.addStateChangeListener(uuid + '.active', (oldValue, newValue) => {
-                if (newValue == oldValue) {
-                    return;
-                }
-                else if (newValue) {
-                    this.sendCommand(control.uuidAction, 'on');
-                }
-                else {
-                    this.sendCommand(control.uuidAction, 'off');
-                }
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
+            this.addStateChangeListener(uuid + '.off', () => {
+                this.sendCommand(control.uuidAction, 'off');
             });
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
             this.addStateChangeListener(uuid + '.pulse', () => {
