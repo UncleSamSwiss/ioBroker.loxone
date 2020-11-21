@@ -81,7 +81,5 @@ export class TextInput extends ControlBase {
                 this.setStateAck.bind(this),
             );
         }
-    }    
-
-    
+    }
 }
