@@ -42,6 +42,9 @@ class LoxoneHandlerBase {
     convertStateToInt(value) {
         return !value ? 0 : parseInt(value.toString());
     }
+    convertStateToFloat(value) {
+        return !value ? 0 : parseFloat(value.toString());
+    }
     getCachedStateValue(id) {
         return this.adapter.getCachedStateValue(id);
     }
@@ -137,7 +140,7 @@ class LoxoneHandlerBase {
                     common = Object.assign(Object.assign({}, common), commonExt);
                 }
                 yield this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], (name, value) => {
-                    this.setStateAck(name, Math.round(this.convertStateToInt(value)));
+                    this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
                 });
             }
         });

@@ -30,7 +30,7 @@ class Slider extends control_base_1.ControlBase {
             }
             yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'value', 'number', 'level', common);
             this.addStateChangeListener(uuid + '.value', (oldValue, newValue) => {
-                this.sendCommand(control.uuidAction, (newValue || '').toString());
+                this.sendCommand(control.uuidAction, (newValue || '0').toString());
             });
             yield this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'error', 'indicator.maintenance');
             if (!control.hasOwnProperty('details')) {
