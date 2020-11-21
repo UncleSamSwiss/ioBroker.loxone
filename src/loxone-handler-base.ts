@@ -219,36 +219,6 @@ export abstract class LoxoneHandlerBase {
         await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, uuid);
     }
 
-    protected async createTextInputStateObjectAsync(
-        controlName: string,
-        uuid: string,
-        states: ControlStates,
-        name: string,
-        type: ioBroker.CommonType,
-        role: string,
-        commonExt?: Partial<ioBroker.StateCommon>,
-    ): Promise<void> {
-        if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
-                name: controlName + ': ' + name,
-                read: false,
-                write: true,
-                type: type,
-                role: role,
-                //smartIgnore: true,
-            };
-            if (commonExt && typeof commonExt === 'object') {
-                common = { ...common, ...commonExt };
-            }
-            await this.updateStateObjectAsync(
-                uuid + '.' + this.normalizeName(name),
-                common,
-                states[name],
-                this.setStateAck.bind(this),
-            );
-        }
-    }
-
     protected normalizeName(name: string): string {
         return name.trim().replace(/[^\wäöüÄÖÜäöüéàèêçß]+/g, '_');
     }
