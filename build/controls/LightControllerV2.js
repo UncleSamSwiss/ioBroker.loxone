@@ -77,13 +77,13 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     this.updateActiveMoods();
                 });
                 this.addStateChangeListener(uuid + '.activeMoods', (oldValue, newValue) => {
-                    let arrayValue = [];
+                    let arrayValue;
                     if (Array.isArray(newValue)) {
                         arrayValue = newValue;
                     }
                     else {
                         try {
-                            arrayValue = JSON.parse(newValue);
+                            newValue = JSON.parse(newValue);
                         }
                         catch (e) {
                             // ignore error, continue below
@@ -91,11 +91,15 @@ class LightControllerV2 extends control_base_1.ControlBase {
                         if (!Array.isArray(newValue)) {
                             arrayValue = newValue.split(',');
                         }
+                        else {
+                            arrayValue = newValue;
+                        }
                     }
                     const ids = [];
                     for (let i = 0; i < arrayValue.length; i++) {
                         const moodName = arrayValue[i];
                         if (!this.moodNameToId.hasOwnProperty(moodName)) {
+                            this.adapter.log.error(`Can't find mood name '${moodName}', discarding new value`);
                             return;
                         }
                         ids.push(this.moodNameToId[moodName]);

@@ -86,17 +86,19 @@ export class LightControllerV2 extends ControlBase {
             this.addStateChangeListener(
                 uuid + '.activeMoods',
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    let arrayValue: string[] = [];
+                    let arrayValue: string[];
                     if (Array.isArray(newValue)) {
                         arrayValue = newValue;
                     } else {
                         try {
-                            arrayValue = JSON.parse(newValue as string);
+                            newValue = JSON.parse(newValue as string);
                         } catch (e) {
                             // ignore error, continue below
                         }
                         if (!Array.isArray(newValue)) {
                             arrayValue = (newValue as string).split(',');
+                        } else {
+                            arrayValue = newValue;
                         }
                     }
 
@@ -104,6 +106,7 @@ export class LightControllerV2 extends ControlBase {
                     for (let i = 0; i < arrayValue.length; i++) {
                         const moodName = arrayValue[i];
                         if (!this.moodNameToId.hasOwnProperty(moodName)) {
+                            this.adapter.log.error(`Can't find mood name '${moodName}', discarding new value`);
                             return;
                         }
                         ids.push(this.moodNameToId[moodName]);
