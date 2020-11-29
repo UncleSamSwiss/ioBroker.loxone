@@ -391,6 +391,7 @@ class Loxone extends utils.Adapter {
         });
     }
     sendCommand(uuid, action) {
+        this.log.debug(`Sending command ${uuid} ${action}`);
         this.client.send_cmd(uuid, action);
     }
     updateObjectAsync(id, obj) {

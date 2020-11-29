@@ -470,6 +470,7 @@ export class Loxone extends utils.Adapter {
     }
 
     public sendCommand(uuid: string, action: string): void {
+        this.log.debug(`Sending command ${uuid} ${action}`);
         this.client.send_cmd(uuid, action);
     }
 
