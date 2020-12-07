@@ -68,6 +68,14 @@ class Gate extends control_base_1.ControlBase {
                     }
                 }
             });
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
+            this.addStateChangeListener(uuid + '.open', () => {
+                this.sendCommand(control.uuidAction, 'open');
+            });
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'close');
+            this.addStateChangeListener(uuid + '.close', () => {
+                this.sendCommand(control.uuidAction, 'close');
+            });
             // for Alexa support:
             if (control.states.position) {
                 this.addStateChangeListener(uuid + '.position', (oldValue, newValue) => {
