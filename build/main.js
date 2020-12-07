@@ -16,6 +16,7 @@ exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
 const loxoneWsApi = require("node-lox-ws-api");
 const weather_server_handler_1 = require("./weather-server-handler");
+const Queue = require("queue-fifo");
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign(Object.assign({ dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : __dirname + '/../' }, options), { name: 'loxone' }));
@@ -26,8 +27,9 @@ class Loxone extends utils.Adapter {
         this.foundCats = {};
         this.stateChangeListeners = {};
         this.stateEventHandlers = {};
-        this.cacheEvents = false;
-        this.eventsCache = {};
+        this.eventsQueue = new Queue();
+        this.runQueue = false;
+        this.queueRunning = false;
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -66,6 +68,7 @@ class Loxone extends utils.Adapter {
                 this.log.error('Miniserver connection error: ' + error);
             });
             this.client.on('close', () => {
+                this.runQueue = false;
                 this.log.info('connection closed');
                 this.setState('info.connection', false, true);
             });
@@ -99,13 +102,14 @@ class Loxone extends utils.Adapter {
             }));
             const handleAnyEvent = (uuid, evt) => {
                 this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
-                this.handleEvent(uuid, evt);
+                this.log.debug(`Enqueue event: ${uuid}`);
+                this.eventsQueue.enqueue({ uuid, evt });
+                this.handleEventQueue();
             };
             this.client.on('update_event_value', handleAnyEvent);
             this.client.on('update_event_text', handleAnyEvent);
             this.client.on('update_event_daytimer', handleAnyEvent);
             this.client.on('update_event_weather', handleAnyEvent);
-            this.cacheEvents = true;
             this.client.connect();
             this.subscribeStates('*');
         });
@@ -151,14 +155,9 @@ class Loxone extends utils.Adapter {
             yield this.loadEnumsAsync(data.rooms, 'enum.rooms', this.foundRooms, this.config.syncRooms);
             yield this.loadEnumsAsync(data.cats, 'enum.functions', this.foundCats, this.config.syncFunctions);
             yield this.loadWeatherServerAsync(data.weatherServer);
-            // replay all cached events (and clear them)
-            if (this.cacheEvents) {
-                this.cacheEvents = false;
-                for (const uuid in this.eventsCache) {
-                    this.handleEvent(uuid, this.eventsCache[uuid]);
-                }
-                this.eventsCache = {};
-            }
+            // replay all queued events
+            this.runQueue = true;
+            this.handleEventQueue();
         });
     }
     loadGlobalStatesAsync(globalStates) {
@@ -371,22 +370,42 @@ class Loxone extends utils.Adapter {
             yield handler.loadAsync(data);
         });
     }
-    handleEvent(uuid, evt) {
-        if (this.cacheEvents) {
-            this.eventsCache[uuid] = evt;
-            return;
+    handleEventQueue() {
+        // TODO: this queueRunning thing is a bit dodge - and...
+        // ... do we really need it when handleEvent doesn't return a promise. Nope!
+        // Yes, as handleEvent really should return a promise then we can await before
+        // processing the next item. This way order is guaranteed.
+        if (!this.runQueue) {
+            this.log.debug('Asked to handle the queue, but is stopped');
         }
-        const stateEventHandlerList = this.stateEventHandlers[uuid];
+        else if (this.queueRunning) {
+            this.log.debug('Asked to handle the queue, but already in progress');
+        }
+        else {
+            this.queueRunning = true;
+            this.log.debug('Processing events from queue length: ' + this.eventsQueue.size());
+            let evt;
+            while ((evt = this.eventsQueue.dequeue())) {
+                this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
+                this.handleEvent(evt);
+            }
+            this.queueRunning = false;
+            this.log.debug('Done with event queue');
+        }
+    }
+    // TODO: this really needs to return a promise as discussed above.
+    handleEvent(evt) {
+        const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
-            this.log.debug('Unknown event UUID: ' + uuid);
+            this.log.debug('Unknown event UUID: ' + evt.uuid);
             return;
         }
         stateEventHandlerList.forEach((item) => {
             try {
-                item.handler(evt);
+                item.handler(evt.evt);
             }
             catch (e) {
-                this.log.error(`Error while handling event UUID ${uuid}: ${e}`);
+                this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
             }
         });
     }
