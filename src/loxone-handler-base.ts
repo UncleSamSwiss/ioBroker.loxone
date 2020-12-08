@@ -5,7 +5,7 @@ import {
     NamedStateEventHandler,
     OldStateValue,
     StateChangeListener,
-    StateEventHandler,
+    StateEventHandler
 } from './main';
 import { Control, ControlStates } from './structure-file';
 
@@ -32,13 +32,13 @@ export abstract class LoxoneHandlerBase {
         this.adapter.sendCommand(uuid, action);
     }
 
-    protected setStateAck(id: string, value: CurrentStateValue): void {
-        this.adapter.setStateAck(id, value);
+    protected setStateAck(id: string, value: CurrentStateValue): ioBroker.SetStatePromise {
+        return this.adapter.setStateAck(id, value);
     }
 
-    protected setFormattedStateAck(id: string, value: CurrentStateValue, format: string): void {
+    protected setFormattedStateAck(id: string, value: CurrentStateValue, format: string): ioBroker.SetStatePromise {
         value = sprintf(format, value);
-        this.setStateAck(id, value);
+        return this.setStateAck(id, value);
     }
 
     protected convertStateToInt(value: OldStateValue): number {
@@ -139,8 +139,8 @@ export abstract class LoxoneHandlerBase {
                 uuid + '.' + this.normalizeName(name),
                 common,
                 states[name],
-                (name: string, value: CurrentStateValue) => {
-                    this.setStateAck(name, value == 1);
+                (name: string, value: CurrentStateValue): ioBroker.SetStatePromise => {
+                    return this.setStateAck(name, value == 1);
                 },
             );
         }
@@ -164,8 +164,8 @@ export abstract class LoxoneHandlerBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 states[name],
-                (name: string, value: CurrentStateValue) => {
-                    this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                (name: string, value: CurrentStateValue): ioBroker.SetStatePromise => {
+                    return this.setStateAck(name, !value ? [] : value.toString().split('|'));
                 },
             );
         }
@@ -196,8 +196,8 @@ export abstract class LoxoneHandlerBase {
                 uuid + '.' + this.normalizeName(name),
                 common,
                 states[name],
-                (name: string, value: CurrentStateValue) => {
-                    this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
+                (name: string, value: CurrentStateValue): ioBroker.SetStatePromise => {
+                    return this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
                 },
             );
         }

@@ -33,11 +33,11 @@ class LoxoneHandlerBase {
         this.adapter.sendCommand(uuid, action);
     }
     setStateAck(id, value) {
-        this.adapter.setStateAck(id, value);
+        return this.adapter.setStateAck(id, value);
     }
     setFormattedStateAck(id, value, format) {
         value = sprintf_js_1.sprintf(format, value);
-        this.setStateAck(id, value);
+        return this.setStateAck(id, value);
     }
     convertStateToInt(value) {
         return !value ? 0 : parseInt(value.toString());
@@ -104,7 +104,7 @@ class LoxoneHandlerBase {
                     common = Object.assign(Object.assign({}, common), commonExt);
                 }
                 yield this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], (name, value) => {
-                    this.setStateAck(name, value == 1);
+                    return this.setStateAck(name, value == 1);
                 });
             }
         });
@@ -119,7 +119,7 @@ class LoxoneHandlerBase {
                     type: 'array',
                     role: 'list',
                 }, states[name], (name, value) => {
-                    this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                    return this.setStateAck(name, !value ? [] : value.toString().split('|'));
                 });
             }
         });
@@ -140,7 +140,7 @@ class LoxoneHandlerBase {
                     common = Object.assign(Object.assign({}, common), commonExt);
                 }
                 yield this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], (name, value) => {
-                    this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
+                    return this.setStateAck(name, Math.round(this.convertStateToFloat(value) * 100));
                 });
             }
         });

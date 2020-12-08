@@ -39,7 +39,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? text.on : text.off);
+                    return this.setStateAck(name, value == 1 ? text.on : text.off);
                 });
             }
             if (control.details.hasOwnProperty('image')) {
@@ -51,7 +51,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? image.on : image.off);
+                    return this.setStateAck(name, value == 1 ? image.on : image.off);
                 });
             }
             if (control.details.hasOwnProperty('color')) {
@@ -63,7 +63,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? color.on : color.off);
+                    return this.setStateAck(name, value == 1 ? color.on : color.off);
                 });
             }
         });

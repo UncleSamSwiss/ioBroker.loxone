@@ -38,7 +38,7 @@ export class InfoOnlyDigital extends ControlBase {
                 },
                 control.states.active,
                 (name: string, value: any) => {
-                    this.setStateAck(name, value == 1 ? text.on : text.off);
+                    return this.setStateAck(name, value == 1 ? text.on : text.off);
                 },
             );
         }
@@ -57,7 +57,7 @@ export class InfoOnlyDigital extends ControlBase {
                 },
                 control.states.active,
                 (name: string, value: any) => {
-                    this.setStateAck(name, value == 1 ? image.on : image.off);
+                    return this.setStateAck(name, value == 1 ? image.on : image.off);
                 },
             );
         }
@@ -76,7 +76,7 @@ export class InfoOnlyDigital extends ControlBase {
                 },
                 control.states.active,
                 (name: string, value: any) => {
-                    this.setStateAck(name, value == 1 ? color.on : color.off);
+                    return this.setStateAck(name, value == 1 ? color.on : color.off);
                 },
             );
         }

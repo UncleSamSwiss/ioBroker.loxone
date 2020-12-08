@@ -33,7 +33,7 @@ export type CurrentStateValue = StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateEventHandler = (value: any) => void;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
-export type NamedStateEventHandler = (id: string, value: any) => void;
+export type NamedStateEventHandler = (id: string, value: any) => ioBroker.SetStatePromise;
 export type LoxoneEvent = { uuid: string; evt: any };
 
 export class Loxone extends utils.Adapter {
@@ -177,7 +177,12 @@ export class Loxone extends utils.Adapter {
                 delete this.client;
             }
 
-            callback();
+            // Force the queue to run before exit ((it will be turned off by
+            // the close above).
+            this.runQueue = true;
+            this.handleEventQueue().then(() => {
+                callback();
+            });
         } catch (e) {
             callback();
         }
@@ -221,7 +226,7 @@ export class Loxone extends utils.Adapter {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: FlatStateValue) => void;
+            handler: (name: string, value: FlatStateValue) => ioBroker.SetStatePromise;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
@@ -290,9 +295,9 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private setOperatingMode(name: string, value: any): void {
-        this.setStateAck(name, value);
-        this.setStateAck(name + '-text', this.operatingModes[value]);
+    private async setOperatingMode(name: string, value: any): ioBroker.SetStatePromise {
+        await this.setStateAck(name, value);
+        return this.setStateAck(name + '-text', this.operatingModes[value]);
     }
 
     private async loadControlsAsync(controls: Controls): Promise<void> {
@@ -447,11 +452,9 @@ export class Loxone extends utils.Adapter {
         await handler.loadAsync(data);
     }
 
-    private handleEventQueue(): void {
-        // TODO: this queueRunning thing is a bit dodge - and...
-        // ... do we really need it when handleEvent doesn't return a promise. Nope!
-        // Yes, as handleEvent really should return a promise then we can await before
-        // processing the next item. This way order is guaranteed.
+    private async handleEventQueue(): Promise<void> {
+        // TODO: This solution with globals for runQueue & queueRunning
+        // isn't very elegant. It works, but is there a better way?
         if (!this.runQueue) {
             this.log.debug('Asked to handle the queue, but is stopped');
         } else if (this.queueRunning) {
@@ -462,28 +465,27 @@ export class Loxone extends utils.Adapter {
             let evt: LoxoneEvent | null;
             while ((evt = this.eventsQueue.dequeue())) {
                 this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
-                this.handleEvent(evt);
+                await this.handleEvent(evt);
             }
             this.queueRunning = false;
             this.log.debug('Done with event queue');
         }
     }
 
-    // TODO: this really needs to return a promise as discussed above.
-    private handleEvent(evt: LoxoneEvent): void {
+    private async handleEvent(evt: LoxoneEvent): Promise<void> {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug('Unknown event UUID: ' + evt.uuid);
             return;
         }
 
-        stateEventHandlerList.forEach((item: StateEventRegistration) => {
+        for (const item of stateEventHandlerList) {
             try {
-                item.handler(evt.evt);
+                await item.handler(evt.evt);
             } catch (e) {
                 this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
             }
-        });
+        }
     }
 
     public sendCommand(uuid: string, action: string): void {
@@ -571,9 +573,9 @@ export class Loxone extends utils.Adapter {
         this.stateChangeListeners[this.namespace + '.' + id] = listener;
     }
 
-    public setStateAck(id: string, value: CurrentStateValue): void {
+    public setStateAck(id: string, value: CurrentStateValue): ioBroker.SetStatePromise {
         this.currentStateValues[this.namespace + '.' + id] = value;
-        this.setState(id, { val: value, ack: true });
+        return this.setStateAsync(id, { val: value, ack: true });
     }
 
     public getCachedStateValue(id: string): OldStateValue {

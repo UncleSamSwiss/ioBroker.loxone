@@ -47,7 +47,7 @@ export class LightControllerV2 extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.moodList,
-                (name: string, value: any) => {
+                async (name: string, value: any) => {
                     const moodList = JSON.parse(value);
                     const list = [];
                     this.idToMoodName = {};
@@ -60,11 +60,11 @@ export class LightControllerV2 extends ControlBase {
                             list.push(mood.name);
                         }
                     }
-                    this.updateActiveMoods();
-                    this.updateFavoriteMoods();
-                    this.updateAdditionalMoods();
+                    await this.updateActiveMoods();
+                    await this.updateFavoriteMoods();
+                    await this.updateAdditionalMoods();
 
-                    this.setStateAck(name, list);
+                    return this.setStateAck(name, list);
                 },
             );
             await this.updateStateObjectAsync(
@@ -80,7 +80,7 @@ export class LightControllerV2 extends ControlBase {
                 control.states.activeMoods,
                 (name: string, value: any) => {
                     this.activeMoods = JSON.parse(value);
-                    this.updateActiveMoods();
+                    return this.updateActiveMoods();
                 },
             );
             this.addStateChangeListener(
@@ -158,7 +158,7 @@ export class LightControllerV2 extends ControlBase {
                 control.states.favoriteMoods,
                 (id: string, value: any) => {
                     this.favoriteMoods = JSON.parse(value);
-                    this.updateFavoriteMoods();
+                    return this.updateFavoriteMoods();
                 },
             );
             await this.updateStateObjectAsync(
@@ -174,7 +174,7 @@ export class LightControllerV2 extends ControlBase {
                 control.states.additionalMoods,
                 (name: string, value: any) => {
                     this.additionalMoods = JSON.parse(value);
-                    this.updateAdditionalMoods();
+                    return this.updateAdditionalMoods();
                 },
             );
         }
@@ -197,9 +197,9 @@ export class LightControllerV2 extends ControlBase {
         await this.loadSubControlsAsync(uuid, control);
     }
 
-    private updateMoodsList(name: string, idList: string[]): void {
+    private updateMoodsList(name: string, idList: string[]): ioBroker.SetStatePromise {
         if (Object.keys(this.idToMoodName).length === 0) {
-            return;
+            return this.resolvedPromise();
         }
         const list = [];
         for (const index in idList) {
@@ -211,18 +211,18 @@ export class LightControllerV2 extends ControlBase {
             }
         }
 
-        this.setStateAck(this.uuid + '.' + name, list);
+        return this.setStateAck(this.uuid + '.' + name, list);
     }
 
-    private updateActiveMoods(): void {
-        this.updateMoodsList('activeMoods', this.activeMoods);
+    private updateActiveMoods(): ioBroker.SetStatePromise {
+        return this.updateMoodsList('activeMoods', this.activeMoods);
     }
 
-    private updateFavoriteMoods(): void {
-        this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+    private updateFavoriteMoods(): ioBroker.SetStatePromise {
+        return this.updateMoodsList('favoriteMoods', this.favoriteMoods);
     }
 
-    private updateAdditionalMoods(): void {
-        this.updateMoodsList('additionalMoods', this.additionalMoods);
+    private updateAdditionalMoods(): ioBroker.SetStatePromise {
+        return this.updateMoodsList('additionalMoods', this.additionalMoods);
     }
 }

@@ -48,7 +48,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.moodList, (name, value) => {
+                }, control.states.moodList, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     const moodList = JSON.parse(value);
                     const list = [];
                     this.idToMoodName = {};
@@ -61,11 +61,11 @@ class LightControllerV2 extends control_base_1.ControlBase {
                             list.push(mood.name);
                         }
                     }
-                    this.updateActiveMoods();
-                    this.updateFavoriteMoods();
-                    this.updateAdditionalMoods();
-                    this.setStateAck(name, list);
-                });
+                    yield this.updateActiveMoods();
+                    yield this.updateFavoriteMoods();
+                    yield this.updateAdditionalMoods();
+                    return this.setStateAck(name, list);
+                }));
                 yield this.updateStateObjectAsync(uuid + '.activeMoods', {
                     name: control.name + ': activeMoods',
                     read: true,
@@ -74,7 +74,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     role: 'list',
                 }, control.states.activeMoods, (name, value) => {
                     this.activeMoods = JSON.parse(value);
-                    this.updateActiveMoods();
+                    return this.updateActiveMoods();
                 });
                 this.addStateChangeListener(uuid + '.activeMoods', (oldValue, newValue) => {
                     let arrayValue;
@@ -145,7 +145,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     role: 'list',
                 }, control.states.favoriteMoods, (id, value) => {
                     this.favoriteMoods = JSON.parse(value);
-                    this.updateFavoriteMoods();
+                    return this.updateFavoriteMoods();
                 });
                 yield this.updateStateObjectAsync(uuid + '.additionalMoods', {
                     name: control.name + ': additionalMoods',
@@ -155,7 +155,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     role: 'list',
                 }, control.states.additionalMoods, (name, value) => {
                     this.additionalMoods = JSON.parse(value);
-                    this.updateAdditionalMoods();
+                    return this.updateAdditionalMoods();
                 });
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
@@ -174,7 +174,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
     }
     updateMoodsList(name, idList) {
         if (Object.keys(this.idToMoodName).length === 0) {
-            return;
+            return this.resolvedPromise();
         }
         const list = [];
         for (const index in idList) {
@@ -186,16 +186,16 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 list.push(id);
             }
         }
-        this.setStateAck(this.uuid + '.' + name, list);
+        return this.setStateAck(this.uuid + '.' + name, list);
     }
     updateActiveMoods() {
-        this.updateMoodsList('activeMoods', this.activeMoods);
+        return this.updateMoodsList('activeMoods', this.activeMoods);
     }
     updateFavoriteMoods() {
-        this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+        return this.updateMoodsList('favoriteMoods', this.favoriteMoods);
     }
     updateAdditionalMoods() {
-        this.updateMoodsList('additionalMoods', this.additionalMoods);
+        return this.updateMoodsList('additionalMoods', this.additionalMoods);
     }
 }
 exports.LightControllerV2 = LightControllerV2;

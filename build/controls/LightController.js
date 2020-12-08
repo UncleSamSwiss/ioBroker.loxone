@@ -43,11 +43,9 @@ class LightController extends control_base_1.ControlBase {
                 }, control.states.sceneList, (name, value) => {
                     // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                     if (value.hasOwnProperty('text')) {
-                        this.setStateAck(name, value.text.split(','));
+                        return this.setStateAck(name, value.text.split(','));
                     }
-                    else {
-                        this.setStateAck(name, value.toString().split(','));
-                    }
+                    return this.setStateAck(name, value.toString().split(','));
                 });
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');

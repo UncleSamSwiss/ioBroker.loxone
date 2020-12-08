@@ -59,7 +59,7 @@ export class Slider extends ControlBase {
                 },
                 control.states.value,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.format as string);
+                    return this.setFormattedStateAck(name, value, control.details.format as string);
                 },
             );
         }

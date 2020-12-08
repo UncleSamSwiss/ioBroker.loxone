@@ -53,7 +53,7 @@ export class Meter extends ControlBase {
                 },
                 control.states.actual,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.actualFormat as string);
+                    return this.setFormattedStateAck(name, value, control.details.actualFormat as string);
                 },
             );
         }
@@ -71,7 +71,7 @@ export class Meter extends ControlBase {
                 },
                 control.states.total,
                 (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.totalFormat as string);
+                    return this.setFormattedStateAck(name, value, control.details.totalFormat as string);
                 },
             );
         }

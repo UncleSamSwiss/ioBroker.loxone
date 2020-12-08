@@ -40,7 +40,7 @@ class Meter extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.actual, (name, value) => {
-                    this.setFormattedStateAck(name, value, control.details.actualFormat);
+                    return this.setFormattedStateAck(name, value, control.details.actualFormat);
                 });
             }
             if (control.details.hasOwnProperty('totalFormat')) {
@@ -51,7 +51,7 @@ class Meter extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.total, (name, value) => {
-                    this.setFormattedStateAck(name, value, control.details.totalFormat);
+                    return this.setFormattedStateAck(name, value, control.details.totalFormat);
                 });
             }
         });

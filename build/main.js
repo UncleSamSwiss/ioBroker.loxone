@@ -123,7 +123,12 @@ class Loxone extends utils.Adapter {
                 this.client.close();
                 delete this.client;
             }
-            callback();
+            // Force the queue to run before exit ((it will be turned off by
+            // the close above).
+            this.runQueue = true;
+            this.handleEventQueue().then(() => {
+                callback();
+            });
         }
         catch (e) {
             callback();
@@ -223,8 +228,10 @@ class Loxone extends utils.Adapter {
         });
     }
     setOperatingMode(name, value) {
-        this.setStateAck(name, value);
-        this.setStateAck(name + '-text', this.operatingModes[value]);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.setStateAck(name, value);
+            return this.setStateAck(name + '-text', this.operatingModes[value]);
+        });
     }
     loadControlsAsync(controls) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -371,41 +378,42 @@ class Loxone extends utils.Adapter {
         });
     }
     handleEventQueue() {
-        // TODO: this queueRunning thing is a bit dodge - and...
-        // ... do we really need it when handleEvent doesn't return a promise. Nope!
-        // Yes, as handleEvent really should return a promise then we can await before
-        // processing the next item. This way order is guaranteed.
-        if (!this.runQueue) {
-            this.log.debug('Asked to handle the queue, but is stopped');
-        }
-        else if (this.queueRunning) {
-            this.log.debug('Asked to handle the queue, but already in progress');
-        }
-        else {
-            this.queueRunning = true;
-            this.log.debug('Processing events from queue length: ' + this.eventsQueue.size());
-            let evt;
-            while ((evt = this.eventsQueue.dequeue())) {
-                this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
-                this.handleEvent(evt);
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: This solution with globals for runQueue & queueRunning
+            // isn't very elegant. It works, but is there a better way?
+            if (!this.runQueue) {
+                this.log.debug('Asked to handle the queue, but is stopped');
             }
-            this.queueRunning = false;
-            this.log.debug('Done with event queue');
-        }
+            else if (this.queueRunning) {
+                this.log.debug('Asked to handle the queue, but already in progress');
+            }
+            else {
+                this.queueRunning = true;
+                this.log.debug('Processing events from queue length: ' + this.eventsQueue.size());
+                let evt;
+                while ((evt = this.eventsQueue.dequeue())) {
+                    this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
+                    yield this.handleEvent(evt);
+                }
+                this.queueRunning = false;
+                this.log.debug('Done with event queue');
+            }
+        });
     }
-    // TODO: this really needs to return a promise as discussed above.
     handleEvent(evt) {
-        const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
-        if (stateEventHandlerList === undefined) {
-            this.log.debug('Unknown event UUID: ' + evt.uuid);
-            return;
-        }
-        stateEventHandlerList.forEach((item) => {
-            try {
-                item.handler(evt.evt);
+        return __awaiter(this, void 0, void 0, function* () {
+            const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
+            if (stateEventHandlerList === undefined) {
+                this.log.debug('Unknown event UUID: ' + evt.uuid);
+                return;
             }
-            catch (e) {
-                this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
+            for (const item of stateEventHandlerList) {
+                try {
+                    yield item.handler(evt.evt);
+                }
+                catch (e) {
+                    this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
+                }
             }
         });
     }
@@ -484,7 +492,7 @@ class Loxone extends utils.Adapter {
     }
     setStateAck(id, value) {
         this.currentStateValues[this.namespace + '.' + id] = value;
-        this.setState(id, { val: value, ack: true });
+        return this.setStateAsync(id, { val: value, ack: true });
     }
     getCachedStateValue(id) {
         if (this.currentStateValues.hasOwnProperty(id)) {

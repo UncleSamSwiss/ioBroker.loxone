@@ -29,8 +29,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0]);
+                    return this.setStateAck(name, rgb[0]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.green', {
                 name: control.name + ': green',
@@ -43,8 +44,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[1]);
+                    return this.setStateAck(name, rgb[1]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.blue', {
                 name: control.name + ': blue',
@@ -57,8 +59,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[2]);
+                    return this.setStateAck(name, rgb[2]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.rgb', {
                 name: control.name + ': RGB',
@@ -69,8 +72,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+                    return this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.level', {
                 name: control.name + ': Level (only with colorTemperature)',
@@ -83,8 +87,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[0]);
+                    return this.setStateAck(name, brightnessTemperature[0]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.colorTemperature', {
                 name: control.name + ': The temperature of the light in °K 2700-6500',
@@ -95,8 +100,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[1]);
+                    return this.setStateAck(name, brightnessTemperature[1]);
                 }
+                return this.resolvedPromise();
             });
             yield this.updateStateObjectAsync(uuid + '.colorTemperatureHue', {
                 name: control.name + ': The temperature of the light in °K scaled for Hue 2000-6500',
@@ -107,8 +113,9 @@ class ColorpickerBase extends control_base_1.ControlBase {
             }, control.states.color, (name, value) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
+                    return this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
                 }
+                return this.resolvedPromise();
             });
             // we use a timer (100 ms) to update the three color values,
             // so if somebody sends us the three values (almost) at once,

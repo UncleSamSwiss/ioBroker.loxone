@@ -7,6 +7,9 @@ class ControlBase extends loxone_handler_base_1.LoxoneHandlerBase {
         super(adapter);
         this.adapter = adapter;
     }
+    resolvedPromise() {
+        return Promise.resolve('Nothing to do');
+    }
 }
 exports.ControlBase = ControlBase;
 //# sourceMappingURL=control-base.js.map

@@ -28,8 +28,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0]);
+                    return this.setStateAck(name, rgb[0]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -48,8 +49,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[1]);
+                    return this.setStateAck(name, rgb[1]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -68,8 +70,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[2]);
+                    return this.setStateAck(name, rgb[2]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -86,8 +89,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+                    return this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -106,8 +110,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[0]);
+                    return this.setStateAck(name, brightnessTemperature[0]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -124,8 +129,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[1]);
+                    return this.setStateAck(name, brightnessTemperature[1]);
                 }
+                return this.resolvedPromise();
             },
         );
         await this.updateStateObjectAsync(
@@ -142,8 +148,9 @@ export abstract class ColorpickerBase extends ControlBase {
             (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
+                    return this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
                 }
+                return this.resolvedPromise();
             },
         );
 
