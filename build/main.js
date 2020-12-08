@@ -123,12 +123,12 @@ class Loxone extends utils.Adapter {
                 this.client.close();
                 delete this.client;
             }
-            // Force the queue to run before exit ((it will be turned off by
-            // the close above).
-            this.runQueue = true;
-            this.handleEventQueue().then(() => {
-                callback();
-            });
+            // Just issue a warning if the event queue isn't empty.
+            // TODO: Should we wait for the queue to empty instead?
+            if (this.eventsQueue.size() > 0) {
+                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+            }
+            callback();
         }
         catch (e) {
             callback();
