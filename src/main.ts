@@ -110,8 +110,13 @@ export class Loxone extends utils.Adapter {
         });
 
         this.client.on('close', () => {
-            this.runQueue = false;
             this.log.info('connection closed');
+            // Stop queue and clear it. Issue a warning if it isn't empty.
+            this.runQueue = false;
+            if (this.eventsQueue.size() > 0) {
+                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+            }
+            this.eventsQueue.clear();
             this.setState('info.connection', false, true);
         });
 
@@ -175,12 +180,6 @@ export class Loxone extends utils.Adapter {
             if (this.client) {
                 this.client.close();
                 delete this.client;
-            }
-
-            // Just issue a warning if the event queue isn't empty.
-            // TODO: Should we wait for the queue to empty instead?
-            if (this.eventsQueue.size() > 0) {
-                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
             }
             callback();
         } catch (e) {
