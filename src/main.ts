@@ -33,7 +33,7 @@ export type CurrentStateValue = StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateEventHandler = (value: any) => void;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
-export type NamedStateEventHandler = (id: string, value: any) => void;
+export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
 
 export class Loxone extends utils.Adapter {
@@ -226,7 +226,7 @@ export class Loxone extends utils.Adapter {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: FlatStateValue) => void;
+            handler: (name: string, value: FlatStateValue) => Promise<void>;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
