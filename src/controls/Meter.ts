@@ -52,8 +52,8 @@ export class Meter extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.actual,
-                (name: string, value: any) => {
-                    return this.setFormattedStateAck(name, value, control.details.actualFormat as string);
+                async (name: string, value: any) => {
+                    await this.setFormattedStateAck(name, value, control.details.actualFormat as string);
                 },
             );
         }
@@ -70,8 +70,8 @@ export class Meter extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.total,
-                (name: string, value: any) => {
-                    return this.setFormattedStateAck(name, value, control.details.totalFormat as string);
+                async (name: string, value: any) => {
+                    await this.setFormattedStateAck(name, value, control.details.totalFormat as string);
                 },
             );
         }

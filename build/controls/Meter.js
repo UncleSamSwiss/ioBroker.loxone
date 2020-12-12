@@ -39,9 +39,9 @@ class Meter extends control_base_1.ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                }, control.states.actual, (name, value) => {
-                    return this.setFormattedStateAck(name, value, control.details.actualFormat);
-                });
+                }, control.states.actual, (name, value) => __awaiter(this, void 0, void 0, function* () {
+                    yield this.setFormattedStateAck(name, value, control.details.actualFormat);
+                }));
             }
             if (control.details.hasOwnProperty('totalFormat')) {
                 yield this.updateStateObjectAsync(uuid + '.total-formatted', {
@@ -50,9 +50,9 @@ class Meter extends control_base_1.ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                }, control.states.total, (name, value) => {
-                    return this.setFormattedStateAck(name, value, control.details.totalFormat);
-                });
+                }, control.states.total, (name, value) => __awaiter(this, void 0, void 0, function* () {
+                    yield this.setFormattedStateAck(name, value, control.details.totalFormat);
+                }));
             }
         });
     }

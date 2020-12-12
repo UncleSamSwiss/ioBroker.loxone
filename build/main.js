@@ -74,6 +74,7 @@ class Loxone extends utils.Adapter {
                 if (this.eventsQueue.size() > 0) {
                     this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
                 }
+                // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
                 this.setState('info.connection', false, true);
             });

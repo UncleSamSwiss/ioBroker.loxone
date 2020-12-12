@@ -40,13 +40,15 @@ class LightController extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.sceneList, (name, value) => {
+                }, control.states.sceneList, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                     if (value.hasOwnProperty('text')) {
-                        return this.setStateAck(name, value.text.split(','));
+                        yield this.setStateAck(name, value.text.split(','));
                     }
-                    return this.setStateAck(name, value.toString().split(','));
-                });
+                    else {
+                        yield this.setStateAck(name, value.toString().split(','));
+                    }
+                }));
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
             this.addStateChangeListener(uuid + '.plus', () => {

@@ -64,7 +64,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     yield this.updateActiveMoods();
                     yield this.updateFavoriteMoods();
                     yield this.updateAdditionalMoods();
-                    return this.setStateAck(name, list);
+                    yield this.setStateAck(name, list);
                 }));
                 yield this.updateStateObjectAsync(uuid + '.activeMoods', {
                     name: control.name + ': activeMoods',
@@ -72,10 +72,10 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: true,
                     type: 'array',
                     role: 'list',
-                }, control.states.activeMoods, (name, value) => {
+                }, control.states.activeMoods, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     this.activeMoods = JSON.parse(value);
-                    return this.updateActiveMoods();
-                });
+                    yield this.updateActiveMoods();
+                }));
                 this.addStateChangeListener(uuid + '.activeMoods', (oldValue, newValue) => {
                     let arrayValue;
                     if (Array.isArray(newValue)) {
@@ -143,20 +143,20 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.favoriteMoods, (id, value) => {
+                }, control.states.favoriteMoods, (id, value) => __awaiter(this, void 0, void 0, function* () {
                     this.favoriteMoods = JSON.parse(value);
-                    return this.updateFavoriteMoods();
-                });
+                    yield this.updateFavoriteMoods();
+                }));
                 yield this.updateStateObjectAsync(uuid + '.additionalMoods', {
                     name: control.name + ': additionalMoods',
                     read: true,
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.additionalMoods, (name, value) => {
+                }, control.states.additionalMoods, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     this.additionalMoods = JSON.parse(value);
-                    return this.updateAdditionalMoods();
-                });
+                    yield this.updateAdditionalMoods();
+                }));
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
             this.addStateChangeListener(uuid + '.plus', () => {

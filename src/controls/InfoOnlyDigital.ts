@@ -37,8 +37,8 @@ export class InfoOnlyDigital extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
-                (name: string, value: any) => {
-                    return this.setStateAck(name, value == 1 ? text.on : text.off);
+                async (name: string, value: any) => {
+                    await this.setStateAck(name, value == 1 ? text.on : text.off);
                 },
             );
         }
@@ -56,8 +56,8 @@ export class InfoOnlyDigital extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
-                (name: string, value: any) => {
-                    return this.setStateAck(name, value == 1 ? image.on : image.off);
+                async (name: string, value: any) => {
+                    await this.setStateAck(name, value == 1 ? image.on : image.off);
                 },
             );
         }
@@ -75,8 +75,8 @@ export class InfoOnlyDigital extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.active,
-                (name: string, value: any) => {
-                    return this.setStateAck(name, value == 1 ? color.on : color.off);
+                async (name: string, value: any) => {
+                    await this.setStateAck(name, value == 1 ? color.on : color.off);
                 },
             );
         }

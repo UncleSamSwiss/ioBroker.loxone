@@ -58,8 +58,8 @@ export class Slider extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.value,
-                (name: string, value: any) => {
-                    return this.setFormattedStateAck(name, value, control.details.format as string);
+                async (name: string, value: any) => {
+                    await this.setFormattedStateAck(name, value, control.details.format as string);
                 },
             );
         }
