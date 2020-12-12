@@ -68,8 +68,13 @@ class Loxone extends utils.Adapter {
                 this.log.error('Miniserver connection error: ' + error);
             });
             this.client.on('close', () => {
-                this.runQueue = false;
                 this.log.info('connection closed');
+                // Stop queue and clear it. Issue a warning if it isn't empty.
+                this.runQueue = false;
+                if (this.eventsQueue.size() > 0) {
+                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                }
+                this.eventsQueue.clear();
                 this.setState('info.connection', false, true);
             });
             this.client.on('send', (message) => {
@@ -122,11 +127,6 @@ class Loxone extends utils.Adapter {
             if (this.client) {
                 this.client.close();
                 delete this.client;
-            }
-            // Just issue a warning if the event queue isn't empty.
-            // TODO: Should we wait for the queue to empty instead?
-            if (this.eventsQueue.size() > 0) {
-                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
             }
             callback();
         }
@@ -230,7 +230,7 @@ class Loxone extends utils.Adapter {
     setOperatingMode(name, value) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.setStateAck(name, value);
-            return this.setStateAck(name + '-text', this.operatingModes[value]);
+            yield this.setStateAck(name + '-text', this.operatingModes[value]);
         });
     }
     loadControlsAsync(controls) {
@@ -491,8 +491,10 @@ class Loxone extends utils.Adapter {
         this.stateChangeListeners[this.namespace + '.' + id] = listener;
     }
     setStateAck(id, value) {
-        this.currentStateValues[this.namespace + '.' + id] = value;
-        return this.setStateAsync(id, { val: value, ack: true });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.currentStateValues[this.namespace + '.' + id] = value;
+            yield this.setStateAsync(id, { val: value, ack: true });
+        });
     }
     getCachedStateValue(id) {
         if (this.currentStateValues.hasOwnProperty(id)) {

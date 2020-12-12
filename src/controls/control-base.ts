@@ -10,8 +10,4 @@ export abstract class ControlBase extends LoxoneHandlerBase {
     }
 
     abstract loadAsync(type: ControlType, uuid: string, control: Control): Promise<void>;
-
-    protected resolvedPromise(): ioBroker.SetStatePromise {
-        return Promise.resolve('Nothing to do');
-    }
 }

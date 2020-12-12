@@ -33,7 +33,7 @@ export type CurrentStateValue = StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateEventHandler = (value: any) => void;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
-export type NamedStateEventHandler = (id: string, value: any) => ioBroker.SetStatePromise;
+export type NamedStateEventHandler = (id: string, value: any) => void;
 export type LoxoneEvent = { uuid: string; evt: any };
 
 export class Loxone extends utils.Adapter {
@@ -225,7 +225,7 @@ export class Loxone extends utils.Adapter {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: FlatStateValue) => ioBroker.SetStatePromise;
+            handler: (name: string, value: FlatStateValue) => void;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
@@ -294,9 +294,9 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async setOperatingMode(name: string, value: any): ioBroker.SetStatePromise {
+    private async setOperatingMode(name: string, value: any): Promise<void> {
         await this.setStateAck(name, value);
-        return this.setStateAck(name + '-text', this.operatingModes[value]);
+        await this.setStateAck(name + '-text', this.operatingModes[value]);
     }
 
     private async loadControlsAsync(controls: Controls): Promise<void> {
@@ -572,9 +572,9 @@ export class Loxone extends utils.Adapter {
         this.stateChangeListeners[this.namespace + '.' + id] = listener;
     }
 
-    public setStateAck(id: string, value: CurrentStateValue): ioBroker.SetStatePromise {
+    public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
         this.currentStateValues[this.namespace + '.' + id] = value;
-        return this.setStateAsync(id, { val: value, ack: true });
+        await this.setStateAsync(id, { val: value, ack: true });
     }
 
     public getCachedStateValue(id: string): OldStateValue {

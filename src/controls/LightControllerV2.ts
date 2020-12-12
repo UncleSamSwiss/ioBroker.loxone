@@ -197,9 +197,9 @@ export class LightControllerV2 extends ControlBase {
         await this.loadSubControlsAsync(uuid, control);
     }
 
-    private updateMoodsList(name: string, idList: string[]): ioBroker.SetStatePromise {
+    private async updateMoodsList(name: string, idList: string[]): Promise<void> {
         if (Object.keys(this.idToMoodName).length === 0) {
-            return this.resolvedPromise();
+            return;
         }
         const list = [];
         for (const index in idList) {
@@ -211,18 +211,18 @@ export class LightControllerV2 extends ControlBase {
             }
         }
 
-        return this.setStateAck(this.uuid + '.' + name, list);
+        await this.setStateAck(this.uuid + '.' + name, list);
     }
 
-    private updateActiveMoods(): ioBroker.SetStatePromise {
-        return this.updateMoodsList('activeMoods', this.activeMoods);
+    private async updateActiveMoods(): Promise<void> {
+        await this.updateMoodsList('activeMoods', this.activeMoods);
     }
 
-    private updateFavoriteMoods(): ioBroker.SetStatePromise {
-        return this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+    private async updateFavoriteMoods(): Promise<void> {
+        await this.updateMoodsList('favoriteMoods', this.favoriteMoods);
     }
 
-    private updateAdditionalMoods(): ioBroker.SetStatePromise {
-        return this.updateMoodsList('additionalMoods', this.additionalMoods);
+    private async updateAdditionalMoods(): Promise<void> {
+        await this.updateMoodsList('additionalMoods', this.additionalMoods);
     }
 }

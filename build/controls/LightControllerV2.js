@@ -173,29 +173,37 @@ class LightControllerV2 extends control_base_1.ControlBase {
         });
     }
     updateMoodsList(name, idList) {
-        if (Object.keys(this.idToMoodName).length === 0) {
-            return this.resolvedPromise();
-        }
-        const list = [];
-        for (const index in idList) {
-            const id = idList[index];
-            if (this.idToMoodName.hasOwnProperty(id)) {
-                list.push(this.idToMoodName[id]);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (Object.keys(this.idToMoodName).length === 0) {
+                return;
             }
-            else {
-                list.push(id);
+            const list = [];
+            for (const index in idList) {
+                const id = idList[index];
+                if (this.idToMoodName.hasOwnProperty(id)) {
+                    list.push(this.idToMoodName[id]);
+                }
+                else {
+                    list.push(id);
+                }
             }
-        }
-        return this.setStateAck(this.uuid + '.' + name, list);
+            yield this.setStateAck(this.uuid + '.' + name, list);
+        });
     }
     updateActiveMoods() {
-        return this.updateMoodsList('activeMoods', this.activeMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('activeMoods', this.activeMoods);
+        });
     }
     updateFavoriteMoods() {
-        return this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+        });
     }
     updateAdditionalMoods() {
-        return this.updateMoodsList('additionalMoods', this.additionalMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('additionalMoods', this.additionalMoods);
+        });
     }
 }
 exports.LightControllerV2 = LightControllerV2;
