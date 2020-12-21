@@ -9,22 +9,6 @@ import { Control, Controls, GlobalStates, OperatingModes, StructureFile, Weather
 import { WeatherServerHandler } from './weather-server-handler';
 import Queue = require('queue-fifo');
 
-// Augment the adapter.config object with the actual types
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace ioBroker {
-        interface AdapterConfig {
-            host: string;
-            port: number;
-            username: string;
-            password: string;
-            syncNames: boolean;
-            syncRooms: boolean;
-            syncFunctions: boolean;
-        }
-    }
-}
-
 export type FlatStateValue = string | number | boolean;
 export type StateValue = FlatStateValue | any[] | Record<string, any>;
 

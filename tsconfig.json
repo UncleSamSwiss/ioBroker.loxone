@@ -1,3 +1,4 @@
+// Root tsconfig to set the settings and power editor support for all TS files
 {
     "compileOnSave": true,
     "compilerOptions": {
@@ -9,11 +10,13 @@
         "allowJs": true,
         "checkJs": true,
 
+        "skipLibCheck": true, // Don't report errors in 3rd party definitions
         "noEmitOnError": true,
         "outDir": "./build/",
         "removeComments": false,
         "module": "commonjs",
         "moduleResolution": "node",
+        "esModuleInterop": true,
         // this is necessary for the automatic typing of the adapter config
         "resolveJsonModule": true,
 
@@ -27,13 +30,13 @@
         // "noUnusedLocals": true,
         // "noUnusedParameters": true,
 
-        // Consider targetting es2017 or higher if you require the new NodeJS 8+ features
-        "target": "es2015",
+        // Consider targetting es2019 or higher if you only support Node.js 12+
+        "target": "es2018",
 
         "sourceMap": false,
         "inlineSourceMap": false,
         "watch": false
     },
-    "include": ["**/*.ts"],
-    "exclude": ["build/**", "node_modules/**", "admin/**"]
+    "include": ["src/**/*.ts", "admin/**/*.ts", "admin/**/*.tsx"],
+    "exclude": ["build/**", "node_modules/**"]
 }

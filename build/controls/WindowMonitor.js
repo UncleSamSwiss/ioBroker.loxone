@@ -1,91 +1,80 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WindowMonitor = void 0;
 const control_base_1 = require("./control-base");
 class WindowMonitor extends control_base_1.ControlBase {
-    loadAsync(type, uuid, control) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateObjectAsync(uuid, {
-                type: type,
+    async loadAsync(type, uuid, control) {
+        await this.updateObjectAsync(uuid, {
+            type: type,
+            common: {
+                name: control.name,
+                role: 'sensor',
+            },
+            native: { control: control },
+        });
+        await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
+            'windowStates',
+            'numOpen',
+            'numClosed',
+            'numTilted',
+            'numOffline',
+            'numLocked',
+            'numUnlocked',
+        ]);
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numOpen', 'number', 'value');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numClosed', 'number', 'value');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numTilted', 'number', 'value');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numOffline', 'number', 'value');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numLocked', 'number', 'value');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numUnlocked', 'number', 'value');
+        if (!control.hasOwnProperty('details') ||
+            !control.details.hasOwnProperty('windows') ||
+            !control.states.hasOwnProperty('windowStates')) {
+            return;
+        }
+        const windowPositions = {
+            1: 'closed',
+            2: 'tilted',
+            4: 'open',
+            8: 'locked',
+            16: 'unlocked',
+        };
+        const windows = control.details.windows;
+        for (const index in windows) {
+            const window = windows[index];
+            const id = uuid + '.' + (parseInt(index) + 1);
+            await this.updateObjectAsync(id, {
+                type: 'channel',
                 common: {
-                    name: control.name,
-                    role: 'sensor',
+                    name: control.name + ': ' + window.name,
+                    role: 'sensor.window.3',
                 },
-                native: { control: control },
+                native: window,
             });
-            yield this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
-                'windowStates',
-                'numOpen',
-                'numClosed',
-                'numTilted',
-                'numOffline',
-                'numLocked',
-                'numUnlocked',
-            ]);
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numOpen', 'number', 'value');
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numClosed', 'number', 'value');
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numTilted', 'number', 'value');
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numOffline', 'number', 'value');
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numLocked', 'number', 'value');
-            yield this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'numUnlocked', 'number', 'value');
-            if (!control.hasOwnProperty('details') ||
-                !control.details.hasOwnProperty('windows') ||
-                !control.states.hasOwnProperty('windowStates')) {
-                return;
-            }
-            const windowPositions = {
-                1: 'closed',
-                2: 'tilted',
-                4: 'open',
-                8: 'locked',
-                16: 'unlocked',
-            };
-            const windows = control.details.windows;
-            for (const index in windows) {
-                const window = windows[index];
-                const id = uuid + '.' + (parseInt(index) + 1);
-                yield this.updateObjectAsync(id, {
-                    type: 'channel',
+            for (let mask = 1; mask <= 16; mask *= 2) {
+                const windowPosition = windowPositions[mask];
+                const obj = {
+                    type: 'state',
                     common: {
-                        name: control.name + ': ' + window.name,
-                        role: 'sensor.window.3',
+                        name: control.name + ': ' + window.name + ': ' + windowPosition,
+                        read: true,
+                        write: false,
+                        type: 'boolean',
+                        role: 'indicator',
                     },
-                    native: window,
-                });
+                    native: {},
+                };
+                await this.updateObjectAsync(id + '.' + windowPosition, obj);
+            }
+        }
+        this.addStateEventHandler(control.states.windowStates, async (value) => {
+            const values = value.toString().split(',');
+            for (const index in values) {
                 for (let mask = 1; mask <= 16; mask *= 2) {
                     const windowPosition = windowPositions[mask];
-                    const obj = {
-                        type: 'state',
-                        common: {
-                            name: control.name + ': ' + window.name + ': ' + windowPosition,
-                            read: true,
-                            write: false,
-                            type: 'boolean',
-                            role: 'indicator',
-                        },
-                        native: {},
-                    };
-                    yield this.updateObjectAsync(id + '.' + windowPosition, obj);
+                    await this.setStateAck(uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition, (parseInt(values[index]) & mask) == mask);
                 }
             }
-            this.addStateEventHandler(control.states.windowStates, (value) => __awaiter(this, void 0, void 0, function* () {
-                const values = value.toString().split(',');
-                for (const index in values) {
-                    for (let mask = 1; mask <= 16; mask *= 2) {
-                        const windowPosition = windowPositions[mask];
-                        yield this.setStateAck(uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition, (parseInt(values[index]) & mask) == mask);
-                    }
-                }
-            }));
         });
     }
 }

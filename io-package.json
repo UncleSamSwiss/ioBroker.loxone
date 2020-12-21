@@ -188,10 +188,10 @@
         "desc": {
             "en": "Communicates with a Loxone Miniserver.",
             "de": "Kommuniziert mit einem Loxone Miniserver.",
-            "ru": "Общается с Loxone Miniserver.",
-            "pt": "Comunica-se com um Loxone Miniserver.",
+            "ru": "Обменивается данными с Loxone Miniserver.",
+            "pt": "Comunica-se com um Miniserver Loxone.",
             "nl": "Communiceert met een Loxone Miniserver.",
-            "fr": "Communique avec un Miniserver Loxone.",
+            "fr": "Communique avec un Loxone Miniserver.",
             "it": "Comunica con un Loxone Miniserver.",
             "es": "Se comunica con un miniserver Loxone.",
             "pl": "Komunikuje się z Loxone Miniserver.",
