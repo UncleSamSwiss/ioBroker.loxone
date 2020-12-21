@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.0.2",
+        "version": "2.1.0",
         "news": {
+            "2.1.0": {
+                "en": "Major bugfixes and support for virtual text inputs",
+                "de": "Wichtige Bugfixes und Unterstützung für virtuelle Texteingaben",
+                "ru": "Основные исправления и поддержка виртуального ввода текста",
+                "pt": "Principais correções de bugs e suporte para entradas de texto virtuais",
+                "nl": "Grote bugfixes en ondersteuning voor virtuele tekstinvoer",
+                "fr": "Corrections de bugs majeurs et prise en charge des entrées de texte virtuelles",
+                "it": "Principali correzioni di bug e supporto per input di testo virtuali",
+                "es": "Correcciones de errores importantes y soporte para entradas de texto virtual",
+                "pl": "Główne poprawki błędów i obsługa wirtualnego wprowadzania tekstu",
+                "zh-cn": "主要错误修正和对虚拟文本输入的支持"
+            },
             "2.0.2": {
                 "en": "Fixed minor issues",
                 "de": "Kleine Bugfixes",
@@ -197,14 +209,8 @@
             "pl": "Komunikuje się z Loxone Miniserver.",
             "zh-cn": "与Loxone小型服务器通信。"
         },
-        "authors": [
-            "UncleSamSwiss <samuel.weibel@gmail.com>"
-        ],
-        "keywords": [
-            "loxone",
-            "miniserver",
-            "smarthome"
-        ],
+        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
+        "keywords": ["loxone", "miniserver", "smarthome"],
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
@@ -225,12 +231,8 @@
             }
         ]
     },
-    "encryptedNative": [
-        "password"
-    ],
-    "protectedNative": [
-        "password"
-    ],
+    "encryptedNative": ["password"],
+    "protectedNative": ["password"],
     "native": {
         "host": "0.0.0.0",
         "port": 80,
