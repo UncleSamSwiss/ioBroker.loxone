@@ -2,29 +2,10 @@
 /*
  * Created with @iobroker/create-adapter v1.26.0
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
-const utils = __importStar(require("@iobroker/adapter-core"));
-const loxoneWsApi = __importStar(require("node-lox-ws-api"));
+const utils = require("@iobroker/adapter-core");
+const loxoneWsApi = require("node-lox-ws-api");
 const weather_server_handler_1 = require("./weather-server-handler");
 const Queue = require("queue-fifo");
 class Loxone extends utils.Adapter {
@@ -303,7 +284,7 @@ class Loxone extends utils.Adapter {
     }
     async loadControlAsync(controlType, uuid, control) {
         const type = control.type || 'None';
-        const module = await Promise.resolve().then(() => __importStar(require(`./controls/${type}`)));
+        const module = await Promise.resolve().then(() => require(`./controls/${type}`));
         const controlObject = new module[type](this);
         await controlObject.loadAsync(controlType, uuid, control);
         if (control.hasOwnProperty('room')) {
