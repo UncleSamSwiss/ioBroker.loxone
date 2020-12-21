@@ -105,7 +105,7 @@ class Jalousie extends control_base_1.ControlBase {
                         isGoingDown = false;
                     }
                     const listenerName = 'auto';
-                    this.addStateEventHandler(control.states.position, (value) => {
+                    this.addStateEventHandler(control.states.position, (value) => __awaiter(this, void 0, void 0, function* () {
                         if (isGoingDown && value >= targetValue) {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'DownOff');
@@ -114,7 +114,7 @@ class Jalousie extends control_base_1.ControlBase {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'UpOff');
                         }
-                    }, listenerName);
+                    }), listenerName);
                 });
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');

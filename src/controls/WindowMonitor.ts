@@ -116,12 +116,12 @@ export class WindowMonitor extends ControlBase {
             }
         }
 
-        this.addStateEventHandler(control.states.windowStates, (value: any) => {
+        this.addStateEventHandler(control.states.windowStates, async (value: any) => {
             const values = value.toString().split(',');
             for (const index in values) {
                 for (let mask = 1; mask <= 16; mask *= 2) {
                     const windowPosition = windowPositions[mask];
-                    this.setStateAck(
+                    await this.setStateAck(
                         uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition,
                         (parseInt(values[index]) & mask) == mask,
                     );

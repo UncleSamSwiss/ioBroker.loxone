@@ -124,7 +124,7 @@ export class Jalousie extends ControlBase {
                 const listenerName = 'auto';
                 this.addStateEventHandler(
                     control.states.position,
-                    (value: any) => {
+                    async (value: any) => {
                         if (isGoingDown && value >= targetValue) {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'DownOff');

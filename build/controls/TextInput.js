@@ -39,7 +39,7 @@ class TextInput extends control_base_1.ControlBase {
                     type: 'string',
                     role: 'text',
                 }, control.states.value, (name, value) => __awaiter(this, void 0, void 0, function* () {
-                    this.setFormattedStateAck(name, value, control.details.format);
+                    yield this.setFormattedStateAck(name, value, control.details.format);
                 }));
             }
         });

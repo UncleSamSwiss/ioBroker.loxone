@@ -100,7 +100,7 @@ class Gate extends control_base_1.ControlBase {
                         return;
                     }
                     const listenerName = 'auto';
-                    this.addStateEventHandler(control.states.position, (value) => {
+                    this.addStateEventHandler(control.states.position, (value) => __awaiter(this, void 0, void 0, function* () {
                         if (isOpening && value >= targetValue) {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'close');
@@ -109,7 +109,7 @@ class Gate extends control_base_1.ControlBase {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'open');
                         }
-                    }, listenerName);
+                    }), listenerName);
                 });
             }
         });

@@ -77,15 +77,15 @@ class WindowMonitor extends control_base_1.ControlBase {
                     yield this.updateObjectAsync(id + '.' + windowPosition, obj);
                 }
             }
-            this.addStateEventHandler(control.states.windowStates, (value) => {
+            this.addStateEventHandler(control.states.windowStates, (value) => __awaiter(this, void 0, void 0, function* () {
                 const values = value.toString().split(',');
                 for (const index in values) {
                     for (let mask = 1; mask <= 16; mask *= 2) {
                         const windowPosition = windowPositions[mask];
-                        this.setStateAck(uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition, (parseInt(values[index]) & mask) == mask);
+                        yield this.setStateAck(uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition, (parseInt(values[index]) & mask) == mask);
                     }
                 }
-            });
+            }));
         });
     }
 }

@@ -37,9 +37,9 @@ class WeatherServerHandler extends loxone_handler_base_1.LoxoneHandlerBase {
                 native: { data: data },
             });
             yield this.setWeatherObjectsAsync('Actual');
-            this.addStateEventHandler(data.states.actual, (value) => {
-                this.setWeatherStates(deviceName + '.Actual', value.entry[0]);
-            });
+            this.addStateEventHandler(data.states.actual, (value) => __awaiter(this, void 0, void 0, function* () {
+                yield this.setWeatherStates(deviceName + '.Actual', value.entry[0]);
+            }));
             this.addStateEventHandler(data.states.forecast, (value) => __awaiter(this, void 0, void 0, function* () {
                 for (let i = 0; i < value.entry.length; i++) {
                     const channelName = 'Hour' + sprintf_js_1.sprintf('%02d', i + 1);
@@ -47,38 +47,42 @@ class WeatherServerHandler extends loxone_handler_base_1.LoxoneHandlerBase {
                         yield this.setWeatherObjectsAsync(channelName);
                         this.forecastChannelsCount++;
                     }
-                    this.setWeatherStates(deviceName + '.' + channelName, value.entry[i]);
+                    yield this.setWeatherStates(deviceName + '.' + channelName, value.entry[i]);
                 }
             }));
         });
     }
     setWeatherStates(parent, values) {
-        if (values === undefined) {
-            return;
-        }
-        this.setStateAck(parent + '.barometricPressure', values.barometricPressure);
-        this.setFormattedStateAck(parent + '.barometricPressure-formatted', values.barometricPressure, this.format.barometricPressure);
-        this.setStateAck(parent + '.dewPoint', values.dewPoint);
-        this.setFormattedStateAck(parent + '.dewPoint-formatted', values.dewPoint, this.format.temperature);
-        this.setStateAck(parent + '.perceivedTemperature', values.perceivedTemperature);
-        this.setFormattedStateAck(parent + '.perceivedTemperature-formatted', values.perceivedTemperature, this.format.temperature);
-        this.setStateAck(parent + '.precipitation', values.precipitation);
-        this.setFormattedStateAck(parent + '.precipitation-formatted', values.precipitation, this.format.precipitation);
-        this.setStateAck(parent + '.relativeHumidity', values.relativeHumidity);
-        this.setFormattedStateAck(parent + '.relativeHumidity-formatted', values.relativeHumidity, this.format.relativeHumidity);
-        this.setStateAck(parent + '.solarRadiation', values.solarRadiation);
-        this.setStateAck(parent + '.temperature', values.temperature);
-        this.setFormattedStateAck(parent + '.temperature-formatted', values.temperature, this.format.temperature);
-        this.setTimeStateAck(parent + '.timestamp', values.timestamp);
-        this.setStateAck(parent + '.weatherType', values.weatherType);
-        this.setStateAck(parent + '.weatherType-text', this.weatherTypeTexts[values.weatherType]);
-        this.setStateAck(parent + '.windDirection', values.windDirection);
-        this.setStateAck(parent + '.windSpeed', values.windSpeed);
-        this.setFormattedStateAck(parent + '.windSpeed-formatted', values.windSpeed, this.format.windSpeed);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (values === undefined) {
+                return;
+            }
+            yield this.setStateAck(parent + '.barometricPressure', values.barometricPressure);
+            yield this.setFormattedStateAck(parent + '.barometricPressure-formatted', values.barometricPressure, this.format.barometricPressure);
+            yield this.setStateAck(parent + '.dewPoint', values.dewPoint);
+            yield this.setFormattedStateAck(parent + '.dewPoint-formatted', values.dewPoint, this.format.temperature);
+            yield this.setStateAck(parent + '.perceivedTemperature', values.perceivedTemperature);
+            yield this.setFormattedStateAck(parent + '.perceivedTemperature-formatted', values.perceivedTemperature, this.format.temperature);
+            yield this.setStateAck(parent + '.precipitation', values.precipitation);
+            yield this.setFormattedStateAck(parent + '.precipitation-formatted', values.precipitation, this.format.precipitation);
+            yield this.setStateAck(parent + '.relativeHumidity', values.relativeHumidity);
+            yield this.setFormattedStateAck(parent + '.relativeHumidity-formatted', values.relativeHumidity, this.format.relativeHumidity);
+            yield this.setStateAck(parent + '.solarRadiation', values.solarRadiation);
+            yield this.setStateAck(parent + '.temperature', values.temperature);
+            yield this.setFormattedStateAck(parent + '.temperature-formatted', values.temperature, this.format.temperature);
+            yield this.setTimeStateAck(parent + '.timestamp', values.timestamp);
+            yield this.setStateAck(parent + '.weatherType', values.weatherType);
+            yield this.setStateAck(parent + '.weatherType-text', this.weatherTypeTexts[values.weatherType]);
+            yield this.setStateAck(parent + '.windDirection', values.windDirection);
+            yield this.setStateAck(parent + '.windSpeed', values.windSpeed);
+            yield this.setFormattedStateAck(parent + '.windSpeed-formatted', values.windSpeed, this.format.windSpeed);
+        });
     }
     setTimeStateAck(id, miniserverTime) {
-        const value = miniserverTime * 1000 + new Date(2009, 0, 1).getTime();
-        this.setStateAck(id, value);
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = miniserverTime * 1000 + new Date(2009, 0, 1).getTime();
+            yield this.setStateAck(id, value);
+        });
     }
     setWeatherObjectsAsync(channelName) {
         return __awaiter(this, void 0, void 0, function* () {

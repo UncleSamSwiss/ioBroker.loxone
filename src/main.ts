@@ -31,7 +31,7 @@ export type StateValue = FlatStateValue | any[] | Record<string, any>;
 export type OldStateValue = StateValue | null | undefined;
 export type CurrentStateValue = StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
-export type StateEventHandler = (value: any) => void;
+export type StateEventHandler = (value: any) => Promise<void>;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
@@ -160,7 +160,7 @@ export class Loxone extends utils.Adapter {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.log.debug(`Enqueue event: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
-            this.handleEventQueue();
+            this.handleEventQueue().catch((e) => this.log.error(`Unhandled error in event ${uuid}: ${e}`));
         };
 
         this.client.on('update_event_value', handleAnyEvent);
@@ -219,7 +219,7 @@ export class Loxone extends utils.Adapter {
 
         // replay all queued events
         this.runQueue = true;
-        this.handleEventQueue();
+        await this.handleEventQueue();
     }
 
     private async loadGlobalStatesAsync(globalStates: GlobalStates): Promise<void> {
@@ -535,8 +535,8 @@ export class Loxone extends utils.Adapter {
         };
         await this.updateObjectAsync(id, obj);
         if (stateEventHandler) {
-            this.addStateEventHandler(stateUuid, (value: StateValue) => {
-                stateEventHandler(id, value);
+            this.addStateEventHandler(stateUuid, async (value: StateValue) => {
+                await stateEventHandler(id, value);
             });
         }
     }

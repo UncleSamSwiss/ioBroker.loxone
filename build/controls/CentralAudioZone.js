@@ -14,7 +14,7 @@ const control_base_1 = require("./control-base");
 class CentralAudioZone extends control_base_1.ControlBase {
     loadAsync(type, uuid, control) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.updateObjectAsync(uuid, {
+            yield this.updateObjectAsync(uuid, {
                 type: type,
                 common: {
                     name: control.name,
@@ -22,7 +22,7 @@ class CentralAudioZone extends control_base_1.ControlBase {
                 },
                 native: { control: control },
             });
-            this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
+            yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
             this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {
                 this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
             });

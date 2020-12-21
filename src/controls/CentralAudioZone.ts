@@ -4,7 +4,7 @@ import { ControlBase, ControlType } from './control-base';
 
 export class CentralAudioZone extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
-        this.updateObjectAsync(uuid, {
+        await this.updateObjectAsync(uuid, {
             type: type,
             common: {
                 name: control.name,
@@ -13,7 +13,7 @@ export class CentralAudioZone extends ControlBase {
             native: { control: control as any },
         });
 
-        this.createButtonCommandStateObjectAsync(
+        await this.createButtonCommandStateObjectAsync(
             control.name,
             uuid,
             'control',

@@ -110,7 +110,7 @@ export class Gate extends ControlBase {
                 const listenerName = 'auto';
                 this.addStateEventHandler(
                     control.states.position,
-                    (value: any) => {
+                    async (value: any) => {
                         if (isOpening && value >= targetValue) {
                             this.removeStateEventHandler(control.states.position, listenerName);
                             this.sendCommand(control.uuidAction, 'close');

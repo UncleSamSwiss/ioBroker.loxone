@@ -47,7 +47,7 @@ export class TextInput extends ControlBase {
                 },
                 control.states.value,
                 async (name: string, value: any) => {
-                    this.setFormattedStateAck(name, value, control.details.format as string);
+                    await this.setFormattedStateAck(name, value, control.details.format as string);
                 },
             );
         }

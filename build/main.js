@@ -110,7 +110,7 @@ class Loxone extends utils.Adapter {
                 this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
                 this.log.debug(`Enqueue event: ${uuid}`);
                 this.eventsQueue.enqueue({ uuid, evt });
-                this.handleEventQueue();
+                this.handleEventQueue().catch((e) => this.log.error(`Unhandled error in event ${uuid}: ${e}`));
             };
             this.client.on('update_event_value', handleAnyEvent);
             this.client.on('update_event_text', handleAnyEvent);
@@ -163,7 +163,7 @@ class Loxone extends utils.Adapter {
             yield this.loadWeatherServerAsync(data.weatherServer);
             // replay all queued events
             this.runQueue = true;
-            this.handleEventQueue();
+            yield this.handleEventQueue();
         });
     }
     loadGlobalStatesAsync(globalStates) {
@@ -460,9 +460,9 @@ class Loxone extends utils.Adapter {
             };
             yield this.updateObjectAsync(id, obj);
             if (stateEventHandler) {
-                this.addStateEventHandler(stateUuid, (value) => {
-                    stateEventHandler(id, value);
-                });
+                this.addStateEventHandler(stateUuid, (value) => __awaiter(this, void 0, void 0, function* () {
+                    yield stateEventHandler(id, value);
+                }));
             }
         });
     }

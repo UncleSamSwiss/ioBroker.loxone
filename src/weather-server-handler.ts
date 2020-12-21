@@ -33,8 +33,8 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
 
         await this.setWeatherObjectsAsync('Actual');
 
-        this.addStateEventHandler(data.states.actual, (value: any) => {
-            this.setWeatherStates(deviceName + '.Actual', value.entry[0]);
+        this.addStateEventHandler(data.states.actual, async (value: any) => {
+            await this.setWeatherStates(deviceName + '.Actual', value.entry[0]);
         });
 
         this.addStateEventHandler(data.states.forecast, async (value: any) => {
@@ -45,52 +45,56 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
                     this.forecastChannelsCount++;
                 }
 
-                this.setWeatherStates(deviceName + '.' + channelName, value.entry[i]);
+                await this.setWeatherStates(deviceName + '.' + channelName, value.entry[i]);
             }
         });
     }
 
-    private setWeatherStates(parent: string, values: any): void {
+    private async setWeatherStates(parent: string, values: any): Promise<void> {
         if (values === undefined) {
             return;
         }
 
-        this.setStateAck(parent + '.barometricPressure', values.barometricPressure);
-        this.setFormattedStateAck(
+        await this.setStateAck(parent + '.barometricPressure', values.barometricPressure);
+        await this.setFormattedStateAck(
             parent + '.barometricPressure-formatted',
             values.barometricPressure,
             this.format.barometricPressure,
         );
-        this.setStateAck(parent + '.dewPoint', values.dewPoint);
-        this.setFormattedStateAck(parent + '.dewPoint-formatted', values.dewPoint, this.format.temperature);
-        this.setStateAck(parent + '.perceivedTemperature', values.perceivedTemperature);
-        this.setFormattedStateAck(
+        await this.setStateAck(parent + '.dewPoint', values.dewPoint);
+        await this.setFormattedStateAck(parent + '.dewPoint-formatted', values.dewPoint, this.format.temperature);
+        await this.setStateAck(parent + '.perceivedTemperature', values.perceivedTemperature);
+        await this.setFormattedStateAck(
             parent + '.perceivedTemperature-formatted',
             values.perceivedTemperature,
             this.format.temperature,
         );
-        this.setStateAck(parent + '.precipitation', values.precipitation);
-        this.setFormattedStateAck(parent + '.precipitation-formatted', values.precipitation, this.format.precipitation);
-        this.setStateAck(parent + '.relativeHumidity', values.relativeHumidity);
-        this.setFormattedStateAck(
+        await this.setStateAck(parent + '.precipitation', values.precipitation);
+        await this.setFormattedStateAck(
+            parent + '.precipitation-formatted',
+            values.precipitation,
+            this.format.precipitation,
+        );
+        await this.setStateAck(parent + '.relativeHumidity', values.relativeHumidity);
+        await this.setFormattedStateAck(
             parent + '.relativeHumidity-formatted',
             values.relativeHumidity,
             this.format.relativeHumidity,
         );
-        this.setStateAck(parent + '.solarRadiation', values.solarRadiation);
-        this.setStateAck(parent + '.temperature', values.temperature);
-        this.setFormattedStateAck(parent + '.temperature-formatted', values.temperature, this.format.temperature);
-        this.setTimeStateAck(parent + '.timestamp', values.timestamp);
-        this.setStateAck(parent + '.weatherType', values.weatherType);
-        this.setStateAck(parent + '.weatherType-text', this.weatherTypeTexts[values.weatherType]);
-        this.setStateAck(parent + '.windDirection', values.windDirection);
-        this.setStateAck(parent + '.windSpeed', values.windSpeed);
-        this.setFormattedStateAck(parent + '.windSpeed-formatted', values.windSpeed, this.format.windSpeed);
+        await this.setStateAck(parent + '.solarRadiation', values.solarRadiation);
+        await this.setStateAck(parent + '.temperature', values.temperature);
+        await this.setFormattedStateAck(parent + '.temperature-formatted', values.temperature, this.format.temperature);
+        await this.setTimeStateAck(parent + '.timestamp', values.timestamp);
+        await this.setStateAck(parent + '.weatherType', values.weatherType);
+        await this.setStateAck(parent + '.weatherType-text', this.weatherTypeTexts[values.weatherType]);
+        await this.setStateAck(parent + '.windDirection', values.windDirection);
+        await this.setStateAck(parent + '.windSpeed', values.windSpeed);
+        await this.setFormattedStateAck(parent + '.windSpeed-formatted', values.windSpeed, this.format.windSpeed);
     }
 
-    private setTimeStateAck(id: string, miniserverTime: number): void {
+    private async setTimeStateAck(id: string, miniserverTime: number): Promise<void> {
         const value = miniserverTime * 1000 + new Date(2009, 0, 1).getTime();
-        this.setStateAck(id, value);
+        await this.setStateAck(id, value);
     }
 
     private async setWeatherObjectsAsync(channelName: string): Promise<void> {
