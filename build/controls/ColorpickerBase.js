@@ -26,12 +26,12 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.red',
                 min: 0,
                 max: 255,
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0]);
+                    yield this.setStateAck(name, rgb[0]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.green', {
                 name: control.name + ': green',
                 read: true,
@@ -40,12 +40,12 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.green',
                 min: 0,
                 max: 255,
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[1]);
+                    yield this.setStateAck(name, rgb[1]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.blue', {
                 name: control.name + ': blue',
                 read: true,
@@ -54,24 +54,24 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.blue',
                 min: 0,
                 max: 255,
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[2]);
+                    yield this.setStateAck(name, rgb[2]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.rgb', {
                 name: control.name + ': RGB',
                 read: true,
                 write: false,
                 type: 'string',
                 role: 'level.color.rgb',
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+                    yield this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.level', {
                 name: control.name + ': Level (only with colorTemperature)',
                 read: true,
@@ -80,36 +80,36 @@ class ColorpickerBase extends control_base_1.ControlBase {
                 role: 'level.color.level',
                 min: 0,
                 max: 100,
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[0]);
+                    yield this.setStateAck(name, brightnessTemperature[0]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.colorTemperature', {
                 name: control.name + ': The temperature of the light in °K 2700-6500',
                 read: true,
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[1]);
+                    yield this.setStateAck(name, brightnessTemperature[1]);
                 }
-            });
+            }));
             yield this.updateStateObjectAsync(uuid + '.colorTemperatureHue', {
                 name: control.name + ': The temperature of the light in °K scaled for Hue 2000-6500',
                 read: true,
                 write: false,
                 type: 'number',
                 role: 'level.color.temperature',
-            }, control.states.color, (name, value) => {
+            }, control.states.color, (name, value) => __awaiter(this, void 0, void 0, function* () {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
+                    yield this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
                 }
-            });
+            }));
             // we use a timer (100 ms) to update the three color values,
             // so if somebody sends us the three values (almost) at once,
             // we don't change the color three times using commands

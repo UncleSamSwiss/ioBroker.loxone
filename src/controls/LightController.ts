@@ -45,12 +45,12 @@ export class LightController extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.sceneList,
-                (name: string, value: any) => {
+                async (name: string, value: any) => {
                     // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                     if (value.hasOwnProperty('text')) {
-                        this.setStateAck(name, value.text.split(','));
+                        await this.setStateAck(name, value.text.split(','));
                     } else {
-                        this.setStateAck(name, value.toString().split(','));
+                        await this.setStateAck(name, value.toString().split(','));
                     }
                 },
             );

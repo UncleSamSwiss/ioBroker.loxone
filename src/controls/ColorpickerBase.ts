@@ -25,10 +25,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0]);
+                    await this.setStateAck(name, rgb[0]);
                 }
             },
         );
@@ -45,10 +45,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[1]);
+                    await this.setStateAck(name, rgb[1]);
                 }
             },
         );
@@ -65,10 +65,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[2]);
+                    await this.setStateAck(name, rgb[2]);
                 }
             },
         );
@@ -83,10 +83,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const rgb = this.loxoneColorToRgb(value);
                 if (rgb !== undefined) {
-                    this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
+                    await this.setStateAck(name, rgb[0] + ',' + rgb[1] + ',' + rgb[2]);
                 }
             },
         );
@@ -103,10 +103,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[0]);
+                    await this.setStateAck(name, brightnessTemperature[0]);
                 }
             },
         );
@@ -121,10 +121,10 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, brightnessTemperature[1]);
+                    await this.setStateAck(name, brightnessTemperature[1]);
                 }
             },
         );
@@ -139,10 +139,13 @@ export abstract class ColorpickerBase extends ControlBase {
                 // TODO: re-add: smartIgnore: true,
             },
             control.states.color,
-            (name: string, value: CurrentStateValue) => {
+            async (name: string, value: CurrentStateValue) => {
                 const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
-                    this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
+                    await this.setStateAck(
+                        name,
+                        Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000),
+                    );
                 }
             },
         );

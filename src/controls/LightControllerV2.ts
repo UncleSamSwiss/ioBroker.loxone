@@ -47,7 +47,7 @@ export class LightControllerV2 extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.moodList,
-                (name: string, value: any) => {
+                async (name: string, value: any) => {
                     const moodList = JSON.parse(value);
                     const list = [];
                     this.idToMoodName = {};
@@ -60,11 +60,11 @@ export class LightControllerV2 extends ControlBase {
                             list.push(mood.name);
                         }
                     }
-                    this.updateActiveMoods();
-                    this.updateFavoriteMoods();
-                    this.updateAdditionalMoods();
+                    await this.updateActiveMoods();
+                    await this.updateFavoriteMoods();
+                    await this.updateAdditionalMoods();
 
-                    this.setStateAck(name, list);
+                    await this.setStateAck(name, list);
                 },
             );
             await this.updateStateObjectAsync(
@@ -78,9 +78,9 @@ export class LightControllerV2 extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.activeMoods,
-                (name: string, value: any) => {
+                async (name: string, value: any) => {
                     this.activeMoods = JSON.parse(value);
-                    this.updateActiveMoods();
+                    await this.updateActiveMoods();
                 },
             );
             this.addStateChangeListener(
@@ -156,9 +156,9 @@ export class LightControllerV2 extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.favoriteMoods,
-                (id: string, value: any) => {
+                async (id: string, value: any) => {
                     this.favoriteMoods = JSON.parse(value);
-                    this.updateFavoriteMoods();
+                    await this.updateFavoriteMoods();
                 },
             );
             await this.updateStateObjectAsync(
@@ -172,9 +172,9 @@ export class LightControllerV2 extends ControlBase {
                     // TODO: re-add: smartIgnore: true,
                 },
                 control.states.additionalMoods,
-                (name: string, value: any) => {
+                async (name: string, value: any) => {
                     this.additionalMoods = JSON.parse(value);
-                    this.updateAdditionalMoods();
+                    await this.updateAdditionalMoods();
                 },
             );
         }
@@ -197,7 +197,7 @@ export class LightControllerV2 extends ControlBase {
         await this.loadSubControlsAsync(uuid, control);
     }
 
-    private updateMoodsList(name: string, idList: string[]): void {
+    private async updateMoodsList(name: string, idList: string[]): Promise<void> {
         if (Object.keys(this.idToMoodName).length === 0) {
             return;
         }
@@ -211,18 +211,18 @@ export class LightControllerV2 extends ControlBase {
             }
         }
 
-        this.setStateAck(this.uuid + '.' + name, list);
+        await this.setStateAck(this.uuid + '.' + name, list);
     }
 
-    private updateActiveMoods(): void {
-        this.updateMoodsList('activeMoods', this.activeMoods);
+    private async updateActiveMoods(): Promise<void> {
+        await this.updateMoodsList('activeMoods', this.activeMoods);
     }
 
-    private updateFavoriteMoods(): void {
-        this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+    private async updateFavoriteMoods(): Promise<void> {
+        await this.updateMoodsList('favoriteMoods', this.favoriteMoods);
     }
 
-    private updateAdditionalMoods(): void {
-        this.updateMoodsList('additionalMoods', this.additionalMoods);
+    private async updateAdditionalMoods(): Promise<void> {
+        await this.updateMoodsList('additionalMoods', this.additionalMoods);
     }
 }

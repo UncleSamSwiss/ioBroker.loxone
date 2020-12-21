@@ -7,6 +7,7 @@ import * as loxoneWsApi from 'node-lox-ws-api';
 import { ControlBase, ControlType } from './controls/control-base';
 import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
+import Queue = require('queue-fifo');
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -32,7 +33,8 @@ export type CurrentStateValue = StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateEventHandler = (value: any) => void;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
-export type NamedStateEventHandler = (id: string, value: any) => void;
+export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
+export type LoxoneEvent = { uuid: string; evt: any };
 
 export class Loxone extends utils.Adapter {
     private client?: any;
@@ -45,8 +47,9 @@ export class Loxone extends utils.Adapter {
     private stateChangeListeners: Record<string, StateChangeListener> = {};
     private stateEventHandlers: Record<string, StateEventRegistration[]> = {};
 
-    private cacheEvents = false;
-    private eventsCache: Record<string, any> = {};
+    private eventsQueue = new Queue<LoxoneEvent>();
+    private runQueue = false;
+    private queueRunning = false;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -108,6 +111,13 @@ export class Loxone extends utils.Adapter {
 
         this.client.on('close', () => {
             this.log.info('connection closed');
+            // Stop queue and clear it. Issue a warning if it isn't empty.
+            this.runQueue = false;
+            if (this.eventsQueue.size() > 0) {
+                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+            }
+            // Yes - I know this could go in the 'if' above but here 'just in case' ;)
+            this.eventsQueue.clear();
             this.setState('info.connection', false, true);
         });
 
@@ -148,7 +158,9 @@ export class Loxone extends utils.Adapter {
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
-            this.handleEvent(uuid, evt);
+            this.log.debug(`Enqueue event: ${uuid}`);
+            this.eventsQueue.enqueue({ uuid, evt });
+            this.handleEventQueue();
         };
 
         this.client.on('update_event_value', handleAnyEvent);
@@ -156,7 +168,6 @@ export class Loxone extends utils.Adapter {
         this.client.on('update_event_daytimer', handleAnyEvent);
         this.client.on('update_event_weather', handleAnyEvent);
 
-        this.cacheEvents = true;
         this.client.connect();
 
         this.subscribeStates('*');
@@ -171,7 +182,6 @@ export class Loxone extends utils.Adapter {
                 this.client.close();
                 delete this.client;
             }
-
             callback();
         } catch (e) {
             callback();
@@ -207,22 +217,16 @@ export class Loxone extends utils.Adapter {
         await this.loadEnumsAsync(data.cats, 'enum.functions', this.foundCats, this.config.syncFunctions);
         await this.loadWeatherServerAsync(data.weatherServer);
 
-        // replay all cached events (and clear them)
-        if (this.cacheEvents) {
-            this.cacheEvents = false;
-            for (const uuid in this.eventsCache) {
-                this.handleEvent(uuid, this.eventsCache[uuid]);
-            }
-
-            this.eventsCache = {};
-        }
+        // replay all queued events
+        this.runQueue = true;
+        this.handleEventQueue();
     }
 
     private async loadGlobalStatesAsync(globalStates: GlobalStates): Promise<void> {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: FlatStateValue) => void;
+            handler: (name: string, value: FlatStateValue) => Promise<void>;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
@@ -291,9 +295,9 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private setOperatingMode(name: string, value: any): void {
-        this.setStateAck(name, value);
-        this.setStateAck(name + '-text', this.operatingModes[value]);
+    private async setOperatingMode(name: string, value: any): Promise<void> {
+        await this.setStateAck(name, value);
+        await this.setStateAck(name + '-text', this.operatingModes[value]);
     }
 
     private async loadControlsAsync(controls: Controls): Promise<void> {
@@ -448,25 +452,40 @@ export class Loxone extends utils.Adapter {
         await handler.loadAsync(data);
     }
 
-    private handleEvent(uuid: string, evt: any): void {
-        if (this.cacheEvents) {
-            this.eventsCache[uuid] = evt;
-            return;
-        }
-
-        const stateEventHandlerList = this.stateEventHandlers[uuid];
-        if (stateEventHandlerList === undefined) {
-            this.log.debug('Unknown event UUID: ' + uuid);
-            return;
-        }
-
-        stateEventHandlerList.forEach((item: StateEventRegistration) => {
-            try {
-                item.handler(evt);
-            } catch (e) {
-                this.log.error(`Error while handling event UUID ${uuid}: ${e}`);
+    private async handleEventQueue(): Promise<void> {
+        // TODO: This solution with globals for runQueue & queueRunning
+        // isn't very elegant. It works, but is there a better way?
+        if (!this.runQueue) {
+            this.log.debug('Asked to handle the queue, but is stopped');
+        } else if (this.queueRunning) {
+            this.log.debug('Asked to handle the queue, but already in progress');
+        } else {
+            this.queueRunning = true;
+            this.log.debug('Processing events from queue length: ' + this.eventsQueue.size());
+            let evt: LoxoneEvent | null;
+            while ((evt = this.eventsQueue.dequeue())) {
+                this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
+                await this.handleEvent(evt);
             }
-        });
+            this.queueRunning = false;
+            this.log.debug('Done with event queue');
+        }
+    }
+
+    private async handleEvent(evt: LoxoneEvent): Promise<void> {
+        const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
+        if (stateEventHandlerList === undefined) {
+            this.log.debug('Unknown event UUID: ' + evt.uuid);
+            return;
+        }
+
+        for (const item of stateEventHandlerList) {
+            try {
+                await item.handler(evt.evt);
+            } catch (e) {
+                this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
+            }
+        }
     }
 
     public sendCommand(uuid: string, action: string): void {
@@ -554,9 +573,9 @@ export class Loxone extends utils.Adapter {
         this.stateChangeListeners[this.namespace + '.' + id] = listener;
     }
 
-    public setStateAck(id: string, value: CurrentStateValue): void {
+    public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
         this.currentStateValues[this.namespace + '.' + id] = value;
-        this.setState(id, { val: value, ack: true });
+        await this.setStateAsync(id, { val: value, ack: true });
     }
 
     public getCachedStateValue(id: string): OldStateValue {

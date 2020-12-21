@@ -38,9 +38,9 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? text.on : text.off);
-                });
+                }, control.states.active, (name, value) => __awaiter(this, void 0, void 0, function* () {
+                    yield this.setStateAck(name, value == 1 ? text.on : text.off);
+                }));
             }
             if (control.details.hasOwnProperty('image')) {
                 const image = control.details.text;
@@ -50,9 +50,9 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? image.on : image.off);
-                });
+                }, control.states.active, (name, value) => __awaiter(this, void 0, void 0, function* () {
+                    yield this.setStateAck(name, value == 1 ? image.on : image.off);
+                }));
             }
             if (control.details.hasOwnProperty('color')) {
                 const color = control.details.text;
@@ -62,9 +62,9 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                     write: false,
                     type: 'string',
                     role: 'text',
-                }, control.states.active, (name, value) => {
-                    this.setStateAck(name, value == 1 ? color.on : color.off);
-                });
+                }, control.states.active, (name, value) => __awaiter(this, void 0, void 0, function* () {
+                    yield this.setStateAck(name, value == 1 ? color.on : color.off);
+                }));
             }
         });
     }

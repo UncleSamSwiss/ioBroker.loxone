@@ -48,7 +48,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.moodList, (name, value) => {
+                }, control.states.moodList, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     const moodList = JSON.parse(value);
                     const list = [];
                     this.idToMoodName = {};
@@ -61,21 +61,21 @@ class LightControllerV2 extends control_base_1.ControlBase {
                             list.push(mood.name);
                         }
                     }
-                    this.updateActiveMoods();
-                    this.updateFavoriteMoods();
-                    this.updateAdditionalMoods();
-                    this.setStateAck(name, list);
-                });
+                    yield this.updateActiveMoods();
+                    yield this.updateFavoriteMoods();
+                    yield this.updateAdditionalMoods();
+                    yield this.setStateAck(name, list);
+                }));
                 yield this.updateStateObjectAsync(uuid + '.activeMoods', {
                     name: control.name + ': activeMoods',
                     read: true,
                     write: true,
                     type: 'array',
                     role: 'list',
-                }, control.states.activeMoods, (name, value) => {
+                }, control.states.activeMoods, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     this.activeMoods = JSON.parse(value);
-                    this.updateActiveMoods();
-                });
+                    yield this.updateActiveMoods();
+                }));
                 this.addStateChangeListener(uuid + '.activeMoods', (oldValue, newValue) => {
                     let arrayValue;
                     if (Array.isArray(newValue)) {
@@ -143,20 +143,20 @@ class LightControllerV2 extends control_base_1.ControlBase {
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.favoriteMoods, (id, value) => {
+                }, control.states.favoriteMoods, (id, value) => __awaiter(this, void 0, void 0, function* () {
                     this.favoriteMoods = JSON.parse(value);
-                    this.updateFavoriteMoods();
-                });
+                    yield this.updateFavoriteMoods();
+                }));
                 yield this.updateStateObjectAsync(uuid + '.additionalMoods', {
                     name: control.name + ': additionalMoods',
                     read: true,
                     write: false,
                     type: 'array',
                     role: 'list',
-                }, control.states.additionalMoods, (name, value) => {
+                }, control.states.additionalMoods, (name, value) => __awaiter(this, void 0, void 0, function* () {
                     this.additionalMoods = JSON.parse(value);
-                    this.updateAdditionalMoods();
-                });
+                    yield this.updateAdditionalMoods();
+                }));
             }
             yield this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
             this.addStateChangeListener(uuid + '.plus', () => {
@@ -173,29 +173,37 @@ class LightControllerV2 extends control_base_1.ControlBase {
         });
     }
     updateMoodsList(name, idList) {
-        if (Object.keys(this.idToMoodName).length === 0) {
-            return;
-        }
-        const list = [];
-        for (const index in idList) {
-            const id = idList[index];
-            if (this.idToMoodName.hasOwnProperty(id)) {
-                list.push(this.idToMoodName[id]);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (Object.keys(this.idToMoodName).length === 0) {
+                return;
             }
-            else {
-                list.push(id);
+            const list = [];
+            for (const index in idList) {
+                const id = idList[index];
+                if (this.idToMoodName.hasOwnProperty(id)) {
+                    list.push(this.idToMoodName[id]);
+                }
+                else {
+                    list.push(id);
+                }
             }
-        }
-        this.setStateAck(this.uuid + '.' + name, list);
+            yield this.setStateAck(this.uuid + '.' + name, list);
+        });
     }
     updateActiveMoods() {
-        this.updateMoodsList('activeMoods', this.activeMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('activeMoods', this.activeMoods);
+        });
     }
     updateFavoriteMoods() {
-        this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('favoriteMoods', this.favoriteMoods);
+        });
     }
     updateAdditionalMoods() {
-        this.updateMoodsList('additionalMoods', this.additionalMoods);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateMoodsList('additionalMoods', this.additionalMoods);
+        });
     }
 }
 exports.LightControllerV2 = LightControllerV2;
