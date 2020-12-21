@@ -44,6 +44,23 @@ class TextInput extends control_base_1.ControlBase {
             }
         });
     }
+    createTextInputStateObjectAsync(controlName, uuid, states, name, type, role, commonExt) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (states !== undefined && states.hasOwnProperty(name)) {
+                let common = {
+                    name: controlName + ': ' + name,
+                    read: false,
+                    write: true,
+                    type: type,
+                    role: role,
+                };
+                if (commonExt && typeof commonExt === 'object') {
+                    common = Object.assign(Object.assign({}, common), commonExt);
+                }
+                yield this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], this.setStateAck.bind(this));
+            }
+        });
+    }
 }
 exports.TextInput = TextInput;
 //# sourceMappingURL=TextInput.js.map
