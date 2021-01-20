@@ -3,6 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Jalousie = void 0;
 const control_base_1 = require("./control-base");
 class Jalousie extends control_base_1.ControlBase {
+    async upDownChangeHandler() {
+        if (this.upDownAutoCommandHandled) {
+            this.positionTarget = undefined;
+        }
+        else {
+            this.upDownAutoCommandHandled = true;
+        }
+    }
     async loadAsync(type, uuid, control) {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -25,12 +33,34 @@ class Jalousie extends control_base_1.ControlBase {
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'up', 'indicator', {
             write: true,
         });
+        this.addStateEventHandler(control.states.up, this.upDownChangeHandler.bind(this), 'up');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'down', 'indicator', {
             write: true,
         });
+        this.addStateEventHandler(control.states.down, this.upDownChangeHandler.bind(this), 'down');
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level.blind', {
             write: true,
         });
+        this.addStateEventHandler(control.states.position, async (value) => {
+            if (typeof this.positionTarget === 'number') {
+                // Below, the actual command ('up' or 'down') is irrelevant but we
+                // need to know the direction for target test.
+                if (this.positionTarget > 0) {
+                    // Going down
+                    if (value >= this.positionTarget) {
+                        this.positionTarget = undefined;
+                        await this.sendCommand(control.uuidAction, 'down');
+                    }
+                }
+                else {
+                    // Going up - don't forget target is negative
+                    if (value <= -this.positionTarget) {
+                        this.positionTarget = undefined;
+                        await this.sendCommand(control.uuidAction, 'up');
+                    }
+                }
+            }
+        }, 'auto');
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'shadePosition', 'level');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'safetyActive', 'indicator');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'autoAllowed', 'indicator');
@@ -82,29 +112,16 @@ class Jalousie extends control_base_1.ControlBase {
                     this.sendCommand(control.uuidAction, 'FullUp');
                     return;
                 }
-                let targetValue;
-                let isGoingDown;
+                this.upDownAutoCommandHandled = false;
                 if (oldValue < newValue) {
-                    targetValue = (newValue - 5) / 100;
+                    this.positionTarget = (newValue - 5) / 100;
                     this.sendCommand(control.uuidAction, 'down');
-                    isGoingDown = true;
                 }
                 else {
-                    targetValue = (newValue + 5) / 100;
+                    // Negative here because we use -ve numbers to indicate movement up
+                    this.positionTarget = -(newValue + 5) / 100;
                     this.sendCommand(control.uuidAction, 'up');
-                    isGoingDown = false;
                 }
-                const listenerName = 'auto';
-                this.addStateEventHandler(control.states.position, async (value) => {
-                    if (isGoingDown && value >= targetValue) {
-                        this.removeStateEventHandler(control.states.position, listenerName);
-                        this.sendCommand(control.uuidAction, 'DownOff');
-                    }
-                    else if (!isGoingDown && value <= targetValue) {
-                        this.removeStateEventHandler(control.states.position, listenerName);
-                        this.sendCommand(control.uuidAction, 'UpOff');
-                    }
-                }, listenerName);
             });
         }
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
