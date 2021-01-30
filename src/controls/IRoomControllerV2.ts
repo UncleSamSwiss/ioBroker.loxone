@@ -16,19 +16,64 @@ export class IRoomControllerV2 extends ControlBase {
             native: { control: control as any },
         });
 
-        // TODO: details not implemented
+        // TODO: details not implemented - needed to get temperature unit for example (C/F).
 
-        await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
-            'absentMinOffset',
-            'absentMaxOffset',
-            'activeMode',
-            'comfortTemperature',
-            'comfortTemperatureOffset',
-            'comfortTolerance',
-            'operatingMode',
-            'tempTarget',
-        ]);
+        await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'modeList');
+        await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'overrideEntries');
+        await this.createSimpleControlStateObjectAsync(
+            control.name,
+            uuid,
+            control.states,
+            'overrideReason',
+            'number',
+            'value',
+            {
+                states: {
+                    0: 'None',
+                    1: 'Presence -> Comfort',
+                    2: 'Window open -> Eco+',
+                    3: 'Comfort',
+                    4: 'Eco',
+                    5: 'Eco+',
+                    6: 'Heat Up',
+                    7: 'Cool Down',
+                },
+            },
+        );
+        await this.createSimpleControlStateObjectAsync(
+            control.name,
+            uuid,
+            control.states,
+            'prepareState',
+            'number',
+            'value',
+            {
+                states: {
+                    '-1': 'Cooling Down',
+                    0: 'None',
+                    1: 'Heating Up',
+                },
+            },
+        );
+        await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'openWindow', 'indicator');
+        await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'useOutdoor', 'indicator');
 
+        await this.createSimpleControlStateObjectAsync(
+            control.name,
+            uuid,
+            control.states,
+            'frostProtectTemperature',
+            'number',
+            'value.temperature',
+        );
+        await this.createSimpleControlStateObjectAsync(
+            control.name,
+            uuid,
+            control.states,
+            'heatProtectTemperature',
+            'number',
+            'value.temperature',
+        );
         // Add event handler to frost/heat protection values so we re-calc target min/max if they change
         this.addStateEventHandler(uuid + '.frostProtectTemperature', async () => {
             await this.updateTempTargetMinMax();
