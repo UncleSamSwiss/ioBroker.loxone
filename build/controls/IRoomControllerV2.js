@@ -35,20 +35,18 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         this.addStateEventHandler(uuid + '.heatProtectTemperature', async () => {
             await this.updateTempTargetMinMax();
         });
-        await this.updateStateObjectAsync(uuid + '.activeMode', 
-        // TODO: Shouldn't this be some kind of enum?
-        // 0 = Economy
-        // 1 = Comfort temperature
-        // 2 = Building protection
-        // 3 = Manual
-        {
+        await this.updateStateObjectAsync(uuid + '.activeMode', {
             name: control.name + ': activeMode',
             read: true,
             write: true,
             type: 'number',
-            min: 0,
-            max: 3,
             role: 'level',
+            states: {
+                0: 'Economy',
+                1: 'Comfort',
+                2: 'Fabric Protection',
+                3: 'Manual',
+            },
         }, control.states.activeMode, async (name, value) => {
             await this.setStateAck(name, value);
             await this.updateTempTargetMinMax();
@@ -141,22 +139,20 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             // So because of this, just start an override at the given temperature.
             this.sendCommand(control.uuidAction, 'override/3//' + newValue);
         });
-        await this.updateStateObjectAsync(uuid + '.operatingMode', 
-        // TODO: Shouldn't this be some kind of enum?
-        // 0 = Automatic, heating and cooling allowed
-        // 1 = Automatic, only heating allowed
-        // 2 = Automatic, only cooling allowed
-        // 3 = Manuel, heating and cooling allowed
-        // 4 = Manuel, only heating allowed
-        // 5 = Manuel, only cooling allowed
-        {
+        await this.updateStateObjectAsync(uuid + '.operatingMode', {
             name: control.name + ': operatingMode',
             read: true,
             write: true,
             type: 'number',
-            min: 0,
-            max: 5,
             role: 'level',
+            states: {
+                0: 'Automatic heating/cooling',
+                1: 'Automatic heating',
+                2: 'Automatic cooling',
+                3: 'Manual heating/cooling',
+                4: 'Manual heating',
+                5: 'Manual cooling',
+            },
         }, control.states.operatingMode, async (name, value) => {
             await this.setStateAck(name, value);
         });

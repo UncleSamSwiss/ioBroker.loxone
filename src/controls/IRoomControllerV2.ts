@@ -39,19 +39,18 @@ export class IRoomControllerV2 extends ControlBase {
 
         await this.updateStateObjectAsync(
             uuid + '.activeMode',
-            // TODO: Shouldn't this be some kind of enum?
-            // 0 = Economy
-            // 1 = Comfort temperature
-            // 2 = Building protection
-            // 3 = Manual
             {
                 name: control.name + ': activeMode',
                 read: true,
                 write: true,
-                type: 'number', // TODO: shame there's no int :(
-                min: 0,
-                max: 3,
+                type: 'number',
                 role: 'level',
+                states: {
+                    0: 'Economy',
+                    1: 'Comfort',
+                    2: 'Fabric Protection',
+                    3: 'Manual',
+                },
             },
             control.states.activeMode,
             async (name: string, value: any) => {
@@ -201,21 +200,20 @@ export class IRoomControllerV2 extends ControlBase {
 
         await this.updateStateObjectAsync(
             uuid + '.operatingMode',
-            // TODO: Shouldn't this be some kind of enum?
-            // 0 = Automatic, heating and cooling allowed
-            // 1 = Automatic, only heating allowed
-            // 2 = Automatic, only cooling allowed
-            // 3 = Manuel, heating and cooling allowed
-            // 4 = Manuel, only heating allowed
-            // 5 = Manuel, only cooling allowed
             {
                 name: control.name + ': operatingMode',
                 read: true,
                 write: true,
-                type: 'number', // TODO: shame there's no int :(
-                min: 0,
-                max: 5,
+                type: 'number',
                 role: 'level',
+                states: {
+                    0: 'Automatic heating/cooling',
+                    1: 'Automatic heating',
+                    2: 'Automatic cooling',
+                    3: 'Manual heating/cooling',
+                    4: 'Manual heating',
+                    5: 'Manual cooling',
+                },
             },
             control.states.operatingMode,
             async (name: string, value: any) => {
