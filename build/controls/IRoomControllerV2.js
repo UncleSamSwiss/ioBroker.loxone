@@ -17,7 +17,12 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             },
             native: { control: control },
         });
-        // TODO: details not implemented - needed to get temperature unit for example (C/F).
+        // TODO: other details not implemented - needed to get temperature unit for example (C/F).
+        // TODO: connectedInputs has bits for frost/heat protection but no set control for them. Eh?
+        const comfortTemperatureWrite = control.details.connectedInputs & 1 ? false : true;
+        const comfortToleranceWrite = control.details.connectedInputs & 2 ? false : true;
+        const absentMinOffsetWrite = control.details.connectedInputs & 4 ? false : true;
+        const absentMaxOffsetWrite = control.details.connectedInputs & 8 ? false : true;
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'modeList');
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'overrideEntries');
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'overrideReason', 'number', 'value', {
@@ -72,9 +77,9 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         await this.updateStateObjectAsync(uuid + '.comfortTemperature', {
             name: control.name + ': comfortTemperature',
             read: true,
-            write: true,
+            write: comfortTemperatureWrite,
             type: 'number',
-            role: 'level.temperature',
+            role: comfortTemperatureWrite ? 'level.temperature' : 'value.temperature',
         }, control.states.comfortTemperature, async (name, value) => {
             await this.setStateAck(name, value);
         });
@@ -84,11 +89,11 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         await this.updateStateObjectAsync(uuid + '.comfortTolerance', {
             name: control.name + ': comfortTolerance',
             read: true,
-            write: true,
+            write: comfortToleranceWrite,
             type: 'number',
             min: 0.5,
             max: 3.0,
-            role: 'level.temperature',
+            role: comfortToleranceWrite ? 'level.temperature' : 'value.temperature',
         }, control.states.comfortTolerance, async (name, value) => {
             await this.setStateAck(name, value);
         });
@@ -98,9 +103,9 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         await this.updateStateObjectAsync(uuid + '.absentMinOffset', {
             name: control.name + ': absentMinOffset',
             read: true,
-            write: true,
+            write: absentMinOffsetWrite,
             type: 'number',
-            role: 'level.temperature',
+            role: absentMinOffsetWrite ? 'level.temperature' : 'value.temperature',
         }, control.states.absentMinOffset, async (name, value) => {
             await this.setStateAck(name, value);
             await this.updateTempTargetMinMax();
@@ -111,9 +116,9 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         await this.updateStateObjectAsync(uuid + '.absentMaxOffset', {
             name: control.name + ': absentMaxOffset',
             read: true,
-            write: true,
+            write: absentMaxOffsetWrite,
             type: 'number',
-            role: 'level.temperature',
+            role: absentMaxOffsetWrite ? 'level.temperature' : 'value.temperature',
         }, control.states.absentMaxOffset, async (name, value) => {
             await this.setStateAck(name, value);
             await this.updateTempTargetMinMax();

@@ -16,7 +16,12 @@ export class IRoomControllerV2 extends ControlBase {
             native: { control: control as any },
         });
 
-        // TODO: details not implemented - needed to get temperature unit for example (C/F).
+        // TODO: other details not implemented - needed to get temperature unit for example (C/F).
+        // TODO: connectedInputs has bits for frost/heat protection but no set control for them. Eh?
+        const comfortTemperatureWrite = (<number>control.details.connectedInputs) & 1 ? false : true;
+        const comfortToleranceWrite = (<number>control.details.connectedInputs) & 2 ? false : true;
+        const absentMinOffsetWrite = (<number>control.details.connectedInputs) & 4 ? false : true;
+        const absentMaxOffsetWrite = (<number>control.details.connectedInputs) & 8 ? false : true;
 
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'modeList');
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'overrideEntries');
@@ -112,9 +117,9 @@ export class IRoomControllerV2 extends ControlBase {
             {
                 name: control.name + ': comfortTemperature',
                 read: true,
-                write: true,
+                write: comfortTemperatureWrite,
                 type: 'number',
-                role: 'level.temperature',
+                role: comfortTemperatureWrite ? 'level.temperature' : 'value.temperature',
             },
             control.states.comfortTemperature,
             async (name: string, value: any) => {
@@ -133,11 +138,11 @@ export class IRoomControllerV2 extends ControlBase {
             {
                 name: control.name + ': comfortTolerance',
                 read: true,
-                write: true,
+                write: comfortToleranceWrite,
                 type: 'number',
                 min: 0.5,
                 max: 3.0,
-                role: 'level.temperature',
+                role: comfortToleranceWrite ? 'level.temperature' : 'value.temperature',
             },
             control.states.comfortTolerance,
             async (name: string, value: any) => {
@@ -156,9 +161,9 @@ export class IRoomControllerV2 extends ControlBase {
             {
                 name: control.name + ': absentMinOffset',
                 read: true,
-                write: true,
+                write: absentMinOffsetWrite,
                 type: 'number',
-                role: 'level.temperature',
+                role: absentMinOffsetWrite ? 'level.temperature' : 'value.temperature',
             },
             control.states.absentMinOffset,
             async (name: string, value: any) => {
@@ -178,9 +183,9 @@ export class IRoomControllerV2 extends ControlBase {
             {
                 name: control.name + ': absentMaxOffset',
                 read: true,
-                write: true,
+                write: absentMaxOffsetWrite,
                 type: 'number',
-                role: 'level.temperature',
+                role: absentMaxOffsetWrite ? 'level.temperature' : 'value.temperature',
             },
             control.states.absentMaxOffset,
             async (name: string, value: any) => {
