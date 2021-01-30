@@ -462,8 +462,9 @@ class Loxone extends utils.Adapter {
         await this.setStateAsync(id, { val: value, ack: true });
     }
     getCachedStateValue(id) {
-        if (this.currentStateValues.hasOwnProperty(id)) {
-            return this.currentStateValues[id];
+        const keyId = this.namespace + '.' + id;
+        if (this.currentStateValues.hasOwnProperty(keyId)) {
+            return this.currentStateValues[keyId];
         }
         return undefined;
     }
