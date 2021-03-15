@@ -3,6 +3,8 @@ import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
 export class Jalousie extends ControlBase {
+    private positionTarget: number | undefined;
+
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -27,9 +29,13 @@ export class Jalousie extends ControlBase {
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'up', 'indicator', {
             write: true,
         });
+        this.addStateEventHandler(control.states.up, () => this.upDownChangeHandler(), 'up');
+
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'down', 'indicator', {
             write: true,
         });
+        this.addStateEventHandler(control.states.down, () => this.upDownChangeHandler(), 'down');
+
         await this.createPercentageControlStateObjectAsync(
             control.name,
             uuid,
@@ -41,6 +47,7 @@ export class Jalousie extends ControlBase {
                 // TODO: re-add: smartIgnore: false
             },
         );
+
         await this.createPercentageControlStateObjectAsync(
             control.name,
             uuid,
@@ -94,6 +101,7 @@ export class Jalousie extends ControlBase {
         });
 
         // for Alexa support:
+        // ... but this is not really Alexa specific to be fair
         if (control.states.position) {
             this.addStateChangeListener(uuid + '.position', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 oldValue = this.convertStateToInt(oldValue);
@@ -110,32 +118,41 @@ export class Jalousie extends ControlBase {
                     this.sendCommand(control.uuidAction, 'FullUp');
                     return;
                 }
-                let targetValue: number;
-                let isGoingDown: boolean;
+
+                this.upDownAutoCommandHandled = false;
                 if (oldValue < newValue) {
-                    targetValue = (newValue - 5) / 100;
+                    this.positionTarget = (newValue - 5) / 100;
                     this.sendCommand(control.uuidAction, 'down');
-                    isGoingDown = true;
                 } else {
-                    targetValue = (newValue + 5) / 100;
+                    // Negative here because we use -ve numbers to indicate movement up
+                    this.positionTarget = -(newValue + 5) / 100;
                     this.sendCommand(control.uuidAction, 'up');
-                    isGoingDown = false;
                 }
-                const listenerName = 'auto';
-                this.addStateEventHandler(
-                    control.states.position,
-                    async (value: any) => {
-                        if (isGoingDown && value >= targetValue) {
-                            this.removeStateEventHandler(control.states.position, listenerName);
-                            this.sendCommand(control.uuidAction, 'DownOff');
-                        } else if (!isGoingDown && value <= targetValue) {
-                            this.removeStateEventHandler(control.states.position, listenerName);
-                            this.sendCommand(control.uuidAction, 'UpOff');
-                        }
-                    },
-                    listenerName,
-                );
             });
+
+            this.addStateEventHandler(
+                control.states.position,
+                async (value: any) => {
+                    if (typeof this.positionTarget === 'number') {
+                        // Below, the actual command ('up' or 'down') is irrelevant but we
+                        // need to know the direction for target test.
+                        if (this.positionTarget > 0) {
+                            // Going down
+                            if (value >= this.positionTarget) {
+                                this.positionTarget = undefined;
+                                await this.sendCommand(control.uuidAction, 'down');
+                            }
+                        } else {
+                            // Going up - don't forget target is negative
+                            if (value <= -this.positionTarget) {
+                                this.positionTarget = undefined;
+                                await this.sendCommand(control.uuidAction, 'up');
+                            }
+                        }
+                    }
+                },
+                'auto',
+            );
         }
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
@@ -152,5 +169,22 @@ export class Jalousie extends ControlBase {
         this.addStateChangeListener(uuid + '.shade', () => {
             this.sendCommand(control.uuidAction, 'shade');
         });
+    }
+
+    // The upDownChangeHandler callback will be triggered when any movement starts or stops.
+    // Normally we want upDownChangeHandler to clear any target as it signifies manual command
+    // has occurred. This can happen in normal use or before a target has been reached for
+    // example.
+    // But in the case of movement started as a result of an auto-position command, we don't
+    // want to clear that target.
+    // For this reason we have the below boolean that tells upDownChangeHandler to ignore the
+    // first change it sees after an auto-position command is started.
+    private upDownAutoCommandHandled = false;
+    private async upDownChangeHandler(): Promise<void> {
+        if (this.upDownAutoCommandHandled) {
+            this.positionTarget = undefined;
+        } else {
+            this.upDownAutoCommandHandled = true;
+        }
     }
 }
