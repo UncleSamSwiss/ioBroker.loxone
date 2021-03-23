@@ -1,11 +1,11 @@
 {
-    "Functions": "",
-    "Loxone Miniserver adapter settings": "",
-    "Miniserver Hostname / IP": "",
-    "Miniserver Password": "",
-    "Miniserver Port": "",
-    "Miniserver Username": "",
-    "Names": "",
-    "Rooms": "",
-    "Synchronize": ""
+    "Functions": "Functies",
+    "Loxone Miniserver adapter settings": "Loxone Miniserver adapter instellingen",
+    "Miniserver Hostname / IP": "Miniserver hostnaam / IP",
+    "Miniserver Password": "Miniserver wachtwoord",
+    "Miniserver Port": "Miniserver poort",
+    "Miniserver Username": "Miniserver gebruikersnaam",
+    "Names": "Namen",
+    "Rooms": "Ruimtes",
+    "Synchronize": "Syncroniseer"
 }
