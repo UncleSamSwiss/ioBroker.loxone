@@ -126,12 +126,14 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.setStateAck(name, value);
             },
         );
-        this.addStateChangeListener(
-            uuid + '.comfortTemperature',
-            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
-            },
-        );
+        if (comfortTemperatureWrite) {
+            this.addStateChangeListener(
+                uuid + '.comfortTemperature',
+                (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                    this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
+                },
+            );
+        }
 
         await this.updateStateObjectAsync(
             uuid + '.comfortTolerance',
@@ -149,12 +151,14 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.setStateAck(name, value);
             },
         );
-        this.addStateChangeListener(
-            uuid + '.comfortTolerance',
-            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setComfortTolerance/' + newValue);
-            },
-        );
+        if (comfortToleranceWrite) {
+            this.addStateChangeListener(
+                uuid + '.comfortTolerance',
+                (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                    this.sendCommand(control.uuidAction, 'setComfortTolerance/' + newValue);
+                },
+            );
+        }
 
         await this.updateStateObjectAsync(
             uuid + '.absentMinOffset',
@@ -171,12 +175,14 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.updateTempTargetMinMax();
             },
         );
-        this.addStateChangeListener(
-            uuid + '.absentMinOffset',
-            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setAbsentMinTemperature/' + newValue);
-            },
-        );
+        if (absentMinOffsetWrite) {
+            this.addStateChangeListener(
+                uuid + '.absentMinOffset',
+                (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                    this.sendCommand(control.uuidAction, 'setAbsentMinTemperature/' + newValue);
+                },
+            );
+        }
 
         await this.updateStateObjectAsync(
             uuid + '.absentMaxOffset',
@@ -193,12 +199,14 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.updateTempTargetMinMax();
             },
         );
-        this.addStateChangeListener(
-            uuid + '.absentMaxOffset',
-            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setAbsentMaxTemperature/' + newValue);
-            },
-        );
+        if (absentMaxOffsetWrite) {
+            this.addStateChangeListener(
+                uuid + '.absentMaxOffset',
+                (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                    this.sendCommand(control.uuidAction, 'setAbsentMaxTemperature/' + newValue);
+                },
+            );
+        }
 
         await this.updateStateObjectAsync(
             uuid + '.comfortTemperatureOffset',
