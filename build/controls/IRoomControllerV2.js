@@ -83,9 +83,11 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         }, control.states.comfortTemperature, async (name, value) => {
             await this.setStateAck(name, value);
         });
-        this.addStateChangeListener(uuid + '.comfortTemperature', (oldValue, newValue) => {
-            this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
-        });
+        if (comfortTemperatureWrite) {
+            this.addStateChangeListener(uuid + '.comfortTemperature', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
+            });
+        }
         await this.updateStateObjectAsync(uuid + '.comfortTolerance', {
             name: control.name + ': comfortTolerance',
             read: true,
@@ -97,9 +99,11 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         }, control.states.comfortTolerance, async (name, value) => {
             await this.setStateAck(name, value);
         });
-        this.addStateChangeListener(uuid + '.comfortTolerance', (oldValue, newValue) => {
-            this.sendCommand(control.uuidAction, 'setComfortTolerance/' + newValue);
-        });
+        if (comfortToleranceWrite) {
+            this.addStateChangeListener(uuid + '.comfortTolerance', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setComfortTolerance/' + newValue);
+            });
+        }
         await this.updateStateObjectAsync(uuid + '.absentMinOffset', {
             name: control.name + ': absentMinOffset',
             read: true,
@@ -110,9 +114,11 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             await this.setStateAck(name, value);
             await this.updateTempTargetMinMax();
         });
-        this.addStateChangeListener(uuid + '.absentMinOffset', (oldValue, newValue) => {
-            this.sendCommand(control.uuidAction, 'setAbsentMinTemperature/' + newValue);
-        });
+        if (absentMinOffsetWrite) {
+            this.addStateChangeListener(uuid + '.absentMinOffset', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setAbsentMinTemperature/' + newValue);
+            });
+        }
         await this.updateStateObjectAsync(uuid + '.absentMaxOffset', {
             name: control.name + ': absentMaxOffset',
             read: true,
@@ -123,9 +129,11 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             await this.setStateAck(name, value);
             await this.updateTempTargetMinMax();
         });
-        this.addStateChangeListener(uuid + '.absentMaxOffset', (oldValue, newValue) => {
-            this.sendCommand(control.uuidAction, 'setAbsentMaxTemperature/' + newValue);
-        });
+        if (absentMaxOffsetWrite) {
+            this.addStateChangeListener(uuid + '.absentMaxOffset', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setAbsentMaxTemperature/' + newValue);
+            });
+        }
         await this.updateStateObjectAsync(uuid + '.comfortTemperatureOffset', {
             name: control.name + ': comfortTemperatureOffset',
             read: true,
@@ -177,7 +185,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             await this.setStateAck(name, value);
         });
         this.addStateChangeListener(uuid + '.operatingMode', (oldValue, newValue) => {
-            this.sendCommand(control.uuidAction, 'override/' + newValue);
+            this.sendCommand(control.uuidAction, 'setOperatingMode/' + newValue);
         });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stopOverride');
         this.addStateChangeListener(uuid + '.stopOverride', () => {
@@ -252,10 +260,10 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 break;
         }
         // Don't do any update if not calculated (can only happen in error condition)
-        if (tempTargetMin != null) {
+        if (tempTargetMin !== undefined) {
             await this.setStateAck(this.uuid + '.tempTargetMin', tempTargetMin);
         }
-        if (tempTargetMax != null) {
+        if (tempTargetMax !== undefined) {
             await this.setStateAck(this.uuid + '.tempTargetMax', tempTargetMax);
         }
     }
