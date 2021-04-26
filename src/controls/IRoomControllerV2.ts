@@ -370,10 +370,10 @@ export class IRoomControllerV2 extends ControlBase {
         }
 
         // Don't do any update if not calculated (can only happen in error condition)
-        if (tempTargetMin != null) {
+        if (tempTargetMin !== undefined) {
             await this.setStateAck(this.uuid + '.tempTargetMin', tempTargetMin);
         }
-        if (tempTargetMax != null) {
+        if (tempTargetMax !== undefined) {
             await this.setStateAck(this.uuid + '.tempTargetMax', tempTargetMax);
         }
     }
