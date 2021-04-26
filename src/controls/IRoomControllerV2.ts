@@ -271,7 +271,7 @@ export class IRoomControllerV2 extends ControlBase {
             },
         );
         this.addStateChangeListener(uuid + '.operatingMode', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'override/' + newValue);
+            this.sendCommand(control.uuidAction, 'setOperatingMode/' + newValue);
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stopOverride');
