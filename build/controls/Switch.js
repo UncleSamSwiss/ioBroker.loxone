@@ -15,6 +15,7 @@ class Switch extends control_base_1.ControlBase {
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['active']);
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'active', 'switch', {
             write: true,
+            // TODO: re-add: smartIgnore: type == 'channel',
         });
         this.addStateChangeListener(uuid + '.active', (oldValue, newValue) => {
             if (newValue == oldValue) {

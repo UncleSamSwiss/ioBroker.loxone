@@ -25,6 +25,7 @@ class Gate extends control_base_1.ControlBase {
         };
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level', {
             write: true,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'active', 'number', 'value', { write: true, states: activeStates });
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'preventOpen', 'indicator');

@@ -29,6 +29,7 @@ class Meter extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.actual, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.actualFormat);
             });
@@ -40,6 +41,7 @@ class Meter extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.total, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.totalFormat);
             });

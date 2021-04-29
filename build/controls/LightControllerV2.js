@@ -38,6 +38,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.moodList, async (name, value) => {
                 const moodList = JSON.parse(value);
                 const list = [];
@@ -62,6 +63,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: true,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.activeMoods, async (name, value) => {
                 this.activeMoods = JSON.parse(value);
                 await this.updateActiveMoods();
@@ -133,6 +135,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.favoriteMoods, async (id, value) => {
                 this.favoriteMoods = JSON.parse(value);
                 await this.updateFavoriteMoods();
@@ -143,6 +146,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.additionalMoods, async (name, value) => {
                 this.additionalMoods = JSON.parse(value);
                 await this.updateAdditionalMoods();

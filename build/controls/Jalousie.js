@@ -44,6 +44,7 @@ class Jalousie extends control_base_1.ControlBase {
         this.addStateEventHandler(control.states.down, () => this.upDownChangeHandler(), 'down');
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level.blind', {
             write: true,
+            // TODO: re-add: smartIgnore: false
         });
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'shadePosition', 'level');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'safetyActive', 'indicator');

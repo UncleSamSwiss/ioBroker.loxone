@@ -28,6 +28,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.active, async (name, value) => {
                 await this.setStateAck(name, value == 1 ? text.on : text.off);
             });
@@ -40,6 +41,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.active, async (name, value) => {
                 await this.setStateAck(name, value == 1 ? image.on : image.off);
             });
@@ -52,6 +54,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.active, async (name, value) => {
                 await this.setStateAck(name, value == 1 ? color.on : color.off);
             });

@@ -16,6 +16,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.red',
             min: 0,
             max: 255,
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const rgb = this.loxoneColorToRgb(value);
             if (rgb !== undefined) {
@@ -30,6 +31,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.green',
             min: 0,
             max: 255,
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const rgb = this.loxoneColorToRgb(value);
             if (rgb !== undefined) {
@@ -44,6 +46,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.blue',
             min: 0,
             max: 255,
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const rgb = this.loxoneColorToRgb(value);
             if (rgb !== undefined) {
@@ -56,6 +59,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             write: false,
             type: 'string',
             role: 'level.color.rgb',
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const rgb = this.loxoneColorToRgb(value);
             if (rgb !== undefined) {
@@ -70,6 +74,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.level',
             min: 0,
             max: 100,
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
@@ -82,6 +87,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             write: false,
             type: 'number',
             role: 'level.color.temperature',
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
@@ -94,6 +100,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             write: false,
             type: 'number',
             role: 'level.color.temperature',
+            // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
             const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {

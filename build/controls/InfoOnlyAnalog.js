@@ -27,6 +27,7 @@ class InfoOnlyAnalog extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.value, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.format);
             });
