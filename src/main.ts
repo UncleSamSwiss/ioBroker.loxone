@@ -142,7 +142,6 @@ export class Loxone extends utils.Adapter {
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
-            this.log.debug(`Enqueue event: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
             this.handleEventQueue().catch((e) => this.log.error(`Unhandled error in event ${uuid}: ${e}`));
         };
@@ -440,19 +439,19 @@ export class Loxone extends utils.Adapter {
         // TODO: This solution with globals for runQueue & queueRunning
         // isn't very elegant. It works, but is there a better way?
         if (!this.runQueue) {
-            this.log.debug('Asked to handle the queue, but is stopped');
+            this.log.silly('Asked to handle the queue, but is stopped');
         } else if (this.queueRunning) {
-            this.log.debug('Asked to handle the queue, but already in progress');
+            this.log.silly('Asked to handle the queue, but already in progress');
         } else {
             this.queueRunning = true;
-            this.log.debug('Processing events from queue length: ' + this.eventsQueue.size());
+            this.log.silly('Processing events from queue length: ' + this.eventsQueue.size());
             let evt: LoxoneEvent | null;
             while ((evt = this.eventsQueue.dequeue())) {
-                this.log.debug(`Dequeued event UUID: ${evt.uuid}`);
+                this.log.silly(`Dequeued event UUID: ${evt.uuid}`);
                 await this.handleEvent(evt);
             }
             this.queueRunning = false;
-            this.log.debug('Done with event queue');
+            this.log.silly('Done with event queue');
         }
     }
 
@@ -563,8 +562,9 @@ export class Loxone extends utils.Adapter {
     }
 
     public getCachedStateValue(id: string): OldStateValue {
-        if (this.currentStateValues.hasOwnProperty(id)) {
-            return this.currentStateValues[id];
+        const keyId = this.namespace + '.' + id;
+        if (this.currentStateValues.hasOwnProperty(keyId)) {
+            return this.currentStateValues[keyId];
         }
 
         return undefined;
