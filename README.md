@@ -248,6 +248,14 @@ Provided by dimmers.
 -   `on` (wo) writing any value to this state sets the dimmer to the last known position
 -   `off` (wo) writing any value to this state disables the dimmer, sets position to 0 but remembers the last position
 
+### EIBDimmer
+
+Provided by EIB/KNX dimmers.
+
+-   `position` (rw) current position for the dimmer
+-   `on` (wo) writing any value to this state sets the dimmer to the last known position
+-   `off` (wo) writing any value to this state disables the dimmer, sets position to 0 but remembers the last position
+
 ### Gate
 
 Provided by gate controls.
@@ -291,12 +299,18 @@ Provided by virtual states as well as the Loxone Touch switch.
 Provided by door controllers.
 
 -   `bell` (ro) whether the bell is ringing
--   `lastBellEvents` (ro) array containing the timestamps for each bell-activity that wasn�t answered
+-   `lastBellEvents` (ro) array containing the timestamps for each bell-activity that wasn't answered
 -   `version` (ro) Loxone Intercoms only - text containing the currently installed firmware
     versions
 -   `answer` (wo) writing any value to this state will deactivate the bell
 
 This type of channel might contain other devices. See the respective chapter for more information.
+
+### Intelligent Room Controller V2
+
+Provided by the intelligent room controller V2 since Miniserver 10.0.
+
+TODO: Documentation currently missing
 
 ### Jalousie
 
@@ -458,6 +472,15 @@ Provided by stairwell and multifunction switches.
 
 -   `entries` (ro) list of entries returned from the miniserver
 
+### ValueSelector
+
+Value selection.
+
+-   `value` (rw) current value
+-   `min` (ro) current minimum value
+-   `max` (ro) current maximum value
+-   `step` (ro) current step value
+
 ### WindowMonitor
 
 Provided by utility meters.
@@ -534,6 +557,13 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+-   (raintonr) Fixes for auto-position based on percentage (#76)
+-   (raintonr) Added support for IRoomControllerV2 (#22)
+-   (UncleSamSwiss) Added experimental support for EIBDimmer (#15)
+-   (UncleSamSwiss) Added support for ValueSelector (#36)
 
 ### 2.1.0 (2020-12-21)
 
