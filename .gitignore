@@ -1,5 +1,6 @@
 .git
 .idea
+.dev-server/
 *.code-workspace
 node_modules
 nbproject
