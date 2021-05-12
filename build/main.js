@@ -183,6 +183,11 @@ class Loxone extends utils.Adapter {
                 role: 'value',
                 handler: this.setStateAck.bind(this),
             },
+            hasInternet: {
+                type: 'boolean',
+                role: 'indicator',
+                handler: (name, value) => this.setStateAck(name, value === 1),
+            },
         };
         const defaultInfo = {
             type: 'string',
