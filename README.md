@@ -88,9 +88,17 @@ By default Loxone Miniserver hides many controls (and thus their states) from th
 
 That means, they are also hidden from this ioBroker adapter.
 
-To ensure, all your states are properly reported to ioBroker, please verify that they have "Use in Visualization" checked:
+### "Use in User Interface"
 
-![Use in Visualization settings](doc/loxone-config-use-in-visualization.png)
+To ensure, all your states are properly reported to ioBroker, please verify that they have "Use" in the "User Interface" section checked:
+
+![Use in User Interface settings](doc/loxone-config-use-in-visualization.png)
+
+### "Display diagnostic inputs"
+
+To see diagnostic inputs (e.g. battery status of Air devices), please verify that the device has "Display diagnostic inputs" checked:
+
+![Display diagnostic inputs settings](doc/loxone-config-display-diagnostics.png)
 
 ## Global States
 
