@@ -88,13 +88,13 @@ By default Loxone Miniserver hides many controls (and thus their states) from th
 
 That means, they are also hidden from this ioBroker adapter.
 
-### "Use in User Interface"
+### Use in User Interface
 
 To ensure, all your states are properly reported to ioBroker, please verify that they have "Use" in the "User Interface" section checked:
 
 ![Use in User Interface settings](doc/loxone-config-use-in-visualization.png)
 
-### "Display diagnostic inputs"
+### Display diagnostic inputs
 
 To see diagnostic inputs (e.g. battery status of Air devices), please verify that the device has "Display diagnostic inputs" checked:
 
@@ -588,6 +588,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for ValueSelector (#36)
 -   (UncleSamSwiss) Added support for TextState (#73)
 -   (UncleSamSwiss) Added support for UpDownAnalog (#57)
+-   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
 
 ### 2.1.0 (2020-12-21)
 

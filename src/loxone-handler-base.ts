@@ -46,7 +46,21 @@ export abstract class LoxoneHandlerBase {
     }
 
     protected convertStateToFloat(value: OldStateValue): number {
+        if (typeof value === 'number') {
+            return value;
+        }
         return !value ? 0 : parseFloat(value.toString());
+    }
+
+    protected convertStateToBoolean(value: OldStateValue): boolean {
+        if (!value) {
+            return false;
+        }
+        if (typeof value === 'boolean') {
+            return value;
+        }
+        value = value.toString();
+        return value !== '0' && value !== 'false';
     }
 
     protected getCachedStateValue(id: string): OldStateValue {
@@ -110,7 +124,20 @@ export abstract class LoxoneHandlerBase {
                 uuid + '.' + this.normalizeName(name),
                 common,
                 states[name],
-                this.setStateAck.bind(this),
+                (id, value) => {
+                    switch (type) {
+                        case 'number':
+                            value = this.convertStateToFloat(value);
+                            break;
+                        case 'boolean':
+                            value = this.convertStateToBoolean(value);
+                            break;
+                        default:
+                            value = value === null || value === undefined ? '' : value.toString();
+                            break;
+                    }
+                    return this.setStateAck(id, value);
+                },
             );
         }
     }

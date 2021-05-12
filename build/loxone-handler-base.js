@@ -32,7 +32,20 @@ class LoxoneHandlerBase {
         return !value ? 0 : parseInt(value.toString());
     }
     convertStateToFloat(value) {
+        if (typeof value === 'number') {
+            return value;
+        }
         return !value ? 0 : parseFloat(value.toString());
+    }
+    convertStateToBoolean(value) {
+        if (!value) {
+            return false;
+        }
+        if (typeof value === 'boolean') {
+            return value;
+        }
+        value = value.toString();
+        return value !== '0' && value !== 'false';
     }
     getCachedStateValue(id) {
         return this.adapter.getCachedStateValue(id);
@@ -67,7 +80,20 @@ class LoxoneHandlerBase {
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
             }
-            await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], this.setStateAck.bind(this));
+            await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], (id, value) => {
+                switch (type) {
+                    case 'number':
+                        value = this.convertStateToFloat(value);
+                        break;
+                    case 'boolean':
+                        value = this.convertStateToBoolean(value);
+                        break;
+                    default:
+                        value = value === null || value === undefined ? '' : value.toString();
+                        break;
+                }
+                return this.setStateAck(id, value);
+            });
         }
     }
     async createBooleanControlStateObjectAsync(controlName, uuid, states, name, role, commonExt) {
