@@ -530,6 +530,11 @@ Native value from ioBroker &gt; Objects
 
 ## Changelog
 
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
+
 ### 2.1.0 (2020-12-21)
 
 -   (raintonr) Fixed: activeMoods can get stuck/not sync properly; all events is now handled with a queue (#58, #61, #62)
