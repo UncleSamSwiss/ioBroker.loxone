@@ -192,7 +192,7 @@ export abstract class LoxoneHandlerBase {
                 },
                 states[name],
                 async (name: string, value: CurrentStateValue) => {
-                    await this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                    await this.setStateAck(name, !value ? '[]' : JSON.stringify(value.toString().split('|')));
                 },
             );
         }

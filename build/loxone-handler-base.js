@@ -124,7 +124,7 @@ class LoxoneHandlerBase {
                 role: 'list',
                 // TODO: re-add: smartIgnore: true,
             }, states[name], async (name, value) => {
-                await this.setStateAck(name, !value ? [] : value.toString().split('|'));
+                await this.setStateAck(name, !value ? '[]' : JSON.stringify(value.toString().split('|')));
             });
         }
     }

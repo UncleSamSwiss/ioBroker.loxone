@@ -55,7 +55,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 await this.updateActiveMoods();
                 await this.updateFavoriteMoods();
                 await this.updateAdditionalMoods();
-                await this.setStateAck(name, list);
+                await this.setStateAck(name, JSON.stringify(list));
             });
             await this.updateStateObjectAsync(uuid + '.activeMoods', {
                 name: control.name + ': activeMoods',
@@ -179,7 +179,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 list.push(id);
             }
         }
-        await this.setStateAck(this.uuid + '.' + name, list);
+        await this.setStateAck(this.uuid + '.' + name, JSON.stringify(list));
     }
     async updateActiveMoods() {
         await this.updateMoodsList('activeMoods', this.activeMoods);

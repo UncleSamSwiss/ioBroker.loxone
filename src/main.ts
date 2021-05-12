@@ -9,8 +9,7 @@ import { Control, Controls, GlobalStates, OperatingModes, StructureFile, Weather
 import { WeatherServerHandler } from './weather-server-handler';
 import Queue = require('queue-fifo');
 
-export type FlatStateValue = string | number | boolean;
-export type StateValue = FlatStateValue | any[] | Record<string, any>;
+export type StateValue = Exclude<ioBroker.State['val'], null>;
 
 export type OldStateValue = StateValue | null | undefined;
 export type CurrentStateValue = StateValue | null;
@@ -209,7 +208,7 @@ export class Loxone extends utils.Adapter {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: FlatStateValue) => Promise<void>;
+            handler: (name: string, value: StateValue) => Promise<void>;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
