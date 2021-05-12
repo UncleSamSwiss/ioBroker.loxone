@@ -444,6 +444,12 @@ Provided by virtual input switches.
 
 -   `active` (rw) the current state of the switch
 
+### Text State
+
+Provided by "state".
+
+-   `textAndIcon` (ro) the current value of the state
+
 ### TimedSwitch
 
 Provided by stairwell and multifunction switches.
@@ -564,6 +570,7 @@ Native value from ioBroker &gt; Objects
 -   (raintonr) Added support for IRoomControllerV2 (#22)
 -   (UncleSamSwiss) Added experimental support for EIBDimmer (#15)
 -   (UncleSamSwiss) Added support for ValueSelector (#36)
+-   (UncleSamSwiss) Added support for TextState (#73)
 
 ### 2.1.0 (2020-12-21)
 
