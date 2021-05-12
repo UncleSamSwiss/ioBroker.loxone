@@ -373,7 +373,7 @@ export class IRoomControllerV2 extends ControlBase {
                 break;
 
             default:
-                this.adapter.log.error(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
+                this.adapter.reportError(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
                 break;
         }
 

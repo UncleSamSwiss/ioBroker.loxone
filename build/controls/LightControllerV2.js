@@ -91,13 +91,13 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 for (let i = 0; i < arrayValue.length; i++) {
                     const moodName = arrayValue[i];
                     if (!this.moodNameToId.hasOwnProperty(moodName)) {
-                        this.adapter.log.error(`Can't find mood name '${moodName}', discarding new value`);
+                        this.adapter.reportError(`Can't find mood name '${moodName}', discarding new value`);
                         return;
                     }
                     ids.push(this.moodNameToId[moodName]);
                 }
                 if (ids.length === 0) {
-                    this.adapter.log.error(uuid + ".activeMoods can't have zero IDs, discarding new value");
+                    this.adapter.reportError(uuid + ".activeMoods can't have zero IDs, discarding new value");
                     return;
                 }
                 const addMoods = [];

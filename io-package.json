@@ -229,7 +229,13 @@
             {
                 "js-controller": ">=1.4.2"
             }
-        ]
+        ],
+        "plugins": {
+            "sentry": {
+                "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
+                "pathWhitelist": ["loxone"]
+            }
+        }
     },
     "encryptedNative": ["password"],
     "protectedNative": ["password"],

@@ -256,7 +256,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 this.adapter.log.debug(`Mode ${activeMode}: -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
             default:
-                this.adapter.log.error(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
+                this.adapter.reportError(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
                 break;
         }
         // Don't do any update if not calculated (can only happen in error condition)

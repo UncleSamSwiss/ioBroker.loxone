@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
+const SentryNode = require("@sentry/node");
 const loxoneWsApi = require("node-lox-ws-api");
 const weather_server_handler_1 = require("./weather-server-handler");
 const Queue = require("queue-fifo");
@@ -25,6 +26,8 @@ class Loxone extends utils.Adapter {
         this.eventsQueue = new Queue();
         this.runQueue = false;
         this.queueRunning = false;
+        this.reportedMissingControls = new Set();
+        this.reportedUnsupportedStateChanges = new Set();
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -88,8 +91,10 @@ class Loxone extends utils.Adapter {
             this.log.silly('keepalive (' + time + 'ms)');
         });
         this.client.on('get_structure_file', async (data) => {
+            var _a;
             this.log.silly('get_structure_file ' + JSON.stringify(data));
             this.log.info('got structure file; last modified on ' + data.lastModified);
+            this.structureFile = data;
             try {
                 await this.loadStructureFileAsync(data);
                 this.log.debug('structure file successfully loaded');
@@ -98,12 +103,17 @@ class Loxone extends utils.Adapter {
             }
             catch (error) {
                 this.log.error(`Couldn't load structure file: ${error}`);
+                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(error, { extra: { data } });
             }
         });
         const handleAnyEvent = (uuid, evt) => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
-            this.handleEventQueue().catch((e) => this.log.error(`Unhandled error in event ${uuid}: ${e}`));
+            this.handleEventQueue().catch((e) => {
+                var _a;
+                this.log.error(`Unhandled error in event ${uuid}: ${e}`);
+                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(e, { extra: { uuid, evt } });
+            });
         };
         this.client.on('update_event_value', handleAnyEvent);
         this.client.on('update_event_text', handleAnyEvent);
@@ -137,7 +147,17 @@ class Loxone extends utils.Adapter {
         }
         this.log.silly(`stateChange ${id} ${JSON.stringify(state)}`);
         if (!this.stateChangeListeners.hasOwnProperty(id)) {
-            this.log.error('Unsupported state change: ' + id);
+            const msg = 'Unsupported state change: ' + id;
+            this.log.error(msg);
+            if (!this.reportedUnsupportedStateChanges.has(id)) {
+                this.reportedUnsupportedStateChanges.add(id);
+                const sentry = this.getSentry();
+                sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
+                    scope.setExtra('state', state);
+                    scope.setExtra('structureFile', JSON.stringify(this.structureFile, null, 2));
+                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                });
+            }
             return;
         }
         this.stateChangeListeners[id](this.currentStateValues[id], state.val);
@@ -226,6 +246,7 @@ class Loxone extends utils.Adapter {
         await this.setStateAck(name + '-text', this.operatingModes[value]);
     }
     async loadControlsAsync(controls) {
+        var _a;
         let hasUnsupported = false;
         for (const uuid in controls) {
             const control = controls[uuid];
@@ -237,6 +258,7 @@ class Loxone extends utils.Adapter {
             }
             catch (e) {
                 this.log.info(`Currently unsupported control type ${control.type}: ${e}`);
+                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(e, { extra: { uuid, control } });
                 if (!hasUnsupported) {
                     hasUnsupported = true;
                     await this.updateObjectAsync('Unsupported', {
@@ -263,6 +285,7 @@ class Loxone extends utils.Adapter {
         }
     }
     async loadSubControlsAsync(parentUuid, control) {
+        var _a;
         if (!control.hasOwnProperty('subControls')) {
             return;
         }
@@ -283,13 +306,32 @@ class Loxone extends utils.Adapter {
             }
             catch (e) {
                 this.log.info(`Currently unsupported sub-control type ${subControl.type}: ${e}`);
+                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(e, { extra: { uuid, subControl } });
             }
         }
     }
     async loadControlAsync(controlType, uuid, control) {
         const type = control.type || 'None';
-        const module = await Promise.resolve().then(() => require(`./controls/${type}`));
-        const controlObject = new module[type](this);
+        if (type.match(/[^a-z0-9]/i)) {
+            throw new Error(`Bad control type: ${type}`);
+        }
+        let controlObject;
+        try {
+            const module = await Promise.resolve().then(() => require(`./controls/${type}`));
+            controlObject = new module[type](this);
+        }
+        catch (error) {
+            const msg = `Unsupported ${controlType} control ${type}`;
+            if (!this.reportedMissingControls.has(msg)) {
+                this.reportedMissingControls.add(msg);
+                const sentry = this.getSentry();
+                sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
+                    scope.setExtra('control', JSON.stringify(control, null, 2));
+                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                });
+            }
+            throw error;
+        }
         await controlObject.loadAsync(controlType, uuid, control);
         if (control.hasOwnProperty('room')) {
             if (!this.foundRooms.hasOwnProperty(control.room)) {
@@ -379,6 +421,7 @@ class Loxone extends utils.Adapter {
         }
     }
     async handleEvent(evt) {
+        var _a;
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug('Unknown event UUID: ' + evt.uuid);
@@ -390,6 +433,7 @@ class Loxone extends utils.Adapter {
             }
             catch (e) {
                 this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
+                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(e, { extra: { evt } });
             }
         }
     }
@@ -472,6 +516,19 @@ class Loxone extends utils.Adapter {
             return this.currentStateValues[keyId];
         }
         return undefined;
+    }
+    getSentry() {
+        if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
+            const sentryInstance = this.getPluginInstance('sentry');
+            if (sentryInstance) {
+                return sentryInstance.getSentryObject();
+            }
+        }
+    }
+    reportError(message) {
+        var _a;
+        this.log.error(message);
+        (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureMessage(message, SentryNode.Severity.Error);
     }
 }
 exports.Loxone = Loxone;
