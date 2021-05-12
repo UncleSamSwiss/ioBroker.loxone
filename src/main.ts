@@ -240,7 +240,7 @@ export class Loxone extends utils.Adapter {
         const defaultInfo: GlobalStateInfo = {
             type: 'string',
             role: 'text',
-            handler: this.setStateAck.bind(this),
+            handler: (name, value) => this.setStateAck(name, `${value}`),
         };
 
         // special case for operating mode (text)
