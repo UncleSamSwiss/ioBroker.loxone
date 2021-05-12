@@ -478,6 +478,14 @@ Provided by stairwell and multifunction switches.
 
 -   `entries` (ro) list of entries returned from the miniserver
 
+### UpDownAnalog
+
+Provided by Virtual Input (Up-Down buttons).
+
+-   `value` (rw) the current value of the input
+-   `value-formatted` (ro) if configured, the formatted value of the state (using the "Unit" format from Loxone Config)
+-   `error` (ro) indicates an invalid value of the slider
+
 ### ValueSelector
 
 Value selection.
@@ -571,6 +579,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added experimental support for EIBDimmer (#15)
 -   (UncleSamSwiss) Added support for ValueSelector (#36)
 -   (UncleSamSwiss) Added support for TextState (#73)
+-   (UncleSamSwiss) Added support for UpDownAnalog (#57)
 
 ### 2.1.0 (2020-12-21)
 
