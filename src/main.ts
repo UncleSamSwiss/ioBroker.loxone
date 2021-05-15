@@ -10,10 +10,8 @@ import { Control, Controls, GlobalStates, OperatingModes, StructureFile, Weather
 import { WeatherServerHandler } from './weather-server-handler';
 import Queue = require('queue-fifo');
 
-export type StateValue = Exclude<ioBroker.State['val'], null>;
-
-export type OldStateValue = StateValue | null | undefined;
-export type CurrentStateValue = StateValue | null;
+export type OldStateValue = ioBroker.StateValue | null | undefined;
+export type CurrentStateValue = ioBroker.StateValue | null;
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateEventHandler = (value: any) => Promise<void>;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
@@ -229,7 +227,7 @@ export class Loxone extends utils.Adapter {
         interface GlobalStateInfo {
             type: ioBroker.CommonType;
             role: string;
-            handler: (name: string, value: StateValue) => Promise<void>;
+            handler: (name: string, value: ioBroker.StateValue) => Promise<void>;
         }
         const globalStateInfos: Record<string, GlobalStateInfo> = {
             operatingMode: {
@@ -564,7 +562,7 @@ export class Loxone extends utils.Adapter {
         };
         await this.updateObjectAsync(id, obj);
         if (stateEventHandler) {
-            this.addStateEventHandler(stateUuid, async (value: StateValue) => {
+            this.addStateEventHandler(stateUuid, async (value: ioBroker.StateValue) => {
                 await stateEventHandler(id, value);
             });
         }

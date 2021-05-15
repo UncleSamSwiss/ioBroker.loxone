@@ -75,7 +75,7 @@ class LoxoneHandlerBase {
                 write: false,
                 type: type,
                 role: role,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -104,7 +104,7 @@ class LoxoneHandlerBase {
                 write: false,
                 type: 'boolean',
                 role: role,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -137,7 +137,7 @@ class LoxoneHandlerBase {
                 type: 'number',
                 role: role,
                 unit: '%',
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -154,7 +154,7 @@ class LoxoneHandlerBase {
             write: true,
             type: 'boolean',
             role: 'button',
-            smartIgnore: true,
+            // TODO: re-add: smartIgnore: true,
         };
         if (commonExt && typeof commonExt === 'object') {
             common = { ...common, ...commonExt };

@@ -63,7 +63,7 @@ export class TextInput extends ControlBase {
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
+            let common: ioBroker.StateCommon = {
                 name: controlName + ': ' + name,
                 read: false,
                 write: true,

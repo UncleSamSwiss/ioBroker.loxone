@@ -109,13 +109,13 @@ export abstract class LoxoneHandlerBase {
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
+            let common: ioBroker.StateCommon = {
                 name: controlName + ': ' + name,
                 read: true,
                 write: false,
                 type: type,
                 role: role,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -151,13 +151,13 @@ export abstract class LoxoneHandlerBase {
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
+            let common: ioBroker.StateCommon = {
                 name: controlName + ': ' + name,
                 read: true,
                 write: false,
                 type: 'boolean' as ioBroker.CommonType,
                 role: role,
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -207,14 +207,14 @@ export abstract class LoxoneHandlerBase {
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
+            let common: ioBroker.StateCommon = {
                 name: controlName + ': ' + name,
                 read: true,
                 write: false,
                 type: 'number' as ioBroker.CommonType,
                 role: role,
                 unit: '%',
-                smartIgnore: true,
+                // TODO: re-add: smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
@@ -236,13 +236,13 @@ export abstract class LoxoneHandlerBase {
         name: string,
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
-        let common = {
+        let common: ioBroker.StateCommon = {
             name: controlName + ': ' + name,
             read: false,
             write: true,
             type: 'boolean' as ioBroker.CommonType,
             role: 'button',
-            smartIgnore: true,
+            // TODO: re-add: smartIgnore: true,
         };
         if (commonExt && typeof commonExt === 'object') {
             common = { ...common, ...commonExt };
