@@ -397,6 +397,15 @@ Provided by utility meters.
 -   `total-formatted` (ro) if configured, the formatted total value of the state (using the "Unit" format from Loxone Config)
 -   `reset` (wo) writing any value to this state resets the total value
 
+### Presence Detector
+
+Provided by presence detector.
+
+-   `active` (ro) presence state
+-   `locked` (ro) locked state
+-   `events` (ro) the number of events
+-   `infoText` (ro) reason why the presence detector is locked
+
 ### Pushbutton
 
 Provided by virtual push-button inputs.
@@ -591,6 +600,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for TextState (#73)
 -   (UncleSamSwiss) Added support for UpDownAnalog (#57)
 -   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
+-   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
 
 ### 2.1.0 (2020-12-21)
 
