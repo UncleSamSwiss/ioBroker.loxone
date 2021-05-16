@@ -10,7 +10,7 @@ class AlarmClock extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'alarm', // TODO: what's the best role here? ioBroker doc is not very clear on what's an "alarm"
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'isEnabled',

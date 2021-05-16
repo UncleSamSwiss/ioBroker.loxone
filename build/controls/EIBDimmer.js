@@ -10,7 +10,7 @@ class EIBDimmer extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['position']);
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'position', 'number', 'level.dimmer', { write: true });

@@ -10,7 +10,7 @@ export class Alarm extends ControlBase {
                 name: control.name,
                 role: 'alarm',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

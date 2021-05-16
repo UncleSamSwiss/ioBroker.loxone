@@ -10,7 +10,7 @@ class CentralAlarm extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'alarm',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'armed');
         this.addStateChangeListener(uuid + '.armed', (oldValue, newValue) => {

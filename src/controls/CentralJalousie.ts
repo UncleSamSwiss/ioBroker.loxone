@@ -10,7 +10,7 @@ export class CentralJalousie extends ControlBase {
                 name: control.name,
                 role: 'blind',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'autoActive');

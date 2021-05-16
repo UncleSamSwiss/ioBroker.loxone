@@ -10,7 +10,7 @@ export class CentralAlarm extends ControlBase {
                 name: control.name,
                 role: 'alarm',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.createButtonCommandStateObjectAsync(

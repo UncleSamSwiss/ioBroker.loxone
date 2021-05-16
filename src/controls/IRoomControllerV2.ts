@@ -13,7 +13,7 @@ export class IRoomControllerV2 extends ControlBase {
                 name: control.name,
                 role: 'thermo',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         // TODO: other details not implemented - needed to get temperature unit for example (C/F).

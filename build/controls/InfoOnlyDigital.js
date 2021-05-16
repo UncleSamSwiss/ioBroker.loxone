@@ -10,7 +10,7 @@ class InfoOnlyDigital extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'switch',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['active']);
         if (!control.hasOwnProperty('states') || !control.states.hasOwnProperty('active')) {

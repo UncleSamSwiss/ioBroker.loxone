@@ -20,7 +20,7 @@ export class LightControllerV2 extends ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

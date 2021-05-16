@@ -10,7 +10,7 @@ class SmokeAlarm extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'alarm',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'nextLevel',

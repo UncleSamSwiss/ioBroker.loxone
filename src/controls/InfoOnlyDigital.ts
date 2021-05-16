@@ -9,7 +9,7 @@ export class InfoOnlyDigital extends ControlBase {
                 name: control.name,
                 role: 'switch',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['active']);

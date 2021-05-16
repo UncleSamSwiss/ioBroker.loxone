@@ -20,7 +20,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'activeMoods',

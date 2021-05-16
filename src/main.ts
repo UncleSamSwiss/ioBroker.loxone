@@ -341,7 +341,7 @@ export class Loxone extends utils.Adapter {
                         type: 'string',
                         role: 'text',
                     },
-                    native: { control: control as any },
+                    native: { control },
                 });
             }
         }
