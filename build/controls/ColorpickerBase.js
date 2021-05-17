@@ -112,7 +112,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
         // we don't change the color three times using commands
         const parentId = this.adapter.namespace + '.' + uuid;
         const updateColorValue = async () => {
-            const states = await this.adapter.getStatesAsync(uuid + '.*');
+            const states = (await this.adapter.getStatesAsync(uuid + '.*'));
             const red = this.convertStateToInt(states[parentId + '.red'].val);
             const green = this.convertStateToInt(states[parentId + '.green'].val);
             const blue = this.convertStateToInt(states[parentId + '.blue'].val);
