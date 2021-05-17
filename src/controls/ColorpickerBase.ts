@@ -171,7 +171,7 @@ export abstract class ColorpickerBase extends ControlBase {
             const blue = this.convertStateToInt(states[parentId + '.blue'].val);
 
             const hsv = colorConvert.rgb.hsv([red, green, blue]);
-            const command = `hsv(${hsv[0]},${hsv[1]},${hsv[2]}`;
+            const command = `hsv(${hsv[0]},${hsv[1]},${hsv[2]})`;
             this.sendCommand(control.uuidAction, command);
         };
         const startUpdateTimer = (): void => {
@@ -236,7 +236,7 @@ export abstract class ColorpickerBase extends ControlBase {
             const brightness = this.convertStateToInt(states[parentId + '.brightness'].val);
             const temperature = this.convertStateToInt(states[parentId + '.temperature'].val);
 
-            const command = `lumitech(${brightness},${temperature}`;
+            const command = `lumitech(${brightness},${temperature})`;
             this.sendCommand(control.uuidAction, command);
         };
         const startUpdateTimer = (): void => {
