@@ -501,7 +501,7 @@ export class Loxone extends utils.Adapter {
     private async handleEvent(evt: LoxoneEvent): Promise<void> {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
-            this.log.debug('Unknown event UUID: ' + evt.uuid);
+            this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
             return;
         }
 

@@ -424,7 +424,7 @@ class Loxone extends utils.Adapter {
         var _a;
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
-            this.log.debug('Unknown event UUID: ' + evt.uuid);
+            this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
             return;
         }
         for (const item of stateEventHandlerList) {
