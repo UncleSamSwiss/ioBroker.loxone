@@ -4,9 +4,6 @@ exports.Colorpicker = void 0;
 const ColorpickerBase_1 = require("./ColorpickerBase");
 class Colorpicker extends ColorpickerBase_1.ColorpickerBase {
     async loadAsync(type, uuid, control) {
-        if (control.details.pickerType != 'Rgb') {
-            throw 'Unsupported color picker type: ' + control.details.pickerType;
-        }
         await this.updateObjectAsync(uuid, {
             type: type,
             common: {

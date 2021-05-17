@@ -652,6 +652,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for TextState (#73)
 -   (UncleSamSwiss) Added support for UpDownAnalog (#57)
 -   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
+-   (UncleSamSwiss) Added support for Lumitech color picker (#44)
 -   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
 -   (UncleSamSwiss) Added support for AAL Smart Alarm (IOBROKER-LOXONE-1X)
 -   (UncleSamSwiss) Added support for AAL Emergency Button (IOBROKER-LOXONE-1W)

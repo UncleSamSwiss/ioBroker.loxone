@@ -12,6 +12,16 @@ export abstract class ColorpickerBase extends ControlBase {
             return;
         }
 
+        if (control.details.pickerType === 'Rgb') {
+            await this.loadRgbColorPickerAsync(uuid, control);
+        } else if (control.details.pickerType === 'Lumitech') {
+            await this.loadLumitechColorPickerAsync(uuid, control);
+        } else {
+            throw 'Unsupported color picker type: ' + control.details.pickerType;
+        }
+    }
+
+    private async loadRgbColorPickerAsync(uuid: string, control: Control): Promise<void> {
         await this.updateStateObjectAsync(
             uuid + '.red',
             {
@@ -175,6 +185,70 @@ export abstract class ColorpickerBase extends ControlBase {
         this.addStateChangeListener(uuid + '.blue', startUpdateTimer);
     }
 
+    private async loadLumitechColorPickerAsync(uuid: string, control: Control): Promise<void> {
+        await this.updateStateObjectAsync(
+            uuid + '.brigthness',
+            {
+                name: control.name + ': Brigthness',
+                read: true,
+                write: false,
+                type: 'number',
+                role: 'level.color.level',
+                min: 0,
+                max: 100,
+                // TODO: re-add: smartIgnore: true,
+            },
+            control.states.color,
+            async (name: string, value: CurrentStateValue) => {
+                const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+                if (brightnessTemperature !== undefined) {
+                    await this.setStateAck(name, brightnessTemperature[0]);
+                }
+            },
+        );
+        await this.updateStateObjectAsync(
+            uuid + '.temperature',
+            {
+                name: control.name + ': Temperature',
+                read: true,
+                write: false,
+                type: 'number',
+                role: 'level.color.temperature',
+                min: 2000,
+                max: 8000,
+                // TODO: re-add: smartIgnore: true,
+            },
+            control.states.color,
+            async (name: string, value: CurrentStateValue) => {
+                const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+                if (brightnessTemperature !== undefined) {
+                    await this.setStateAck(name, brightnessTemperature[1]);
+                }
+            },
+        );
+
+        // we use a timer (100 ms) to update the two color values,
+        // so if somebody sends us the two values (almost) at once,
+        // we don't change the color twice using commands
+        const parentId = this.adapter.namespace + '.' + uuid;
+        const updateColorValue = async (): Promise<void> => {
+            const states = (await this.adapter.getStatesAsync(uuid + '.*'))!;
+            const brightness = this.convertStateToInt(states[parentId + '.brightness'].val);
+            const temperature = this.convertStateToInt(states[parentId + '.temperature'].val);
+
+            const command = `lumitech(${brightness},${temperature}`;
+            this.sendCommand(control.uuidAction, command);
+        };
+        const startUpdateTimer = (): void => {
+            if (this.colorUpdateTimer) {
+                clearTimeout(this.colorUpdateTimer);
+            }
+            this.colorUpdateTimer = setTimeout(updateColorValue, 100);
+        };
+        this.addStateChangeListener(uuid + '.brightness', startUpdateTimer);
+        this.addStateChangeListener(uuid + '.temperature', startUpdateTimer);
+    }
+
     private loxoneColorToRgb(value: CurrentStateValue): RGB | undefined {
         if (!value) {
             return undefined;
@@ -230,6 +304,24 @@ export abstract class ColorpickerBase extends ControlBase {
         value = value.toString();
 
         const match = value.match(/temp\((\d+),(\d+)\)/i);
+        if (match) {
+            const brightness = parseFloat(match[1]);
+            const temperature = parseFloat(match[2]);
+
+            return [Math.round(brightness), Math.round(temperature)];
+        }
+
+        return undefined;
+    }
+
+    private lumitechColorToBrightnessTemperature(value: CurrentStateValue): [number, number] | undefined {
+        if (!value) {
+            return undefined;
+        }
+
+        value = value.toString();
+
+        const match = value.match(/lumitech\((\d+),(\d+)\)/i);
         if (match) {
             const brightness = parseFloat(match[1]);
             const temperature = parseFloat(match[2]);
