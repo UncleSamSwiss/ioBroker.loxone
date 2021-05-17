@@ -124,7 +124,7 @@ Behind the name of the state, you can see the type of the state:
 -   `(ro)`: read-only: this state can't be changed from ioBroker
 -   `(wo)`: write-only: this state's value isn't reported by this adapter, but it can be changed, triggering some action on the Loxone Miniserver
 
-### AAL Smart Alarm
+### AalSmartAlarm
 
 Provided by AAL Smart Alarm control.
 
@@ -139,6 +139,21 @@ Provided by AAL Smart Alarm control.
 -   `confirm` (wo) Confirm pending alarm
 -   `disable` (wo) Disable control for a certain period of time, no alarms will be executed. Setting it to 0 will reenable the Smart Alarm
 -   `startDrill` (wo) Execute test alarm
+
+### AalEmergency
+
+Provided by AAL Smart Emergency Button control.
+
+-   `status` (ro) the ID of the current status
+    -   0 = running, normal operation, waiting for emergency button press
+    -   1 = alarm triggered
+    -   2 = reset input in config asserted, control is shut down
+    -   3 = app has temporarily disabled control
+-   `disableEndTime` (ro) End time for the control to be disabled
+-   `resetActive` (ro) text state with the active reset input (if control is in reset)
+-   `trigger` (wo) trigger an alarm from the app
+-   `quit` (wo) quit an active alarm
+-   `disable` (wo) disable the control for the given time in seconds. Set to 0 to start control again if it is disabled
 
 ### Alarm
 
@@ -618,6 +633,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
 -   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
 -   (UncleSamSwiss) Added support for AAL Smart Alarm (IOBROKER-LOXONE-1X)
+-   (UncleSamSwiss) Added support for AAL Emergency Button (IOBROKER-LOXONE-1W)
 
 ### 2.1.0 (2020-12-21)
 
