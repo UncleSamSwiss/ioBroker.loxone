@@ -124,6 +124,22 @@ Behind the name of the state, you can see the type of the state:
 -   `(ro)`: read-only: this state can't be changed from ioBroker
 -   `(wo)`: write-only: this state's value isn't reported by this adapter, but it can be changed, triggering some action on the Loxone Miniserver
 
+### AAL Smart Alarm
+
+Provided by AAL Smart Alarm control.
+
+-   `alarmLevel` (ro) the ID of the current alarm level
+    -   0 = No alarm
+    -   1 = Immediate alarm
+    -   2 = Delayed alarm
+-   `alarmCause` (ro) A string representing the last cause for an alarm
+-   `isLocked` (ro) Reset active, inputs will be ignored and therefore no alarms will be executed
+-   `isLeaveActive` (ro) Leave input is set, no alarms will be executed
+-   `disableEndTime` (ro) End time for the control to be disabled
+-   `confirm` (wo) Confirm pending alarm
+-   `disable` (wo) Disable control for a certain period of time, no alarms will be executed. Setting it to 0 will reenable the Smart Alarm
+-   `startDrill` (wo) Execute test alarm
+
 ### Alarm
 
 Provided by burgler alarm control.
@@ -601,6 +617,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for UpDownAnalog (#57)
 -   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
 -   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
+-   (UncleSamSwiss) Added support for AAL Smart Alarm (IOBROKER-LOXONE-1X)
 
 ### 2.1.0 (2020-12-21)
 
