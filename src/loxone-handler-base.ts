@@ -95,7 +95,9 @@ export abstract class LoxoneHandlerBase {
                 continue;
             }
 
-            await this.createSimpleControlStateObjectAsync(controlName, uuid, states, stateName, 'string', 'text');
+            await this.createSimpleControlStateObjectAsync(controlName, uuid, states, stateName, 'string', 'text', {
+                desc: 'This state is currently unsupported by this adapter, you can only see the text representation of it.',
+            });
         }
     }
 

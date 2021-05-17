@@ -609,15 +609,23 @@ Every channel contains the following states:
 -   `windSpeed`: wind speed value
 -   `windSpeed-formatted`: formatted wind speed value with unit
 
-## Compatibility
+## Unsupported Control Types
 
-Compatibility has been tested with Loxone Miniserver Go 9.0.9.26 using Loxone Config 9.0.9.26.
+When Loxone adds new control types, they are most often not immediately supported by this adapter.
+
+In this case, the control will have "Unknown:" in front of its name. E.g. `Unknown: Wallbox`
+
+Those controls will contain all states reported by the Miniserver, but they will all be read-only strings.
+
+If you need better support for a new control type, please follow the steps in the next section to requeset a new feature.
+
+**Sentry:** unsupported control types will be reported to the developers using Sentry. This way you might get new controls in the next release without having to request it yourself.
 
 ## Bug Reports and Feature Requests
 
 Please use the GitHub repository to report any bugs or request new features.
 
-If you require a missing control type, please provide the name as it is reported in the error log of ioBroker as well as the entire raw contents of the device in the ioBroker object tree:
+If you require an unsupported control type, please provide the name as it is reported in the error log of ioBroker as well as the entire raw contents of the device in the ioBroker object tree:
 
 Log file example for "LightController":
 
@@ -636,6 +644,7 @@ Native value from ioBroker &gt; Objects
 
 ### **WORK IN PROGRESS**
 
+-   (UncleSamSwiss) Unknown/unsupported controls are now shown with their states as read-only strings
 -   (raintonr) Fixes for auto-position based on percentage (#76)
 -   (raintonr) Added support for IRoomControllerV2 (#22)
 -   (UncleSamSwiss) Added experimental support for EIBDimmer (#15)

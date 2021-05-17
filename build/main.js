@@ -7,6 +7,7 @@ exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
 const SentryNode = require("@sentry/node");
 const loxoneWsApi = require("node-lox-ws-api");
+const Unknown_1 = require("./controls/Unknown");
 const weather_server_handler_1 = require("./weather-server-handler");
 const Queue = require("queue-fifo");
 class Loxone extends utils.Adapter {
@@ -330,7 +331,7 @@ class Loxone extends utils.Adapter {
                     sentry.captureMessage(msg, SentryNode.Severity.Warning);
                 });
             }
-            throw error;
+            controlObject = new Unknown_1.Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
         if (control.hasOwnProperty('room')) {

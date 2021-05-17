@@ -6,6 +6,7 @@ import * as utils from '@iobroker/adapter-core';
 import * as SentryNode from '@sentry/node';
 import * as loxoneWsApi from 'node-lox-ws-api';
 import { ControlBase, ControlType } from './controls/control-base';
+import { Unknown } from './controls/Unknown';
 import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 import Queue = require('queue-fifo');
@@ -393,7 +394,7 @@ export class Loxone extends utils.Adapter {
                     sentry.captureMessage(msg, SentryNode.Severity.Warning);
                 });
             }
-            throw error;
+            controlObject = new Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
 
