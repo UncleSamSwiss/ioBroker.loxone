@@ -1,4 +1,5 @@
 {
+    "Don't synchronize weather data": "Не синхронизировать данные о погоде",
     "Functions": "групп устройств",
     "Loxone Miniserver adapter settings": "Настройки драйвера Loxone Miniserver",
     "Miniserver Hostname / IP": "IP / Hostname Минисервера",
@@ -7,5 +8,9 @@
     "Miniserver Username": "Имя пользователя",
     "Names": "имена",
     "Rooms": "комнат",
-    "Synchronize": "Синхронизация"
+    "Synchronize": "Синхронизация",
+    "Synchronize 24 hours of weather forcast": "Синхронизация 24-часового прогноза погоды",
+    "Synchronize current weather only": "Синхронизировать только текущую погоду",
+    "Synchronize entire weather forcast": "Синхронизировать весь прогноз погоды",
+    "Weather Server": "Сервер погоды"
 }

@@ -1,11 +1,16 @@
 {
-    "Functions": "",
-    "Loxone Miniserver adapter settings": "",
-    "Miniserver Hostname / IP": "",
-    "Miniserver Password": "",
-    "Miniserver Port": "",
-    "Miniserver Username": "",
-    "Names": "",
-    "Rooms": "",
-    "Synchronize": ""
+    "Don't synchronize weather data": "不同步天气数据",
+    "Functions": "职能",
+    "Loxone Miniserver adapter settings": "Loxone Miniserver适配器设置",
+    "Miniserver Hostname / IP": "小型服务器主机名/ IP",
+    "Miniserver Password": "小型服务器密码",
+    "Miniserver Port": "小型服务器端口",
+    "Miniserver Username": "小型服务器用户名",
+    "Names": "名字",
+    "Rooms": "房间数",
+    "Synchronize": "同步化",
+    "Synchronize 24 hours of weather forcast": "同步24小时天气预报",
+    "Synchronize current weather only": "仅同步当前天气",
+    "Synchronize entire weather forcast": "同步整个天气预报",
+    "Weather Server": "天气服务器"
 }

@@ -1,4 +1,5 @@
 {
+    "Don't synchronize weather data": "Don't synchronize weather data",
     "Functions": "Functions",
     "Loxone Miniserver adapter settings": "Loxone Miniserver adapter settings",
     "Miniserver Hostname / IP": "Miniserver host name / IP",
@@ -7,5 +8,9 @@
     "Miniserver Username": "Miniserver username",
     "Names": "Names",
     "Rooms": "Rooms",
-    "Synchronize": "Synchronize"
+    "Synchronize": "Synchronize",
+    "Synchronize 24 hours of weather forcast": "Synchronize 24 hours of weather forcast",
+    "Synchronize current weather only": "Synchronize current weather only",
+    "Synchronize entire weather forcast": "Synchronize entire weather forcast",
+    "Weather Server": "Weather Server"
 }

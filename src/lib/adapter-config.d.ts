@@ -11,6 +11,9 @@ declare global {
             syncNames: boolean;
             syncRooms: boolean;
             syncFunctions: boolean;
+
+            /** if not set, it implies "all" */
+            weatherServer?: 'off' | 'current' | '1day' | 'all';
         }
     }
 }

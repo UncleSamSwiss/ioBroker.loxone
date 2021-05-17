@@ -475,8 +475,12 @@ export class Loxone extends utils.Adapter {
     }
 
     private async loadWeatherServerAsync(data: WeatherServer): Promise<void> {
+        if (this.config.weatherServer === 'off') {
+            this.log.debug('WeatherServer is disabled in the adapter configuration');
+            return;
+        }
         const handler = new WeatherServerHandler(this);
-        await handler.loadAsync(data);
+        await handler.loadAsync(data, this.config.weatherServer || 'all');
     }
 
     private async handleEventQueue(): Promise<void> {

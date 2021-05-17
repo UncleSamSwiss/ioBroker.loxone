@@ -69,6 +69,15 @@ This will populate the enum.rooms enumeration with all rooms provided by the Lox
 
 This will populate the enum.functions enumeration with all categories provided by the Loxone Miniserver and will link all controls.
 
+### Weather Server
+
+Choose what weather data you wish to synchronize:
+
+-   "Don't synchronize weather data" will not synchronize anything related to the Weather Server
+-   "Synchronize current weather only" will synchronize the data under "Actual"
+-   "Synchronize 24 hours of weather forcast" will synchronize the current weather and 24 hours of weather forcast
+-   "Synchronize entire weather forcast" will synchronize the current weather and the entire weather forcast (96 hours)
+
 ## States
 
 The adapter automatically connects to the configured Loxone Miniserver and creates states for each control state it finds.
@@ -653,6 +662,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for UpDownAnalog (#57)
 -   (UncleSamSwiss) Fixed some "State has wrong type" warnings (#99, #128)
 -   (UncleSamSwiss) Added support for Lumitech color picker (#44)
+-   (UncleSamSwiss) Weather server data can now be filtered (#131)
 -   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
 -   (UncleSamSwiss) Added support for AAL Smart Alarm (IOBROKER-LOXONE-1X)
 -   (UncleSamSwiss) Added support for AAL Emergency Button (IOBROKER-LOXONE-1W)

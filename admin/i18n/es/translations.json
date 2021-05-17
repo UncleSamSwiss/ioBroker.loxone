@@ -1,11 +1,16 @@
 {
-    "Functions": "",
-    "Loxone Miniserver adapter settings": "",
-    "Miniserver Hostname / IP": "",
-    "Miniserver Password": "",
-    "Miniserver Port": "",
-    "Miniserver Username": "",
-    "Names": "",
-    "Rooms": "",
-    "Synchronize": ""
+    "Don't synchronize weather data": "No sincronice los datos meteorológicos",
+    "Functions": "Funciones",
+    "Loxone Miniserver adapter settings": "Configuración del adaptador Loxone Miniserver",
+    "Miniserver Hostname / IP": "IP / nombre de host del Miniserver",
+    "Miniserver Password": "Contraseña de Miniserver",
+    "Miniserver Port": "Puerto miniserver",
+    "Miniserver Username": "Nombre de usuario de Miniserver",
+    "Names": "Nombres",
+    "Rooms": "Habitaciones",
+    "Synchronize": "Sincronizar",
+    "Synchronize 24 hours of weather forcast": "Sincronizar 24 horas de previsión meteorológica",
+    "Synchronize current weather only": "Sincronizar solo el clima actual",
+    "Synchronize entire weather forcast": "Sincronizar todo el pronóstico del tiempo",
+    "Weather Server": "Servidor meteorológico"
 }

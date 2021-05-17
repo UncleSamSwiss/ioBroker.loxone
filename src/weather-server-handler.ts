@@ -13,7 +13,7 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
         super(adapter);
     }
 
-    public async loadAsync(data: WeatherServer): Promise<void> {
+    public async loadAsync(data: WeatherServer, filter: 'current' | '1day' | 'all'): Promise<void> {
         if (data === undefined || !data.hasOwnProperty('states') || !data.states.hasOwnProperty('actual')) {
             return;
         }
@@ -37,8 +37,13 @@ export class WeatherServerHandler extends LoxoneHandlerBase {
             await this.setWeatherStates(deviceName + '.Actual', value.entry[0]);
         });
 
+        if (filter === 'current') {
+            return;
+        }
+
         this.addStateEventHandler(data.states.forecast, async (value: any) => {
-            for (let i = 0; i < value.entry.length; i++) {
+            const hourCount = Math.min(value.entry.length, filter === '1day' ? 24 : Number.MAX_VALUE);
+            for (let i = 0; i < hourCount; i++) {
                 const channelName = 'Hour' + sprintf('%02d', i + 1);
                 if (i >= this.forecastChannelsCount) {
                     await this.setWeatherObjectsAsync(channelName);
