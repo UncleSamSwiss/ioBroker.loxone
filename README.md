@@ -651,7 +651,7 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 2.2.0 (2021-05-17)
 
 -   (UncleSamSwiss) Unknown/unsupported controls are now shown with their states as read-only strings
 -   (raintonr) Fixes for auto-position based on percentage (#76)
