@@ -240,8 +240,29 @@ export abstract class LoxoneHandlerBase {
             name: controlName + ': ' + name,
             read: false,
             write: true,
-            type: 'boolean' as ioBroker.CommonType,
+            type: 'boolean',
             role: 'button',
+            // TODO: re-add: smartIgnore: true,
+        };
+        if (commonExt && typeof commonExt === 'object') {
+            common = { ...common, ...commonExt };
+        }
+        await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, uuid);
+    }
+
+    protected async createNumberInputStateObjectAsync(
+        controlName: string,
+        uuid: string,
+        name: string,
+        role: string,
+        commonExt?: Partial<ioBroker.StateCommon>,
+    ): Promise<void> {
+        let common: ioBroker.StateCommon = {
+            name: controlName + ': ' + name,
+            read: false,
+            write: true,
+            type: 'number',
+            role: role,
             // TODO: re-add: smartIgnore: true,
         };
         if (commonExt && typeof commonExt === 'object') {

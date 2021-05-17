@@ -161,6 +161,20 @@ class LoxoneHandlerBase {
         }
         await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, uuid);
     }
+    async createNumberInputStateObjectAsync(controlName, uuid, name, role, commonExt) {
+        let common = {
+            name: controlName + ': ' + name,
+            read: false,
+            write: true,
+            type: 'number',
+            role: role,
+            // TODO: re-add: smartIgnore: true,
+        };
+        if (commonExt && typeof commonExt === 'object') {
+            common = { ...common, ...commonExt };
+        }
+        await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, uuid);
+    }
     normalizeName(name) {
         return name.trim().replace(/[^\wäöüÄÖÜäöüéàèêçß]+/g, '_');
     }

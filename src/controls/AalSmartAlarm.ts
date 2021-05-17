@@ -1,3 +1,4 @@
+import { CurrentStateValue, OldStateValue } from '../main';
 import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
@@ -64,18 +65,10 @@ export class AalSmartAlarm extends ControlBase {
             this.sendCommand(control.uuidAction, 'confirm');
         });
 
-        await this.createSimpleControlStateObjectAsync(
-            control.name,
-            uuid,
-            control.states,
-            'disable',
-            'number',
-            'level.timer',
-            {
-                read: false,
-                write: true,
-            },
-        );
+        await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
+        this.addStateChangeListener(uuid + '.disable', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `disable/${newValue || '0'}`);
+        });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'startDrill');
         this.addStateChangeListener(uuid + '.startDrill', () => {
