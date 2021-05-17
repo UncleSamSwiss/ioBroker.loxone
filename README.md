@@ -418,6 +418,18 @@ Provided by central lighting controller.
 
 -   `control` (wo) turns all lights on or off
 
+### Mailbox
+
+Provided by Paketsafe Air / Tree.
+
+-   `notificationsDisabledInput` (ro) State of the notifications disabled input
+-   `packetReceived` (ro) State if a packet has been received
+-   `mailReceived` (ro) State if mail has been received
+-   `disableEndTime` (ro) timestamp until the notifications are disabled
+-   `confirmPacket` (wo) Confirm receive of a packet
+-   `confirmMail` (wo) Confirm receive of mail
+-   `disableNotifications` (wo) Disable the notifications for x seconds; 0 seconds for cancelling timer
+
 ### Meter
 
 Provided by utility meters.
@@ -634,6 +646,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for PresenceDetector (IOBROKER-LOXONE-1R)
 -   (UncleSamSwiss) Added support for AAL Smart Alarm (IOBROKER-LOXONE-1X)
 -   (UncleSamSwiss) Added support for AAL Emergency Button (IOBROKER-LOXONE-1W)
+-   (UncleSamSwiss) Added support for Paketsafe (IOBROKER-LOXONE-1P)
 
 ### 2.1.0 (2020-12-21)
 
