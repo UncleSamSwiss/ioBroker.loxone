@@ -10,7 +10,7 @@ class CentralLightController extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
         this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {

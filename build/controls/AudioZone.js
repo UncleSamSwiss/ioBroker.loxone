@@ -10,7 +10,7 @@ class AudioZone extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'media.music',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'serverState',
@@ -57,6 +57,7 @@ class AudioZone extends control_base_1.ControlBase {
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'clientState', 'number', 'value', { states: clientStates });
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'power', 'switch', {
             write: true,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'volume', 'number', 'level.volume', { write: true });
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'maxVolume', 'number', 'value');

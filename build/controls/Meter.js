@@ -10,7 +10,7 @@ class Meter extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'sensor',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['actual', 'total']);
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'actual', 'number', 'value.power.consumption');
@@ -29,6 +29,7 @@ class Meter extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.actual, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.actualFormat);
             });
@@ -40,6 +41,7 @@ class Meter extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.total, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.totalFormat);
             });

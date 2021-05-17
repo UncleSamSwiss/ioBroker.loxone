@@ -15,7 +15,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'thermo',
             },
-            native: { control: control },
+            native: { control },
         });
         // TODO: other details not implemented - needed to get temperature unit for example (C/F).
         // TODO: connectedInputs has bits for frost/heat protection but no set control for them. Eh?
@@ -256,7 +256,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 this.adapter.log.debug(`Mode ${activeMode}: -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
             default:
-                this.adapter.log.error(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
+                this.adapter.reportError(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
                 break;
         }
         // Don't do any update if not calculated (can only happen in error condition)

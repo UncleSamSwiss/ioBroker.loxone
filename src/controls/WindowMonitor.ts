@@ -9,7 +9,7 @@ export class WindowMonitor extends ControlBase {
                 name: control.name,
                 role: 'sensor',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

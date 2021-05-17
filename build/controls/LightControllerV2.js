@@ -20,7 +20,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'activeMoods',
@@ -38,6 +38,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.moodList, async (name, value) => {
                 const moodList = JSON.parse(value);
                 const list = [];
@@ -54,7 +55,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 await this.updateActiveMoods();
                 await this.updateFavoriteMoods();
                 await this.updateAdditionalMoods();
-                await this.setStateAck(name, list);
+                await this.setStateAck(name, JSON.stringify(list));
             });
             await this.updateStateObjectAsync(uuid + '.activeMoods', {
                 name: control.name + ': activeMoods',
@@ -62,6 +63,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: true,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.activeMoods, async (name, value) => {
                 this.activeMoods = JSON.parse(value);
                 await this.updateActiveMoods();
@@ -89,13 +91,13 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 for (let i = 0; i < arrayValue.length; i++) {
                     const moodName = arrayValue[i];
                     if (!this.moodNameToId.hasOwnProperty(moodName)) {
-                        this.adapter.log.error(`Can't find mood name '${moodName}', discarding new value`);
+                        this.adapter.reportError(`Can't find mood name '${moodName}', discarding new value`);
                         return;
                     }
                     ids.push(this.moodNameToId[moodName]);
                 }
                 if (ids.length === 0) {
-                    this.adapter.log.error(uuid + ".activeMoods can't have zero IDs, discarding new value");
+                    this.adapter.reportError(uuid + ".activeMoods can't have zero IDs, discarding new value");
                     return;
                 }
                 const addMoods = [];
@@ -133,6 +135,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.favoriteMoods, async (id, value) => {
                 this.favoriteMoods = JSON.parse(value);
                 await this.updateFavoriteMoods();
@@ -143,6 +146,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.additionalMoods, async (name, value) => {
                 this.additionalMoods = JSON.parse(value);
                 await this.updateAdditionalMoods();
@@ -175,7 +179,7 @@ class LightControllerV2 extends control_base_1.ControlBase {
                 list.push(id);
             }
         }
-        await this.setStateAck(this.uuid + '.' + name, list);
+        await this.setStateAck(this.uuid + '.' + name, JSON.stringify(list));
     }
     async updateActiveMoods() {
         await this.updateMoodsList('activeMoods', this.activeMoods);

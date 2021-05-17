@@ -10,7 +10,7 @@ export class TextInput extends ControlBase {
                 name: control.name,
                 role: 'sensor',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['text']);
@@ -63,7 +63,7 @@ export class TextInput extends ControlBase {
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
-            let common = {
+            let common: ioBroker.StateCommon = {
                 name: controlName + ': ' + name,
                 read: false,
                 write: true,

@@ -13,7 +13,7 @@ export class None extends ControlBase {
                 name: control.name,
                 role: 'info',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, []);

@@ -12,7 +12,7 @@ export class Jalousie extends ControlBase {
                 name: control.name,
                 role: 'blind',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [

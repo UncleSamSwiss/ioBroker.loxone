@@ -10,7 +10,7 @@ class TextInput extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'sensor',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['text']);
         const common = { write: true };
@@ -28,6 +28,7 @@ class TextInput extends control_base_1.ControlBase {
                 write: false,
                 type: 'string',
                 role: 'text',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.value, async (name, value) => {
                 await this.setFormattedStateAck(name, value, control.details.format);
             });
@@ -41,6 +42,7 @@ class TextInput extends control_base_1.ControlBase {
                 write: true,
                 type: type,
                 role: role,
+                //smartIgnore: true,
             };
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };

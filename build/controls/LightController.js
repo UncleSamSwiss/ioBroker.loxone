@@ -10,7 +10,7 @@ class LightController extends control_base_1.ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['activeScene', 'sceneList']);
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'activeScene', 'number', 'level', { write: true });
@@ -30,6 +30,7 @@ class LightController extends control_base_1.ControlBase {
                 write: false,
                 type: 'array',
                 role: 'list',
+                // TODO: re-add: smartIgnore: true,
             }, control.states.sceneList, async (name, value) => {
                 // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
                 if (value.hasOwnProperty('text')) {

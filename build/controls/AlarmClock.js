@@ -8,9 +8,9 @@ class AlarmClock extends control_base_1.ControlBase {
             type: type,
             common: {
                 name: control.name,
-                role: 'alarm',
+                role: 'alarm', // TODO: what's the best role here? ioBroker doc is not very clear on what's an "alarm"
             },
-            native: { control: control },
+            native: { control },
         });
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, [
             'isEnabled',
@@ -24,6 +24,7 @@ class AlarmClock extends control_base_1.ControlBase {
         ]);
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'isEnabled', 'switch', {
             write: true,
+            // TODO: re-add: smartIgnore: false,
         });
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'isAlarmActive', 'indicator');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'confirmationNeeded', 'indicator');

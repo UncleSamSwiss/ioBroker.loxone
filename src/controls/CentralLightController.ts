@@ -10,7 +10,7 @@ export class CentralLightController extends ControlBase {
                 name: control.name,
                 role: 'light',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.createButtonCommandStateObjectAsync(

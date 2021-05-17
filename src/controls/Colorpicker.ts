@@ -14,7 +14,7 @@ export class Colorpicker extends ColorpickerBase {
                 name: control.name,
                 role: 'light.color.rgb',
             },
-            native: { control: control as any },
+            native: { control },
         });
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['color', 'favorites']);
