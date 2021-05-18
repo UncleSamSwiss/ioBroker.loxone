@@ -44,7 +44,7 @@ export class InfoOnlyDigital extends ControlBase {
         }
 
         if (control.details.hasOwnProperty('image')) {
-            const image: any = control.details.text;
+            const image: any = control.details.image;
             await this.updateStateObjectAsync(
                 uuid + '.active-image',
                 {

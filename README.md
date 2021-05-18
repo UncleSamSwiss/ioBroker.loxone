@@ -651,6 +651,10 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+-   (UncleSamSwiss) Fixed typo causing "Cannot read property 'off' of undefined" (IOBROKER-LOXONE-2R, #72)
+
 ### 2.2.0 (2021-05-17)
 
 -   (UncleSamSwiss) Unknown/unsupported controls are now shown with their states as read-only strings
