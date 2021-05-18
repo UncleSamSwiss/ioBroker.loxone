@@ -654,6 +654,7 @@ Native value from ioBroker &gt; Objects
 ### **WORK IN PROGRESS**
 
 -   (UncleSamSwiss) Fixed typo causing "Cannot read property 'off' of undefined" (IOBROKER-LOXONE-2R, #72)
+-   (UncleSamSwiss) Improved Sentry reporting for structure file
 
 ### 2.2.0 (2021-05-17)
 
