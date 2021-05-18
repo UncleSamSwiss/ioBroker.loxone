@@ -6,9 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
 const SentryNode = require("@sentry/node");
+const axios_1 = require("axios");
 const loxoneWsApi = require("node-lox-ws-api");
 const Unknown_1 = require("./controls/Unknown");
 const weather_server_handler_1 = require("./weather-server-handler");
+const FormData = require("form-data");
 const Queue = require("queue-fifo");
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
@@ -92,10 +94,13 @@ class Loxone extends utils.Adapter {
             this.log.silly('keepalive (' + time + 'ms)');
         });
         this.client.on('get_structure_file', async (data) => {
-            var _a;
-            this.log.silly('get_structure_file ' + JSON.stringify(data));
-            this.log.info('got structure file; last modified on ' + data.lastModified);
-            this.structureFile = data;
+            this.log.silly(`get_structure_file ${JSON.stringify(data)}`);
+            this.log.info(`got structure file; last modified on ${data.lastModified}`);
+            const sentry = this.getSentry();
+            if (sentry) {
+                // add a global event processor to upload the structure file (only once)
+                sentry.addGlobalEventProcessor(this.createSentryEventProcessor(data));
+            }
             try {
                 await this.loadStructureFileAsync(data);
                 this.log.debug('structure file successfully loaded');
@@ -104,7 +109,7 @@ class Loxone extends utils.Adapter {
             }
             catch (error) {
                 this.log.error(`Couldn't load structure file: ${error}`);
-                (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(error, { extra: { data } });
+                sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { data } });
             }
         });
         const handleAnyEvent = (uuid, evt) => {
@@ -155,13 +160,51 @@ class Loxone extends utils.Adapter {
                 const sentry = this.getSentry();
                 sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
                     scope.setExtra('state', state);
-                    scope.setExtra('structureFile', JSON.stringify(this.structureFile, null, 2));
                     sentry.captureMessage(msg, SentryNode.Severity.Warning);
                 });
             }
             return;
         }
         this.stateChangeListeners[id](this.currentStateValues[id], state.val);
+    }
+    createSentryEventProcessor(data) {
+        const sentry = this.getSentry();
+        let attachmentEventId;
+        return async (event) => {
+            var _a;
+            try {
+                if (attachmentEventId) {
+                    // structure file was already added
+                    if (event.breadcrumbs) {
+                        event.breadcrumbs.push({
+                            type: 'debug',
+                            category: 'started',
+                            message: `Structure file added to event ${attachmentEventId}`,
+                            level: SentryNode.Severity.Info,
+                        });
+                    }
+                    return event;
+                }
+                const dsn = (_a = sentry.getCurrentHub().getClient()) === null || _a === void 0 ? void 0 : _a.getDsn();
+                if (!dsn || !event.event_id) {
+                    return event;
+                }
+                attachmentEventId = event.event_id;
+                const { host, path, projectId, port, protocol, user } = dsn;
+                const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${path !== '' ? `/${path}` : ''}/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${user}&sentry_version=7&sentry_client=custom-javascript`;
+                const form = new FormData();
+                form.append('att', JSON.stringify(data, null, 2), {
+                    contentType: 'application/json',
+                    filename: 'LoxAPP3.json',
+                });
+                await axios_1.default.post(endpoint, form, { headers: form.getHeaders() });
+                return event;
+            }
+            catch (ex) {
+                console.error(ex);
+            }
+            return event;
+        };
     }
     async loadStructureFileAsync(data) {
         this.stateEventHandlers = {};
