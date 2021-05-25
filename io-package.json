@@ -255,6 +255,7 @@
         "connectionType": "local",
         "dataSource": "push",
         "materialize": true,
+        "tier": 2,
         "dependencies": [
             {
                 "js-controller": ">=1.4.2"
