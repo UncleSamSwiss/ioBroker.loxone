@@ -18,7 +18,7 @@
     "url": "https://github.com/UncleSamSwiss/ioBroker.loxone"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.4.0",
+    "@iobroker/adapter-core": "^2.5.0",
     "@sentry/node": "^6.4.0",
     "axios": "^0.21.1",
     "color-convert": "^2.0.1",
