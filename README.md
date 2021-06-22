@@ -287,6 +287,19 @@ This device only appears inside a Light Controller V2 in Loxone software version
 Setting one or more of the above states from ioBroker will only send a command to the Miniserver after about 100 ms.
 This is to prevent the color from changing multiple times for a single user input.
 
+### Daytimer
+
+Provided by timer/schedule.
+
+-   `mode` (ro) current operating mode of the daytimer
+-   `mode-text` (ro) current operating mode name of the daytimer
+-   `override` (ro) the remaining time of the timer
+-   `value` (ro) current value, `true` or `false` for digital and a value for analog
+-   `value-formatted` (ro) current formatted value as text
+-   `needsActivation` (ro) only available if the control needs to be activated
+-   `resetActive` (ro) stays active as long as the reset input of the daytimer is active
+-   `pulse` (wo) activates the new value if an entry needs activation
+
 ### Dimmer
 
 Provided by dimmers.
@@ -650,6 +663,11 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+-   (UncleSamSwiss) Explicitly setting tier to 2.
+-   (UncleSamSwiss) Added support for Daytimer (IOBROKER-LOXONE-1Z)
 
 ### 2.2.1 (2021-05-18)
 
