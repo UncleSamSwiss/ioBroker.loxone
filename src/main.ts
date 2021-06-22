@@ -250,7 +250,7 @@ export class Loxone extends utils.Adapter {
                 await axios.post(endpoint, form, { headers: form.getHeaders() });
                 return event;
             } catch (ex) {
-                console.error(ex);
+                this.log.error(`Couldn't upload structure file attachment to sentry: ${ex}`);
             }
 
             return event;

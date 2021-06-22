@@ -201,7 +201,7 @@ class Loxone extends utils.Adapter {
                 return event;
             }
             catch (ex) {
-                console.error(ex);
+                this.log.error(`Couldn't upload structure file attachment to sentry: ${ex}`);
             }
             return event;
         };
