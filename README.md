@@ -478,6 +478,12 @@ Provided by virtual push-button inputs.
 -   `active` (rw) the current state of the pushbutton
 -   `pulse` (wo) writing any value to this state will simulate the button being pushed only for a very short time
 
+### Radio
+
+Provided by radio buttons (8x and 16x).
+
+-   `activeOutput` (rw) ID of the currently active output or 0 if none is active ("All Off")
+
 ### Slider
 
 Provided by analog virtual inputs.
@@ -668,6 +674,7 @@ Native value from ioBroker &gt; Objects
 
 -   (UncleSamSwiss) Explicitly setting tier to 2.
 -   (UncleSamSwiss) Added support for Daytimer (IOBROKER-LOXONE-1Z)
+-   (UncleSamSwiss) Added support for Radio (IOBROKER-LOXONE-21)
 
 ### 2.2.1 (2021-05-18)
 
