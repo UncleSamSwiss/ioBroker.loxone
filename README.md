@@ -719,7 +719,7 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 2.2.2 (2021-06-23)
 
 -   (UncleSamSwiss) Explicitly setting adapter tier to 2.
 -   (UncleSamSwiss) Added support for Daytimer (IOBROKER-LOXONE-1Z)
