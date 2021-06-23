@@ -98,7 +98,7 @@ class LoxoneHandlerBase {
             });
         }
     }
-    async createBooleanControlStateObjectAsync(controlName, uuid, states, name, role, commonExt) {
+    async createBooleanControlStateObjectAsync(controlName, uuid, states, name, role, commonExt, converter) {
         if (states !== undefined && states.hasOwnProperty(name)) {
             let common = {
                 name: controlName + ': ' + name,
@@ -111,8 +111,9 @@ class LoxoneHandlerBase {
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
             }
+            const convert = converter || ((value) => value == 1);
             await this.updateStateObjectAsync(uuid + '.' + this.normalizeName(name), common, states[name], async (name, value) => {
-                await this.setStateAck(name, value == 1);
+                await this.setStateAck(name, convert(value));
             });
         }
     }

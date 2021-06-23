@@ -319,6 +319,29 @@ Provided by EIB/KNX dimmers.
 -   `on` (wo) writing any value to this state sets the dimmer to the last known position
 -   `off` (wo) writing any value to this state disables the dimmer, sets position to 0 but remembers the last position
 
+### Fronius
+
+Provided by energy monitor.
+
+-   `prodCurr` (ro) current production power
+-   `prodCurrDay` (ro) energy production all over the current day
+-   `prodCurrMonth` (ro) energy production all over the current month
+-   `prodCurrYear` (ro) energy production all over the current year
+-   `prodTotal` (ro) energy production since setting up
+-   `consCurr` (ro) current consumption power
+-   `consCurrDay` (ro) energy consumed throughout the current day
+-   `consTotal` (ro) energy consumed since setting up
+-   `deliveryDay` (ro) unknown
+-   `earningsDay` (ro) how much money was earned over the current by either consuming the produced power yourself instead of consuming it from the grid, or by exporting unused produced power to the grid
+-   `earningsMonth` (ro) how much money was earned over the current month
+-   `earningsYear` (ro) how much money was earned over the current year
+-   `earningsTotal` (ro) how much money was earned since setting up
+-   `gridCurr` (ro) current grid consumption/delivery power. If negative, power is being delivered to the grid.
+-   `batteryCurr` (ro) current battery charging/usage power. If negative, the battery is charging.
+-   `stateOfCharge` (ro) represents the charging state of the battery. 100 = fully charged.
+-   `co2Factor` (ro) How much co2 does it take to produce one kWh, used to compute CO2 savings
+-   `online` (ro) true: online, false: offline
+
 ### Gate
 
 Provided by gate controls.
@@ -672,9 +695,10 @@ Native value from ioBroker &gt; Objects
 
 ### **WORK IN PROGRESS**
 
--   (UncleSamSwiss) Explicitly setting tier to 2.
+-   (UncleSamSwiss) Explicitly setting adapter tier to 2.
 -   (UncleSamSwiss) Added support for Daytimer (IOBROKER-LOXONE-1Z)
 -   (UncleSamSwiss) Added support for Radio (IOBROKER-LOXONE-21)
+-   (UncleSamSwiss) Added support for Fronius (IOBROKER-LOXONE-1Y)
 
 ### 2.2.1 (2021-05-18)
 

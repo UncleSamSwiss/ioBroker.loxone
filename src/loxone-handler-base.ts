@@ -151,6 +151,7 @@ export abstract class LoxoneHandlerBase {
         name: string,
         role: string,
         commonExt?: Partial<ioBroker.StateCommon>,
+        converter?: (value: CurrentStateValue) => boolean,
     ): Promise<void> {
         if (states !== undefined && states.hasOwnProperty(name)) {
             let common: ioBroker.StateCommon = {
@@ -164,12 +165,13 @@ export abstract class LoxoneHandlerBase {
             if (commonExt && typeof commonExt === 'object') {
                 common = { ...common, ...commonExt };
             }
+            const convert = converter || ((value) => value == 1);
             await this.updateStateObjectAsync(
                 uuid + '.' + this.normalizeName(name),
                 common,
                 states[name],
                 async (name: string, value: CurrentStateValue) => {
-                    await this.setStateAck(name, value == 1);
+                    await this.setStateAck(name, convert(value));
                 },
             );
         }
