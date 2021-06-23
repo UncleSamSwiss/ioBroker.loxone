@@ -287,7 +287,7 @@ This device only appears inside a Light Controller V2 in Loxone software version
 Setting one or more of the above states from ioBroker will only send a command to the Miniserver after about 100 ms.
 This is to prevent the color from changing multiple times for a single user input.
 
-### Daytimer
+### Daytimer / IRCDaytimer
 
 Provided by timer/schedule.
 
@@ -699,6 +699,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for Daytimer (IOBROKER-LOXONE-1Z)
 -   (UncleSamSwiss) Added support for Radio (IOBROKER-LOXONE-21)
 -   (UncleSamSwiss) Added support for Fronius (IOBROKER-LOXONE-1Y)
+-   (UncleSamSwiss) Added support for IRCDaytimer (IOBROKER-LOXONE-27)
 
 ### 2.2.1 (2021-05-18)
 
