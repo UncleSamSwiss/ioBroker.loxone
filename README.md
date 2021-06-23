@@ -381,6 +381,13 @@ Provided by
     -   total to 0
     -   lastActivation to 0
 
+### InfoOnlyAnalog
+
+Provided by virtual states as well as the Loxone Touch switch.
+
+-   `value` (ro) the state value (number) of the control
+-   `value-formatted` (ro) if configured, the formatted value of the state (using the "Unit" format from Loxone Config)
+
 ### InfoOnlyDigital
 
 Provided by virtual states as well as the Loxone Touch switch.
@@ -392,12 +399,12 @@ Provided by virtual states as well as the Loxone Touch switch.
 
 ![InfoOnlyDigital settings](doc/loxone-config-info-only-digital.png)
 
-### InfoOnlyAnalog
+### InfoOnlyText
 
-Provided by virtual states as well as the Loxone Touch switch.
+Provided by virtual text states.
 
--   `value` (ro) the state value (number) of the control
--   `value-formatted` (ro) if configured, the formatted value of the state (using the "Unit" format from Loxone Config)
+-   `text` (ro) the state value of the control
+-   `text-formatted` (ro) if configured, the formatted value of the state
 
 ### Intercom
 
@@ -720,6 +727,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for Fronius (IOBROKER-LOXONE-1Y)
 -   (UncleSamSwiss) Added support for IRCDaytimer (IOBROKER-LOXONE-27)
 -   (UncleSamSwiss) Added support for Hourcounter (IOBROKER-LOXONE-23)
+-   (UncleSamSwiss) Added support for InfoOnlyText (IOBROKER-LOXONE-29)
 
 ### 2.2.1 (2021-05-18)
 
