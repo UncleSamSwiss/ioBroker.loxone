@@ -187,11 +187,11 @@ export abstract class ColorpickerBase extends ControlBase {
 
     private async loadLumitechColorPickerAsync(uuid: string, control: Control): Promise<void> {
         await this.updateStateObjectAsync(
-            uuid + '.brigthness',
+            uuid + '.brightness',
             {
-                name: control.name + ': Brigthness',
+                name: control.name + ': Brightness',
                 read: true,
-                write: false,
+                write: true,
                 type: 'number',
                 role: 'level.color.level',
                 min: 0,
@@ -211,7 +211,7 @@ export abstract class ColorpickerBase extends ControlBase {
             {
                 name: control.name + ': Temperature',
                 read: true,
-                write: false,
+                write: true,
                 type: 'number',
                 role: 'level.color.temperature',
                 min: 2000,

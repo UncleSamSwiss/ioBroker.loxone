@@ -142,10 +142,10 @@ class ColorpickerBase extends control_base_1.ControlBase {
         this.addStateChangeListener(uuid + '.blue', startUpdateTimer);
     }
     async loadLumitechColorPickerAsync(uuid, control) {
-        await this.updateStateObjectAsync(uuid + '.brigthness', {
-            name: control.name + ': Brigthness',
+        await this.updateStateObjectAsync(uuid + '.brightness', {
+            name: control.name + ': Brightness',
             read: true,
-            write: false,
+            write: true,
             type: 'number',
             role: 'level.color.level',
             min: 0,
@@ -160,7 +160,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
         await this.updateStateObjectAsync(uuid + '.temperature', {
             name: control.name + ': Temperature',
             read: true,
-            write: false,
+            write: true,
             type: 'number',
             role: 'level.color.temperature',
             min: 2000,

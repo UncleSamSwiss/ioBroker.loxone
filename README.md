@@ -728,6 +728,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for IRCDaytimer (IOBROKER-LOXONE-27)
 -   (UncleSamSwiss) Added support for Hourcounter (IOBROKER-LOXONE-23)
 -   (UncleSamSwiss) Added support for InfoOnlyText (IOBROKER-LOXONE-29)
+-   (UncleSamSwiss) Fixed issues with Lumitech color pickers (#150)
 
 ### 2.2.1 (2021-05-18)
 
