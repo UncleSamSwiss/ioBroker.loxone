@@ -362,6 +362,25 @@ Provided by central gate control.
 -   `close` (wo) closes all gates
 -   `stop` (wo) stops all gate motors
 
+### Hourcounter
+
+Provided by
+
+-   `total` (ro) total number of seconds the counter has been active so far
+-   `remaining` (ro) how many seconds left until the next maintenance is required
+-   `lastActivation` (ro) the timestamp when the counter was activated the last time
+-   `overdue` (ro) `false` if not overdue, otherwise maintenance is required
+-   `maintenanceInterval` (ro) seconds until the next maintenance
+-   `active` (ro) whether or not the counter is currently active
+-   `overdueSince` (ro) seconds since the maintainanceInterval was exceeded
+-   `reset` (wo) will cause a reset of the following values
+    -   remaining to maintenanceInterval
+    -   overdue to 0
+    -   overdueSince to 0
+-   `resetAll` (wo) like `reset`, but also sets
+    -   total to 0
+    -   lastActivation to 0
+
 ### InfoOnlyDigital
 
 Provided by virtual states as well as the Loxone Touch switch.
@@ -700,6 +719,7 @@ Native value from ioBroker &gt; Objects
 -   (UncleSamSwiss) Added support for Radio (IOBROKER-LOXONE-21)
 -   (UncleSamSwiss) Added support for Fronius (IOBROKER-LOXONE-1Y)
 -   (UncleSamSwiss) Added support for IRCDaytimer (IOBROKER-LOXONE-27)
+-   (UncleSamSwiss) Added support for Hourcounter (IOBROKER-LOXONE-23)
 
 ### 2.2.1 (2021-05-18)
 
