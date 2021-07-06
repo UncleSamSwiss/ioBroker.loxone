@@ -38,7 +38,7 @@ export class Loxone extends utils.Adapter {
     private runQueue = false;
     private queueRunning = false;
 
-    private readonly reportedMissingControls = new Set<string>();
+    public readonly reportedMissingControls = new Set<string>();
     private readonly reportedUnsupportedStateChanges = new Set<string>();
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
@@ -434,15 +434,6 @@ export class Loxone extends utils.Adapter {
             const module = await import(`./controls/${type}`);
             controlObject = new module[type](this);
         } catch (error) {
-            const msg = `Unsupported ${controlType} control ${type}`;
-            if (!this.reportedMissingControls.has(msg)) {
-                this.reportedMissingControls.add(msg);
-                const sentry = this.getSentry();
-                sentry?.withScope((scope) => {
-                    scope.setExtra('control', JSON.stringify(control, null, 2));
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
-                });
-            }
             controlObject = new Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
@@ -572,6 +563,14 @@ export class Loxone extends utils.Adapter {
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
         this.client.send_cmd(uuid, action);
+    }
+
+    public getExistingObject(id: string): ioBroker.Object | undefined {
+        const fullId = this.namespace + '.' + id;
+        if (this.existingObjects.hasOwnProperty(fullId)) {
+            return this.existingObjects[fullId];
+        }
+        return undefined;
     }
 
     public async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {

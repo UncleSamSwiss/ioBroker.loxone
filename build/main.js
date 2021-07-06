@@ -365,15 +365,6 @@ class Loxone extends utils.Adapter {
             controlObject = new module[type](this);
         }
         catch (error) {
-            const msg = `Unsupported ${controlType} control ${type}`;
-            if (!this.reportedMissingControls.has(msg)) {
-                this.reportedMissingControls.add(msg);
-                const sentry = this.getSentry();
-                sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
-                    scope.setExtra('control', JSON.stringify(control, null, 2));
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
-                });
-            }
             controlObject = new Unknown_1.Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
@@ -488,6 +479,13 @@ class Loxone extends utils.Adapter {
     sendCommand(uuid, action) {
         this.log.debug(`Sending command ${uuid} ${action}`);
         this.client.send_cmd(uuid, action);
+    }
+    getExistingObject(id) {
+        const fullId = this.namespace + '.' + id;
+        if (this.existingObjects.hasOwnProperty(fullId)) {
+            return this.existingObjects[fullId];
+        }
+        return undefined;
     }
     async updateObjectAsync(id, obj) {
         const fullId = this.namespace + '.' + id;
