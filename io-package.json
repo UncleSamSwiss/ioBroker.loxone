@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.2.2",
+        "version": "2.2.3",
         "news": {
+            "2.2.3": {
+                "en": "Reduced number of Sentry reports for unsupported controls.",
+                "de": "Reduzierte Anzahl von Sentry-Berichten für nicht unterstützte Kontrollen.",
+                "ru": "Уменьшено количество отчетов Sentry для неподдерживаемых элементов управления.",
+                "pt": "Número reduzido de relatórios Sentry para controles não suportados.",
+                "nl": "Verminderd aantal Sentry-rapporten voor niet-ondersteunde besturingselementen.",
+                "fr": "Réduction du nombre de rapports Sentry pour les contrôles non pris en charge.",
+                "it": "Numero ridotto di rapporti Sentry per controlli non supportati.",
+                "es": "Número reducido de informes Sentry para controles no compatibles.",
+                "pl": "Zmniejszono liczbę raportów Sentry dla nieobsługiwanych elementów sterujących.",
+                "zh-cn": "减少了不受支持的控件的哨兵报告数量。"
+            },
             "2.2.2": {
                 "en": "Explicitly setting adapter tier to 2.\nAdded support for Daytimer (IOBROKER-LOXONE-1Z)\nAdded support for Radio (IOBROKER-LOXONE-21)\nAdded support for Fronius (IOBROKER-LOXONE-1Y)\nAdded support for IRCDaytimer (IOBROKER-LOXONE-27)\nAdded support for Hourcounter (IOBROKER-LOXONE-23)\nAdded support for InfoOnlyText (IOBROKER-LOXONE-29)\nFixed issues with Lumitech color pickers (#150)",
                 "de": "Adapterschicht explizit auf 2 setzen.\nUnterstützung für Daytimer hinzugefügt (IOBROKER-LOXONE-1Z)\nUnterstützung für Radio hinzugefügt (IOBROKER-LOXONE-21)\nUnterstützung für Fronius (IOBROKER-LOXONE-1Y) hinzugefügt\nUnterstützung für IRCDaytimer hinzugefügt (IOBROKER-LOXONE-27)\nUnterstützung für Stundenzähler hinzugefügt (IOBROKER-LOXONE-23)\nUnterstützung für InfoOnlyText hinzugefügt (IOBROKER-LOXONE-29)\nProbleme mit Lumitech-Farbwählern behoben (#150)",
