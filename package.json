@@ -31,7 +31,7 @@
     "@alcalzone/release-script": "^2.2.0",
     "@iobroker/adapter-dev": "^0.0.4",
     "@iobroker/testing": "^2.4.4",
-    "@types/chai": "^4.2.19",
+    "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/color-convert": "^2.0.0",
     "@types/gulp": "^4.0.8",
