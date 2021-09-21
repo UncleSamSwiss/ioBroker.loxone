@@ -80,7 +80,7 @@ async function translateGoogle(text: string, targetLang: string): Promise<string
             return response.data[0][0][0];
         }
         throw new Error('Invalid response for translate request');
-    } catch (e) {
+    } catch (e: any) {
         if (e.response?.status === 429) {
             throw new Error(`Could not translate to "${targetLang}": Rate-limited by Google Translate`);
         } else {

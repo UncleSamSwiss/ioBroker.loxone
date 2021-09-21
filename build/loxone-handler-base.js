@@ -25,7 +25,7 @@ class LoxoneHandlerBase {
         await this.adapter.setStateAck(id, value);
     }
     async setFormattedStateAck(id, value, format) {
-        value = sprintf_js_1.sprintf(format, value);
+        value = (0, sprintf_js_1.sprintf)(format, value);
         await this.setStateAck(id, value);
     }
     convertStateToInt(value) {

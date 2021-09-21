@@ -36,7 +36,7 @@ class WeatherServerHandler extends loxone_handler_base_1.LoxoneHandlerBase {
         this.addStateEventHandler(data.states.forecast, async (value) => {
             const hourCount = Math.min(value.entry.length, filter === '1day' ? 24 : Number.MAX_VALUE);
             for (let i = 0; i < hourCount; i++) {
-                const channelName = 'Hour' + sprintf_js_1.sprintf('%02d', i + 1);
+                const channelName = 'Hour' + (0, sprintf_js_1.sprintf)('%02d', i + 1);
                 if (i >= this.forecastChannelsCount) {
                     await this.setWeatherObjectsAsync(channelName);
                     this.forecastChannelsCount++;
