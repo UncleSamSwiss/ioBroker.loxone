@@ -112,10 +112,7 @@ class Loxone extends utils.Adapter {
             }
         };
         this.socket = new LxCommunicator.WebSocket(webSocketConfig);
-        const success = await this.connect();
-        if (!success) {
-            this.reconnect();
-        }
+        await this.connect();
         this.subscribeStates('*');
     }
     async connect() {
@@ -125,15 +122,17 @@ class Loxone extends utils.Adapter {
         }
         catch (error) {
             this.log.error(`Couldn't open socket: ${JSON.stringify(error)}`);
+            this.reconnect();
             return false;
         }
         let file;
         try {
-            file = await this.socket.send("data/LoxAPP3.json");
+            const fileString = await this.socket.send("data/LoxAPP3.json");
+            file = JSON.parse(fileString);
         }
         catch (error) {
             this.log.error(`Couldn't get structure file: ${JSON.stringify(error)}`);
-            this.socket.close();
+            this.reconnect();
             return false;
         }
         this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
@@ -153,6 +152,7 @@ class Loxone extends utils.Adapter {
             this.log.error(`Couldn't load structure file: ${error}`);
             sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { file } });
             this.socket.close();
+            this.reconnect();
             return false;
         }
         try {
@@ -161,6 +161,7 @@ class Loxone extends utils.Adapter {
         catch (error) {
             this.log.error(`Couldn't enable status updates: ${error}`);
             this.socket.close();
+            this.reconnect();
             return false;
         }
         return true;
