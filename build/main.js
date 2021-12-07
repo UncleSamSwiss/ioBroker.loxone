@@ -124,7 +124,7 @@ class Loxone extends utils.Adapter {
             await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
         }
         catch (error) {
-            this.log.error(`Couldn't open socket: ${error}`);
+            this.log.error(`Couldn't open socket: ${JSON.stringify(error)}`);
             return false;
         }
         let file;
@@ -132,7 +132,7 @@ class Loxone extends utils.Adapter {
             file = await this.socket.send("data/LoxAPP3.json");
         }
         catch (error) {
-            this.log.error(`Couldn't get structure file: ${error}`);
+            this.log.error(`Couldn't get structure file: ${JSON.stringify(error)}`);
             this.socket.close();
             return false;
         }
