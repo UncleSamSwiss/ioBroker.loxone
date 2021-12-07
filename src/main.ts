@@ -6,13 +6,16 @@ import * as utils from '@iobroker/adapter-core';
 import * as SentryNode from '@sentry/node';
 import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
-import * as loxoneWsApi from 'node-lox-ws-api';
+import * as LxCommunicator from 'lxcommunicator';
+import { v4 } from 'uuid';
 import { ControlBase, ControlType } from './controls/control-base';
 import { Unknown } from './controls/Unknown';
 import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 import FormData = require('form-data');
 import Queue = require('queue-fifo');
+
+const WebSocketConfig = LxCommunicator.WebSocketConfig;
 
 export type OldStateValue = ioBroker.StateValue | null | undefined;
 export type CurrentStateValue = ioBroker.StateValue | null;
@@ -24,7 +27,8 @@ export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
 
 export class Loxone extends utils.Adapter {
-    private client?: any;
+    private uuid: string = '';
+    private socket?: any;
     private existingObjects: Record<string, ioBroker.Object> = {};
     private currentStateValues: Record<string, CurrentStateValue> = {};
     private operatingModes: OperatingModes = {};
@@ -40,6 +44,7 @@ export class Loxone extends utils.Adapter {
 
     public readonly reportedMissingControls = new Set<string>();
     private readonly reportedUnsupportedStateChanges = new Set<string>();
+    private reconnectTimer?: ioBroker.Timeout;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -69,88 +74,11 @@ export class Loxone extends utils.Adapter {
 
         // Reset the connection indicator during startup
         this.setState('info.connection', false, true);
-
+        this.uuid = v4();
         // connect to Loxone Miniserver
-        this.client = new loxoneWsApi(
-            this.config.host + ':' + this.config.port,
-            this.config.username,
-            this.config.password,
-            true,
-            'AES-256-CBC',
-        );
+        const webSocketConfig = new WebSocketConfig(WebSocketConfig.protocol.WS,
+            this.uuid, 'iobroker', WebSocketConfig.permission.APP, false);
 
-        this.client.on('connect', () => {
-            this.log.info('Miniserver connected');
-        });
-
-        this.client.on('authorized', () => {
-            this.log.debug('authorized');
-        });
-
-        this.client.on('auth_failed', () => {
-            this.log.error('Miniserver auth failed');
-        });
-
-        this.client.on('connect_failed', () => {
-            this.log.error('Miniserver connect failed');
-        });
-
-        this.client.on('connection_error', (error: any) => {
-            this.log.error('Miniserver connection error: ' + error);
-        });
-
-        this.client.on('close', () => {
-            this.log.info('connection closed');
-            // Stop queue and clear it. Issue a warning if it isn't empty.
-            this.runQueue = false;
-            if (this.eventsQueue.size() > 0) {
-                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
-            }
-            // Yes - I know this could go in the 'if' above but here 'just in case' ;)
-            this.eventsQueue.clear();
-            this.setState('info.connection', false, true);
-        });
-
-        this.client.on('send', (message: any) => {
-            this.log.debug('sent message: ' + message);
-        });
-
-        this.client.on('message_text', (message: any) => {
-            this.log.debug('message_text ' + JSON.stringify(message));
-        });
-
-        this.client.on('message_file', (message: any) => {
-            this.log.debug('message_file ' + JSON.stringify(message));
-        });
-
-        this.client.on('message_invalid', (message: any) => {
-            this.log.debug('message_invalid ' + JSON.stringify(message));
-        });
-
-        this.client.on('keepalive', (time: number) => {
-            this.log.silly('keepalive (' + time + 'ms)');
-        });
-
-        this.client.on('get_structure_file', async (data: StructureFile) => {
-            this.log.silly(`get_structure_file ${JSON.stringify(data)}`);
-            this.log.info(`got structure file; last modified on ${data.lastModified}`);
-            const sentry = this.getSentry();
-            if (sentry) {
-                // add a global event processor to upload the structure file (only once)
-                sentry.addGlobalEventProcessor(this.createSentryEventProcessor(data));
-            }
-
-            try {
-                await this.loadStructureFileAsync(data);
-                this.log.debug('structure file successfully loaded');
-
-                // we are ready, let's set the connection indicator
-                this.setState('info.connection', true, true);
-            } catch (error) {
-                this.log.error(`Couldn't load structure file: ${error}`);
-                sentry?.captureException(error, { extra: { data } });
-            }
-        });
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
@@ -161,14 +89,123 @@ export class Loxone extends utils.Adapter {
             });
         };
 
-        this.client.on('update_event_value', handleAnyEvent);
-        this.client.on('update_event_text', handleAnyEvent);
-        this.client.on('update_event_daytimer', handleAnyEvent);
-        this.client.on('update_event_weather', handleAnyEvent);
+        webSocketConfig.delegate = {
+            socketOnDataProgress: (socket: any, progress: any) => {
+                this.log.info('data progress ' + progress);
+            },
+            socketOnTokenConfirmed: (socket: any, response: any) => {
+                this.log.info('token confirmed');
+            },
+            socketOnTokenReceived: (socket: any, result: any) => {
+                this.log.info('token received');
+            },
+            socketOnConnectionClosed: (socket: any, code: string) => {
+                this.log.info('Socket closed ' + code);
 
-        this.client.connect();
+                // Stop queue and clear it. Issue a warning if it isn't empty.
+                this.runQueue = false;
+                if (this.eventsQueue.size() > 0) {
+                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                }
+                // Yes - I know this could go in the 'if' above but here 'just in case' ;)
+                this.eventsQueue.clear();
+                this.setState('info.connection', false, true);
+
+                if (code != LxCommunicator.SupportCode.WEBSOCKET_MANUAL_CLOSE) {
+                    this.reconnect();
+                }
+            },
+            socketOnEventReceived: (socket: any, events: any, type: number) => {
+                this.log.info(`socket event received ${type} ${JSON.stringify(events)}`);
+                for (const evt of events) {
+                    switch (type) {
+                        case LxCommunicator.BinaryEvent.Type.EVENT:
+                            handleAnyEvent(evt.uuid, evt.value);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.EVENTTEXT:
+                            handleAnyEvent(evt.uuid, evt.text);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.EVENT:
+                            handleAnyEvent(evt.uuid, evt);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.WEATHER:
+                            handleAnyEvent(evt.uuid, evt);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        };
+        this.socket = new LxCommunicator.WebSocket(webSocketConfig);
+
+        const success = await this.connect();
+        if (!success) {
+            this.reconnect();
+        }
 
         this.subscribeStates('*');
+    }
+
+    private async connect(): Promise<boolean> {
+        this.log.info("Trying to connect");
+
+        try {
+            await this.socket.open(
+                this.config.host + ':' + this.config.port,
+                this.config.username,
+                this.config.password);
+        } catch (error) {
+            this.log.error(`Couldn't open socket: ${error}`);
+            return false;
+        }
+        let file: StructureFile;
+        try {
+            file = await this.socket.send("data/LoxAPP3.json");
+        } catch (error) {
+            this.log.error(`Couldn't get structure file: ${error}`);
+            this.socket.close();
+            return false;
+        }
+        this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
+        this.log.info(`got structure file; last modified on ${file.lastModified}`);
+        const sentry = this.getSentry();
+        if (sentry) {
+            // add a global event processor to upload the structure file (only once)
+            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+        }
+
+        try {
+            await this.loadStructureFileAsync(file);
+            this.log.debug('structure file successfully loaded');
+
+            // we are ready, let's set the connection indicator
+            this.setState('info.connection', true, true);
+        } catch (error) {
+            this.log.error(`Couldn't load structure file: ${error}`);
+            sentry?.captureException(error, { extra: { file } });
+            this.socket.close();
+            return false;
+        }
+
+        try {
+            await this.socket.send("jdev/sps/enablebinstatusupdate");
+        } catch (error) {
+            this.log.error(`Couldn't enable status updates: ${error}`);
+            this.socket.close();
+            return false;
+        }
+        return true;
+    }
+
+    private reconnect() {
+        if (this.reconnectTimer) {
+            return;
+        }
+        this.reconnectTimer = this.setTimeout(() => {
+            delete this.reconnectTimer;
+            this.connect();
+        }, 5000);
     }
 
     /**
@@ -176,9 +213,9 @@ export class Loxone extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
-            if (this.client) {
-                this.client.close();
-                delete this.client;
+            if (this.socket) {
+                this.socket.close();
+                delete this.socket;
             }
             callback();
         } catch (e) {
@@ -562,7 +599,7 @@ export class Loxone extends utils.Adapter {
 
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
-        this.client.send_cmd(uuid, action);
+        this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
 
     public getExistingObject(id: string): ioBroker.Object | undefined {
