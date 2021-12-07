@@ -23,7 +23,7 @@
     "axios": "^0.24.0",
     "color-convert": "^2.0.1",
     "form-data": "^4.0.0",
-    "node-lox-ws-api": "github:arsiesis/node-lox-ws-api",
+    "node-lox-ws-api": "^0.4.5",
     "queue-fifo": "*",
     "sprintf-js": "^1.1.2"
   },
