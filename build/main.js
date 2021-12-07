@@ -7,11 +7,13 @@ exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
 const SentryNode = require("@sentry/node");
 const axios_1 = require("axios");
-const loxoneWsApi = require("node-lox-ws-api");
+const LxCommunicator = require("lxcommunicator");
+const uuid_1 = require("uuid");
 const Unknown_1 = require("./controls/Unknown");
 const weather_server_handler_1 = require("./weather-server-handler");
 const FormData = require("form-data");
 const Queue = require("queue-fifo");
+const WebSocketConfig = LxCommunicator.WebSocketConfig;
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
         super({
@@ -19,6 +21,7 @@ class Loxone extends utils.Adapter {
             ...options,
             name: 'loxone',
         });
+        this.uuid = '';
         this.existingObjects = {};
         this.currentStateValues = {};
         this.operatingModes = {};
@@ -50,68 +53,9 @@ class Loxone extends utils.Adapter {
         this.existingObjects = await this.getAdapterObjectsAsync();
         // Reset the connection indicator during startup
         this.setState('info.connection', false, true);
+        this.uuid = (0, uuid_1.v4)();
         // connect to Loxone Miniserver
-        this.client = new loxoneWsApi(this.config.host + ':' + this.config.port, this.config.username, this.config.password, true, 'AES-256-CBC');
-        this.client.on('connect', () => {
-            this.log.info('Miniserver connected');
-        });
-        this.client.on('authorized', () => {
-            this.log.debug('authorized');
-        });
-        this.client.on('auth_failed', () => {
-            this.log.error('Miniserver auth failed');
-        });
-        this.client.on('connect_failed', () => {
-            this.log.error('Miniserver connect failed');
-        });
-        this.client.on('connection_error', (error) => {
-            this.log.error('Miniserver connection error: ' + error);
-        });
-        this.client.on('close', () => {
-            this.log.info('connection closed');
-            // Stop queue and clear it. Issue a warning if it isn't empty.
-            this.runQueue = false;
-            if (this.eventsQueue.size() > 0) {
-                this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
-            }
-            // Yes - I know this could go in the 'if' above but here 'just in case' ;)
-            this.eventsQueue.clear();
-            this.setState('info.connection', false, true);
-        });
-        this.client.on('send', (message) => {
-            this.log.debug('sent message: ' + message);
-        });
-        this.client.on('message_text', (message) => {
-            this.log.debug('message_text ' + JSON.stringify(message));
-        });
-        this.client.on('message_file', (message) => {
-            this.log.debug('message_file ' + JSON.stringify(message));
-        });
-        this.client.on('message_invalid', (message) => {
-            this.log.debug('message_invalid ' + JSON.stringify(message));
-        });
-        this.client.on('keepalive', (time) => {
-            this.log.silly('keepalive (' + time + 'ms)');
-        });
-        this.client.on('get_structure_file', async (data) => {
-            this.log.silly(`get_structure_file ${JSON.stringify(data)}`);
-            this.log.info(`got structure file; last modified on ${data.lastModified}`);
-            const sentry = this.getSentry();
-            if (sentry) {
-                // add a global event processor to upload the structure file (only once)
-                sentry.addGlobalEventProcessor(this.createSentryEventProcessor(data));
-            }
-            try {
-                await this.loadStructureFileAsync(data);
-                this.log.debug('structure file successfully loaded');
-                // we are ready, let's set the connection indicator
-                this.setState('info.connection', true, true);
-            }
-            catch (error) {
-                this.log.error(`Couldn't load structure file: ${error}`);
-                sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { data } });
-            }
-        });
+        const webSocketConfig = new WebSocketConfig(WebSocketConfig.protocol.WS, this.uuid, 'iobroker', WebSocketConfig.permission.APP, false);
         const handleAnyEvent = (uuid, evt) => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
@@ -121,21 +65,123 @@ class Loxone extends utils.Adapter {
                 (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureException(e, { extra: { uuid, evt } });
             });
         };
-        this.client.on('update_event_value', handleAnyEvent);
-        this.client.on('update_event_text', handleAnyEvent);
-        this.client.on('update_event_daytimer', handleAnyEvent);
-        this.client.on('update_event_weather', handleAnyEvent);
-        this.client.connect();
+        webSocketConfig.delegate = {
+            socketOnDataProgress: (socket, progress) => {
+                this.log.info('data progress ' + progress);
+            },
+            socketOnTokenConfirmed: (socket, response) => {
+                this.log.info('token confirmed');
+            },
+            socketOnTokenReceived: (socket, result) => {
+                this.log.info('token received');
+            },
+            socketOnConnectionClosed: (socket, code) => {
+                this.log.info('Socket closed ' + code);
+                // Stop queue and clear it. Issue a warning if it isn't empty.
+                this.runQueue = false;
+                if (this.eventsQueue.size() > 0) {
+                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                }
+                // Yes - I know this could go in the 'if' above but here 'just in case' ;)
+                this.eventsQueue.clear();
+                this.setState('info.connection', false, true);
+                if (code != LxCommunicator.SupportCode.WEBSOCKET_MANUAL_CLOSE) {
+                    this.reconnect();
+                }
+            },
+            socketOnEventReceived: (socket, events, type) => {
+                this.log.info(`socket event received ${type} ${JSON.stringify(events)}`);
+                for (const evt of events) {
+                    switch (type) {
+                        case LxCommunicator.BinaryEvent.Type.EVENT:
+                            handleAnyEvent(evt.uuid, evt.value);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.EVENTTEXT:
+                            handleAnyEvent(evt.uuid, evt.text);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.EVENT:
+                            handleAnyEvent(evt.uuid, evt);
+                            break;
+                        case LxCommunicator.BinaryEvent.Type.WEATHER:
+                            handleAnyEvent(evt.uuid, evt);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        };
+        this.socket = new LxCommunicator.WebSocket(webSocketConfig);
+        const success = await this.connect();
+        if (!success) {
+            this.reconnect();
+        }
         this.subscribeStates('*');
+    }
+    async connect() {
+        this.log.info("Trying to connect");
+        try {
+            await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
+        }
+        catch (error) {
+            this.log.error(`Couldn't open socket: ${error}`);
+            return false;
+        }
+        let file;
+        try {
+            file = await this.socket.send("data/LoxAPP3.json");
+        }
+        catch (error) {
+            this.log.error(`Couldn't get structure file: ${error}`);
+            this.socket.close();
+            return false;
+        }
+        this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
+        this.log.info(`got structure file; last modified on ${file.lastModified}`);
+        const sentry = this.getSentry();
+        if (sentry) {
+            // add a global event processor to upload the structure file (only once)
+            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+        }
+        try {
+            await this.loadStructureFileAsync(file);
+            this.log.debug('structure file successfully loaded');
+            // we are ready, let's set the connection indicator
+            this.setState('info.connection', true, true);
+        }
+        catch (error) {
+            this.log.error(`Couldn't load structure file: ${error}`);
+            sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { file } });
+            this.socket.close();
+            return false;
+        }
+        try {
+            await this.socket.send("jdev/sps/enablebinstatusupdate");
+        }
+        catch (error) {
+            this.log.error(`Couldn't enable status updates: ${error}`);
+            this.socket.close();
+            return false;
+        }
+        return true;
+    }
+    reconnect() {
+        if (this.reconnectTimer) {
+            return;
+        }
+        this.reconnectTimer = this.setTimeout(() => {
+            delete this.reconnectTimer;
+            this.connect();
+        }, 5000);
     }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      */
     onUnload(callback) {
         try {
-            if (this.client) {
-                this.client.close();
-                delete this.client;
+            if (this.socket) {
+                this.socket.close();
+                delete this.socket;
             }
             callback();
         }
@@ -478,7 +524,7 @@ class Loxone extends utils.Adapter {
     }
     sendCommand(uuid, action) {
         this.log.debug(`Sending command ${uuid} ${action}`);
-        this.client.send_cmd(uuid, action);
+        this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
     getExistingObject(id) {
         const fullId = this.namespace + '.' + id;
