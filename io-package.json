@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.2.3",
+        "version": "2.2.4",
         "news": {
             "2.2.3": {
                 "en": "Reduced number of Sentry reports for unsupported controls.",

@@ -7,6 +7,7 @@ import * as SentryNode from '@sentry/node';
 import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
 import * as LxCommunicator from 'lxcommunicator';
+import { serializeError } from 'serialize-error';
 import { v4 } from 'uuid';
 import { ControlBase, ControlType } from './controls/control-base';
 import { Unknown } from './controls/Unknown';
@@ -153,7 +154,7 @@ export class Loxone extends utils.Adapter {
                 this.config.username,
                 this.config.password);
         } catch (error) {
-            this.log.error(`Couldn't open socket: ${JSON.stringify(error)}`);
+            this.log.error(`Couldn't open socket: ${serializeError(error)}`);
             this.reconnect();
             return false;
         }
@@ -162,7 +163,7 @@ export class Loxone extends utils.Adapter {
             const fileString = await this.socket.send("data/LoxAPP3.json");
             file = JSON.parse(fileString);
         } catch (error) {
-            this.log.error(`Couldn't get structure file: ${JSON.stringify(error)}`);
+            this.log.error(`Couldn't get structure file: ${serializeError(error)}`);
             this.reconnect();
             return false;
         }
@@ -191,7 +192,7 @@ export class Loxone extends utils.Adapter {
         try {
             await this.socket.send("jdev/sps/enablebinstatusupdate");
         } catch (error) {
-            this.log.error(`Couldn't enable status updates: ${error}`);
+            this.log.error(`Couldn't enable status updates: ${serializeError(error)}`);
             this.socket.close();
             this.reconnect();
             return false;

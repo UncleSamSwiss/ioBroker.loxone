@@ -8,6 +8,7 @@ const utils = require("@iobroker/adapter-core");
 const SentryNode = require("@sentry/node");
 const axios_1 = require("axios");
 const LxCommunicator = require("lxcommunicator");
+const serialize_error_1 = require("serialize-error");
 const uuid_1 = require("uuid");
 const Unknown_1 = require("./controls/Unknown");
 const weather_server_handler_1 = require("./weather-server-handler");
@@ -121,7 +122,7 @@ class Loxone extends utils.Adapter {
             await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
         }
         catch (error) {
-            this.log.error(`Couldn't open socket: ${JSON.stringify(error)}`);
+            this.log.error(`Couldn't open socket: ${(0, serialize_error_1.serializeError)(error)}`);
             this.reconnect();
             return false;
         }
@@ -131,7 +132,7 @@ class Loxone extends utils.Adapter {
             file = JSON.parse(fileString);
         }
         catch (error) {
-            this.log.error(`Couldn't get structure file: ${JSON.stringify(error)}`);
+            this.log.error(`Couldn't get structure file: ${(0, serialize_error_1.serializeError)(error)}`);
             this.reconnect();
             return false;
         }
@@ -159,7 +160,7 @@ class Loxone extends utils.Adapter {
             await this.socket.send("jdev/sps/enablebinstatusupdate");
         }
         catch (error) {
-            this.log.error(`Couldn't enable status updates: ${error}`);
+            this.log.error(`Couldn't enable status updates: ${(0, serialize_error_1.serializeError)(error)}`);
             this.socket.close();
             this.reconnect();
             return false;
