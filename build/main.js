@@ -8,7 +8,6 @@ const utils = require("@iobroker/adapter-core");
 const SentryNode = require("@sentry/node");
 const axios_1 = require("axios");
 const LxCommunicator = require("lxcommunicator");
-const serialize_error_1 = require("serialize-error");
 const uuid_1 = require("uuid");
 const Unknown_1 = require("./controls/Unknown");
 const weather_server_handler_1 = require("./weather-server-handler");
@@ -117,22 +116,24 @@ class Loxone extends utils.Adapter {
         this.subscribeStates('*');
     }
     async connect() {
-        this.log.info("Trying to connect");
+        this.log.info('Trying to connect');
         try {
             await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
         }
         catch (error) {
-            this.log.error(`Couldn't open socket: ${(0, serialize_error_1.serializeError)(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't open socket`);
             this.reconnect();
             return false;
         }
         let file;
         try {
-            const fileString = await this.socket.send("data/LoxAPP3.json");
+            const fileString = await this.socket.send('data/LoxAPP3.json');
             file = JSON.parse(fileString);
         }
         catch (error) {
-            this.log.error(`Couldn't get structure file: ${(0, serialize_error_1.serializeError)(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't get structure file`);
             this.reconnect();
             return false;
         }
@@ -150,17 +151,19 @@ class Loxone extends utils.Adapter {
             this.setState('info.connection', true, true);
         }
         catch (error) {
-            this.log.error(`Couldn't load structure file: ${error}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't load structure file`);
             sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { file } });
             this.socket.close();
             this.reconnect();
             return false;
         }
         try {
-            await this.socket.send("jdev/sps/enablebinstatusupdate");
+            await this.socket.send('jdev/sps/enablebinstatusupdate');
         }
         catch (error) {
-            this.log.error(`Couldn't enable status updates: ${(0, serialize_error_1.serializeError)(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't enable status updates`);
             this.socket.close();
             this.reconnect();
             return false;

@@ -7,7 +7,6 @@ import * as SentryNode from '@sentry/node';
 import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
 import * as LxCommunicator from 'lxcommunicator';
-import { serializeError } from 'serialize-error';
 import { v4 } from 'uuid';
 import { ControlBase, ControlType } from './controls/control-base';
 import { Unknown } from './controls/Unknown';
@@ -146,7 +145,7 @@ export class Loxone extends utils.Adapter {
     }
 
     private async connect(): Promise<boolean> {
-        this.log.info("Trying to connect");
+        this.log.info('Trying to connect');
 
         try {
             await this.socket.open(
@@ -154,16 +153,18 @@ export class Loxone extends utils.Adapter {
                 this.config.username,
                 this.config.password);
         } catch (error) {
-            this.log.error(`Couldn't open socket: ${serializeError(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't open socket`);
             this.reconnect();
             return false;
         }
         let file: StructureFile;
         try {
-            const fileString = await this.socket.send("data/LoxAPP3.json");
+            const fileString = await this.socket.send('data/LoxAPP3.json');
             file = JSON.parse(fileString);
         } catch (error) {
-            this.log.error(`Couldn't get structure file: ${serializeError(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't get structure file`);
             this.reconnect();
             return false;
         }
@@ -182,7 +183,8 @@ export class Loxone extends utils.Adapter {
             // we are ready, let's set the connection indicator
             this.setState('info.connection', true, true);
         } catch (error) {
-            this.log.error(`Couldn't load structure file: ${error}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't load structure file`);
             sentry?.captureException(error, { extra: { file } });
             this.socket.close();
             this.reconnect();
@@ -190,9 +192,10 @@ export class Loxone extends utils.Adapter {
         }
 
         try {
-            await this.socket.send("jdev/sps/enablebinstatusupdate");
+            await this.socket.send('jdev/sps/enablebinstatusupdate');
         } catch (error) {
-            this.log.error(`Couldn't enable status updates: ${serializeError(error)}`);
+            // do not stringify error, it can contain circular references
+            this.log.error(`Couldn't enable status updates`);
             this.socket.close();
             this.reconnect();
             return false;
