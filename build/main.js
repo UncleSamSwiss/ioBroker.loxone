@@ -69,10 +69,10 @@ class Loxone extends utils.Adapter {
             socketOnDataProgress: (socket, progress) => {
                 this.log.info('data progress ' + progress);
             },
-            socketOnTokenConfirmed: (socket, response) => {
+            socketOnTokenConfirmed: (_socket, _response) => {
                 this.log.info('token confirmed');
             },
-            socketOnTokenReceived: (socket, result) => {
+            socketOnTokenReceived: (_socket, _result) => {
                 this.log.info('token received');
             },
             socketOnConnectionClosed: (socket, code) => {

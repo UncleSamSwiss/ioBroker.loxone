@@ -27,7 +27,7 @@ export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
 
 export class Loxone extends utils.Adapter {
-    private uuid: string = '';
+    private uuid = '';
     private socket?: any;
     private existingObjects: Record<string, ioBroker.Object> = {};
     private currentStateValues: Record<string, CurrentStateValue> = {};
@@ -76,9 +76,13 @@ export class Loxone extends utils.Adapter {
         this.setState('info.connection', false, true);
         this.uuid = v4();
         // connect to Loxone Miniserver
-        const webSocketConfig = new WebSocketConfig(WebSocketConfig.protocol.WS,
-            this.uuid, 'iobroker', WebSocketConfig.permission.APP, false);
-
+        const webSocketConfig = new WebSocketConfig(
+            WebSocketConfig.protocol.WS,
+            this.uuid,
+            'iobroker',
+            WebSocketConfig.permission.APP,
+            false,
+        );
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
@@ -93,10 +97,10 @@ export class Loxone extends utils.Adapter {
             socketOnDataProgress: (socket: any, progress: any) => {
                 this.log.info('data progress ' + progress);
             },
-            socketOnTokenConfirmed: (socket: any, response: any) => {
+            socketOnTokenConfirmed: (_socket: any, _response: any) => {
                 this.log.info('token confirmed');
             },
-            socketOnTokenReceived: (socket: any, result: any) => {
+            socketOnTokenReceived: (_socket: any, _result: any) => {
                 this.log.info('token received');
             },
             socketOnConnectionClosed: (socket: any, code: string) => {
@@ -151,7 +155,8 @@ export class Loxone extends utils.Adapter {
             await this.socket.open(
                 this.config.host + ':' + this.config.port,
                 this.config.username,
-                this.config.password);
+                this.config.password,
+            );
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't open socket`);
