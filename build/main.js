@@ -109,7 +109,7 @@ class Loxone extends utils.Adapter {
                             break;
                     }
                 }
-            }
+            },
         };
         this.socket = new LxCommunicator.WebSocket(webSocketConfig);
         await this.connect();
@@ -176,7 +176,10 @@ class Loxone extends utils.Adapter {
         }
         this.reconnectTimer = this.setTimeout(() => {
             delete this.reconnectTimer;
-            this.connect();
+            this.connect().catch((e) => {
+                this.log.error(`Couldn't reconnect: ${e}`);
+                this.reconnect();
+            });
         }, 5000);
     }
     /**
