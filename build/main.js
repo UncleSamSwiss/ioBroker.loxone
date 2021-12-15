@@ -67,13 +67,13 @@ class Loxone extends utils.Adapter {
         };
         webSocketConfig.delegate = {
             socketOnDataProgress: (socket, progress) => {
-                this.log.info('data progress ' + progress);
+                this.log.debug('data progress ' + progress);
             },
             socketOnTokenConfirmed: (_socket, _response) => {
-                this.log.info('token confirmed');
+                this.log.debug('token confirmed');
             },
             socketOnTokenReceived: (_socket, _result) => {
-                this.log.info('token received');
+                this.log.debug('token received');
             },
             socketOnConnectionClosed: (socket, code) => {
                 this.log.info('Socket closed ' + code);
@@ -90,7 +90,7 @@ class Loxone extends utils.Adapter {
                 }
             },
             socketOnEventReceived: (socket, events, type) => {
-                this.log.info(`socket event received ${type} ${JSON.stringify(events)}`);
+                this.log.silly(`socket event received ${type} ${JSON.stringify(events)}`);
                 for (const evt of events) {
                     switch (type) {
                         case LxCommunicator.BinaryEvent.Type.EVENT:
