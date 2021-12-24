@@ -70,6 +70,10 @@ class AudioZoneV2 extends control_base_1.ControlBase {
         this.addStateChangeListener(uuid + '.next', () => {
             this.sendCommand(control.uuidAction, 'next');
         });
+        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pause');
+        this.addStateChangeListener(uuid + '.pause', () => {
+            this.sendCommand(control.uuidAction, 'pause');
+        });
     }
 }
 exports.AudioZoneV2 = AudioZoneV2;
