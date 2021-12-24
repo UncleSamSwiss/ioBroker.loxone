@@ -65,14 +65,13 @@ export class AudioZoneV2 extends ControlBase {
             control.states,
             'clientState',
             'number',
-            'value',
+            'volume',
             { states: clientStates },
         );
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'power', 'switch', {
             write: true,
             // TODO: re-add: smartIgnore: false,
         });
-        await this.createNumberInputStateObjectAsync(control.name, uuid, 'volume', 'level.volume', { write: true });
         this.addStateChangeListener(uuid + '.playState', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             newValue = this.convertStateToInt(newValue);
             if (newValue === 0 || newValue === 1) {
@@ -84,6 +83,17 @@ export class AudioZoneV2 extends ControlBase {
         this.addStateChangeListener(uuid + '.power', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
         });
+        await this.createSimpleControlStateObjectAsync(
+            control.name,
+            uuid,
+            control.states,
+            'volume',
+            'number',
+            'level.volume',
+            {
+                write: true,
+            },
+        );
         this.addStateChangeListener(uuid + '.volume', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, 'volume/' + newValue);
         });
