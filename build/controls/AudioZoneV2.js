@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AudioZone2 = void 0;
+exports.AudioZoneV2 = void 0;
 const control_base_1 = require("./control-base");
-class AudioZone2 extends control_base_1.ControlBase {
+class AudioZoneV2 extends control_base_1.ControlBase {
     async loadAsync(type, uuid, control) {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -112,5 +112,5 @@ class AudioZone2 extends control_base_1.ControlBase {
         });
     }
 }
-exports.AudioZone2 = AudioZone2;
-//# sourceMappingURL=AudioZone2.js.map
+exports.AudioZoneV2 = AudioZoneV2;
+//# sourceMappingURL=AudioZoneV2.js.map
