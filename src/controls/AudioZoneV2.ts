@@ -91,7 +91,7 @@ export class AudioZoneV2 extends ControlBase {
             control.states,
             'volume',
             'number',
-            'value',
+            'level.volume',
             { write: true },
         );
         await this.createSimpleControlStateObjectAsync(
@@ -101,7 +101,6 @@ export class AudioZoneV2 extends ControlBase {
             'maxVolume',
             'number',
             'value',
-            { write: true },
         );
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'shuffle', 'switch', {
             write: true,
