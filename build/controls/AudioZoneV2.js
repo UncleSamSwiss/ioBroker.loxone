@@ -59,7 +59,7 @@ class AudioZoneV2 extends control_base_1.ControlBase {
             write: true,
             // TODO: re-add: smartIgnore: false,
         });
-        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'volume', 'number', 'volume', { write: true });
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'volume', 'number', 'level.volume', { write: true });
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'maxVolume', 'number', 'value');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'shuffle', 'switch', {
             write: true,
