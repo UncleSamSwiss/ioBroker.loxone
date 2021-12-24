@@ -46,7 +46,7 @@ class AudioZoneV2 extends control_base_1.ControlBase {
             write: true,
             // TODO: re-add: smartIgnore: false,
         });
-        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'volume', 'number', 'level.volume', { write: true });
+        await this.createNumberInputStateObjectAsync(control.name, uuid, 'volume', 'level.volume', { write: true });
         this.addStateChangeListener(uuid + '.playState', (oldValue, newValue) => {
             newValue = this.convertStateToInt(newValue);
             if (newValue === 0 || newValue === 1) {
