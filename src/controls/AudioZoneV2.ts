@@ -91,7 +91,7 @@ export class AudioZoneV2 extends ControlBase {
             control.states,
             'volume',
             'number',
-            'level.volume',
+            'volume',
             { write: true },
         );
         await this.createSimpleControlStateObjectAsync(
