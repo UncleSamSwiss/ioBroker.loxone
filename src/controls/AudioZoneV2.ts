@@ -65,7 +65,7 @@ export class AudioZoneV2 extends ControlBase {
             control.states,
             'clientState',
             'number',
-            'volume',
+            'value',
             { states: clientStates },
         );
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'power', 'switch', {
