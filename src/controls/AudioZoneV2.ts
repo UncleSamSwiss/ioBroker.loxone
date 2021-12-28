@@ -97,6 +97,12 @@ export class AudioZoneV2 extends ControlBase {
         this.addStateChangeListener(uuid + '.volume', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, 'volume/' + newValue);
         });
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'tts', 'string', 'text', {
+            write: true,
+        });
+        this.addStateChangeListener(uuid + '.tts', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, 'tts/' + newValue);
+        });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'prev');
         this.addStateChangeListener(uuid + '.prev', () => {
             this.sendCommand(control.uuidAction, 'prev');
