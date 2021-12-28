@@ -20,6 +20,7 @@ export class AudioZoneV2 extends ControlBase {
             'power',
             'volume',
             'volumeStep',
+            'tts',
         ]);
 
         const serverStates = {
@@ -110,6 +111,10 @@ export class AudioZoneV2 extends ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'next');
         this.addStateChangeListener(uuid + '.next', () => {
             this.sendCommand(control.uuidAction, 'next');
+        });
+        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'play');
+        this.addStateChangeListener(uuid + '.pause', () => {
+            this.sendCommand(control.uuidAction, 'pause');
         });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pause');
         this.addStateChangeListener(uuid + '.pause', () => {

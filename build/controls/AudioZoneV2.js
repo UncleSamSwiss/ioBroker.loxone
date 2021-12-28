@@ -19,6 +19,7 @@ class AudioZoneV2 extends control_base_1.ControlBase {
             'power',
             'volume',
             'volumeStep',
+            'tts',
         ]);
         const serverStates = {
             '-3': 'invalid zone',
@@ -77,6 +78,10 @@ class AudioZoneV2 extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'next');
         this.addStateChangeListener(uuid + '.next', () => {
             this.sendCommand(control.uuidAction, 'next');
+        });
+        await this.createButtonCommandStateObjectAsync(control.name, uuid, 'play');
+        this.addStateChangeListener(uuid + '.pause', () => {
+            this.sendCommand(control.uuidAction, 'pause');
         });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pause');
         this.addStateChangeListener(uuid + '.pause', () => {
