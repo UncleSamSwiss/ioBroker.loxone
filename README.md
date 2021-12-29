@@ -719,7 +719,7 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 3.0.0 (2021-12-29)
 
 -   (tdesmet) Changed to lxcommunicator (fixes #210)
 -   (UncleSamSwiss) Updated all dependencies

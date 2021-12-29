@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "loxone",
-        "version": "2.2.4",
+        "version": "3.0.0",
         "news": {
+            "3.0.0": {
+                "en": "Changed to lxcommunicator (fixes #210)\nUpdated all dependencies",
+                "de": "Zu lxcommunicator geändert (Fixes #210)\nAlle Abhängigkeiten aktualisiert",
+                "ru": "Изменен на lxcommunicator (исправления # 210)\nОбновлены все зависимости",
+                "pt": "Alterado para lxcommunicator (correções # 210)\nTodas as dependências atualizadas",
+                "nl": "Gewijzigd in lxcommunicator (reparatie #210)\nAlle afhankelijkheden bijgewerkt",
+                "fr": "Changé en lxcommunicator (correctifs #210)\nMise à jour de toutes les dépendances",
+                "it": "Modificato in lxcommunicator (correzioni #210)\nAggiornate tutte le dipendenze",
+                "es": "Cambiado a lxcommunicator (arreglos # 210)\nActualizadas todas las dependencias",
+                "pl": "Zmieniono na lxcommunicator (poprawki #210)\nZaktualizowano wszystkie zależności",
+                "zh-cn": "更改为 lxcommunicator（修复 #210）\n更新了所有依赖项"
+            },
             "2.2.3": {
                 "en": "Reduced number of Sentry reports for unsupported controls.",
                 "de": "Reduzierte Anzahl von Sentry-Berichten für nicht unterstützte Kontrollen.",
