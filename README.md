@@ -719,6 +719,11 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+-   (tdesmet) Changed to lxcommunicator (fixes #210)
+-   (UncleSamSwiss) Updated all dependencies
+
 ### 2.2.3 (2021-07-06)
 
 -   (UncleSamSwiss) Reduced number of Sentry reports for unsupported controls.
