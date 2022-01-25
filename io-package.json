@@ -269,14 +269,8 @@
             "pl": "Komunikuje się z Loxone Miniserver.",
             "zh-cn": "与Loxone小型服务器通信。"
         },
-        "authors": [
-            "UncleSamSwiss <samuel.weibel@gmail.com>"
-        ],
-        "keywords": [
-            "loxone",
-            "miniserver",
-            "smarthome"
-        ],
+        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
+        "keywords": ["loxone", "miniserver", "smarthome"],
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
@@ -294,7 +288,7 @@
         "tier": 2,
         "dependencies": [
             {
-                "js-controller": ">=1.4.2"
+                "js-controller": ">=2.0.0"
             }
         ],
         "globalDependencies": [
@@ -305,18 +299,12 @@
         "plugins": {
             "sentry": {
                 "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
-                "pathWhitelist": [
-                    "loxone"
-                ]
+                "pathWhitelist": ["loxone"]
             }
         }
     },
-    "encryptedNative": [
-        "password"
-    ],
-    "protectedNative": [
-        "password"
-    ],
+    "encryptedNative": ["password"],
+    "protectedNative": ["password"],
     "native": {
         "host": "0.0.0.0",
         "port": 80,
