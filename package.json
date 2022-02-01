@@ -41,7 +41,7 @@
     "@types/sinon": "^10.0.9",
     "@types/sinon-chai": "^3.2.8",
     "@types/sprintf-js": "^1.1.2",
-    "@types/uuid": "^8.3.3",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "chai": "^4.3.4",
