@@ -33,7 +33,7 @@
     "@iobroker/adapter-dev": "^0.1.0",
     "@iobroker/testing": "^2.5.4",
     "@types/chai": "^4.2.22",
-    "@types/chai-as-promised": "^7.1.4",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/color-convert": "^2.0.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^16.11.17",
