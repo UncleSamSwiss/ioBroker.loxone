@@ -719,6 +719,11 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+### 3.0.0 (2021-12-29)
+
+-   (tdesmet) Changed to lxcommunicator (fixes #210)
+-   (UncleSamSwiss) Updated all dependencies
+
 ### 2.2.3 (2021-07-06)
 
 -   (UncleSamSwiss) Reduced number of Sentry reports for unsupported controls.
@@ -834,7 +839,7 @@ Native value from ioBroker &gt; Objects
 
 ## License
 
-Copyright 2021 UncleSamSwiss
+Copyright 2022 UncleSamSwiss
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
