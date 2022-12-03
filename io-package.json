@@ -269,8 +269,14 @@
             "pl": "Komunikuje się z Loxone Miniserver.",
             "zh-cn": "与Loxone小型服务器通信。"
         },
-        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
-        "keywords": ["loxone", "miniserver", "smarthome"],
+        "authors": [
+            "UncleSamSwiss <samuel.weibel@gmail.com>"
+        ],
+        "keywords": [
+            "loxone",
+            "miniserver",
+            "smarthome"
+        ],
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
@@ -299,12 +305,18 @@
         "plugins": {
             "sentry": {
                 "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
-                "pathWhitelist": ["loxone"]
+                "pathWhitelist": [
+                    "loxone"
+                ]
             }
         }
     },
-    "encryptedNative": ["password"],
-    "protectedNative": ["password"],
+    "encryptedNative": [
+        "password"
+    ],
+    "protectedNative": [
+        "password"
+    ],
     "native": {
         "host": "0.0.0.0",
         "port": 80,
@@ -332,6 +344,45 @@
                 "role": "indicator.connected",
                 "name": "Connected to Miniserver",
                 "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.messagesReceived",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of messages received",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.messagesSent",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of messages sent",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.unknownEvents",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of unknown events received",
+                "type": "number",
                 "read": true,
                 "write": false,
                 "def": false
