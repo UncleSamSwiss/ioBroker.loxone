@@ -25,6 +25,7 @@ export type StateEventRegistration = { name?: string; handler: StateEventHandler
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
+export type InfoEntry = { value: number; lastSet: number; timer: ioBroker.Timeout | null };
 
 export class Loxone extends utils.Adapter {
     private uuid = '';
@@ -46,6 +47,8 @@ export class Loxone extends utils.Adapter {
     private readonly reportedUnsupportedStateChanges = new Set<string>();
     private reconnectTimer?: ioBroker.Timeout;
 
+    private info: Map<string, InfoEntry>;
+
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : __dirname + '/../',
@@ -55,12 +58,16 @@ export class Loxone extends utils.Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
+        this.info = new Map<string, InfoEntry>();
     }
 
     /**
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        // Init info
+        await this.initInfoStates();
+
         // store all current (acknowledged) state values
         const allStates = await this.getStatesAsync('*');
         for (const id in allStates) {
@@ -121,6 +128,7 @@ export class Loxone extends utils.Adapter {
             },
             socketOnEventReceived: (socket: any, events: any, type: number) => {
                 this.log.silly(`socket event received ${type} ${JSON.stringify(events)}`);
+                this.incInfoState('info.messagesReceived');
                 for (const evt of events) {
                     switch (type) {
                         case LxCommunicator.BinaryEvent.Type.EVENT:
@@ -234,6 +242,7 @@ export class Loxone extends utils.Adapter {
         } catch (e) {
             callback();
         }
+        this.flushInfoStates();
     }
 
     /**
@@ -242,6 +251,12 @@ export class Loxone extends utils.Adapter {
     private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
         // Warning: state can be null if it was deleted!
         if (!id || !state || state.ack) {
+            return;
+        }
+
+        // Ignore info changes
+        // TODO: can this be done better by ignoring '.info.' in subscribeStates?
+        if (id.includes('.info.')) {
             return;
         }
 
@@ -597,6 +612,7 @@ export class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
+            this.incInfoState('info.unknownEvents');
             return;
         }
 
@@ -610,8 +626,89 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    private async initInfoStates(): Promise<void> {
+        // Wait for states to load because if we don't, although the chances
+        // of processing starting before this actually completes is small, we
+        // should cater for that.
+        await this.initInfoState('info.messagesReceived');
+        await this.initInfoState('info.messagesSent');
+        await this.initInfoState('info.unknownEvents');
+    }
+
+    private async initInfoState(id: string): Promise<void> {
+        const value = Number((await this.getStateAsync(id))?.val);
+        this.info.set(id, {
+            value: value,
+            lastSet: value,
+            timer: null,
+        });
+    }
+
+    private flushInfoStates(): void {
+        // Called on shutdown
+        this.info.forEach((infoEntry, key) => {
+            if (infoEntry.timer) {
+                // Timer running, so cancel it and update state value if changed since last written
+                this.clearTimeout(infoEntry.timer);
+                this.setInfoStateIfChanged(key, infoEntry, true);
+            }
+        });
+    }
+
+    private incInfoState(id: string): void {
+        // Increment the given ID
+        const infoEntry = this.info.get(id);
+        if (infoEntry) {
+            infoEntry.value++;
+            this.setInfoState(id, infoEntry);
+        } else {
+            // This should never happen!
+            this.log.error('No info entry for ' + id);
+        }
+    }
+
+    private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
+        if (infoEntry.value != infoEntry.lastSet) {
+            this.setState(id, infoEntry.value, true);
+            infoEntry.lastSet = infoEntry.value;
+            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+
+            if (!shutdown) {
+                // Start a timer which will set the current value from the info ID map on completion
+                // Obviously don't do this if called from shutdown
+                this.log.silly('Starting timer for ' + id);
+                infoEntry.timer = this.setTimeout(
+                    (cbId, cbInfoEntry) => {
+                        this.log.silly('Timeout for ' + id);
+
+                        // Remove from timer from map as we have just finished
+                        cbInfoEntry.timer = null;
+
+                        // Update the state, but only if the value in the info ID map has changed
+                        this.setInfoStateIfChanged(cbId, cbInfoEntry);
+                    },
+                    30000, // Update every 30s max TODO: make this a config parameter?
+                    id,
+                    infoEntry, // Pass reference to entry
+                );
+            }
+        }
+    }
+
+    private setInfoState(id: string, infoEntry: InfoEntry): void {
+        this.log.silly('Setting info state ' + id + ': ' + infoEntry.value);
+
+        // If no timer is running, just set value immediately
+        if (!infoEntry.timer) {
+            this.setInfoStateIfChanged(id, infoEntry);
+        }
+        // Otherwise when the timer completes the current value of the info id
+        // will be read from the global map and set if changed.
+    }
+
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
+        this.incInfoState('info.messagesSent');
         this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
 
