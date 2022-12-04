@@ -25,7 +25,14 @@ export type StateEventRegistration = { name?: string; handler: StateEventHandler
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
-export type InfoEntry = { value: number; lastSet: number; timer: ioBroker.Timeout | null };
+export type GetInfoValueCallback = (() => ioBroker.StateValue) | null;
+export type InfoEntry = {
+    getValueCallback: GetInfoValueCallback;
+    value: ioBroker.StateValue;
+    lastSet: ioBroker.StateValue;
+    timer: ioBroker.Timeout | null;
+};
+export type unknownEventEntry = { count: number; lastValue: any };
 
 export class Loxone extends utils.Adapter {
     private uuid = '';
@@ -48,6 +55,7 @@ export class Loxone extends utils.Adapter {
     private reconnectTimer?: ioBroker.Timeout;
 
     private info: Map<string, InfoEntry>;
+    private unknownEventDetails: Map<string, unknownEventEntry>;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -59,6 +67,7 @@ export class Loxone extends utils.Adapter {
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.info = new Map<string, InfoEntry>();
+        this.unknownEventDetails = new Map<string, unknownEventEntry>();
     }
 
     /**
@@ -612,7 +621,7 @@ export class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
-            this.incInfoState('info.unknownEvents');
+            this.addUnknownEvent(evt.uuid, evt.evt);
             return;
         }
 
@@ -633,13 +642,29 @@ export class Loxone extends utils.Adapter {
         await this.initInfoState('info.messagesReceived');
         await this.initInfoState('info.messagesSent');
         await this.initInfoState('info.unknownEvents');
+
+        // The actual value of info.unknownEventDetails is built with a
+        // callback when needed (when timer completes). This avoids
+        // constantly stringifying the object every time it is updated.
+        //
+        // TODO: to avoid resetting event details on every startup
+        // there really should be a SetInfoValueCallback.
+        await this.initInfoState('info.unknownEventDetails', () => {
+            const out: any[] = [];
+            this.unknownEventDetails.forEach((value, key) => {
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
+            });
+            return JSON.stringify(out);
+        });
     }
 
-    private async initInfoState(id: string): Promise<void> {
-        const value = Number((await this.getStateAsync(id))?.val);
+    private async initInfoState(id: string, getValueCallback: GetInfoValueCallback = null): Promise<void> {
+        const state = await this.getStateAsync(id);
+        const initValue = state ? state.val : null;
         this.info.set(id, {
-            value: value,
-            lastSet: value,
+            getValueCallback: getValueCallback,
+            value: initValue,
+            lastSet: initValue,
             timer: null,
         });
     }
@@ -655,19 +680,53 @@ export class Loxone extends utils.Adapter {
         });
     }
 
-    private incInfoState(id: string): void {
-        // Increment the given ID
+    private getInfoEntry(id: string): InfoEntry | undefined {
         const infoEntry = this.info.get(id);
-        if (infoEntry) {
-            infoEntry.value++;
-            this.setInfoState(id, infoEntry);
-        } else {
+        if (!infoEntry) {
             // This should never happen!
             this.log.error('No info entry for ' + id);
+        }
+        return infoEntry;
+    }
+
+    private addUnknownEvent(id: string, value: any): void {
+        // Increment global counter...
+        this.incInfoState('info.unknownEvents');
+
+        /// ... and add details of this event to unknown map.
+        const eventEntry = this.unknownEventDetails.get(id);
+        if (eventEntry) {
+            // Add to existing
+            eventEntry.count++;
+            eventEntry.lastValue = value;
+        } else {
+            // New entry
+            this.unknownEventDetails.set(id, { count: 1, lastValue: value });
+        }
+
+        // Store details in DB
+        const infoEntry = this.getInfoEntry('info.unknownEventDetails');
+        if (infoEntry && !infoEntry.timer) {
+            this.setInfoStateIfChanged('info.unknownEventDetails', infoEntry);
+        }
+    }
+
+    private incInfoState(id: string): void {
+        // Increment the given ID
+        const infoEntry = this.getInfoEntry(id);
+        if (infoEntry && !infoEntry.timer) {
+            // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
+            infoEntry.value = Number(infoEntry.value) + 1;
+            this.setInfoStateIfChanged(id, infoEntry);
         }
     }
 
     private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
+        // Build the current value with callback if there is one
+        if (infoEntry.getValueCallback) {
+            infoEntry.value = infoEntry.getValueCallback();
+        }
+
         if (infoEntry.value != infoEntry.lastSet) {
             this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
@@ -693,17 +752,6 @@ export class Loxone extends utils.Adapter {
                 );
             }
         }
-    }
-
-    private setInfoState(id: string, infoEntry: InfoEntry): void {
-        this.log.silly('Setting info state ' + id + ': ' + infoEntry.value);
-
-        // If no timer is running, just set value immediately
-        if (!infoEntry.timer) {
-            this.setInfoStateIfChanged(id, infoEntry);
-        }
-        // Otherwise when the timer completes the current value of the info id
-        // will be read from the global map and set if changed.
     }
 
     public sendCommand(uuid: string, action: string): void {

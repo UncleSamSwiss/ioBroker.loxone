@@ -38,6 +38,7 @@ class Loxone extends utils.Adapter {
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.info = new Map();
+        this.unknownEventDetails = new Map();
     }
     /**
      * Is called when databases are connected and adapter received configuration.
@@ -528,7 +529,7 @@ class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
-            this.incInfoState('info.unknownEvents');
+            this.addUnknownEvent(evt.uuid, evt.evt);
             return;
         }
         for (const item of stateEventHandlerList) {
@@ -548,13 +549,27 @@ class Loxone extends utils.Adapter {
         await this.initInfoState('info.messagesReceived');
         await this.initInfoState('info.messagesSent');
         await this.initInfoState('info.unknownEvents');
+        // The actual value of info.unknownEventDetails is built with a
+        // callback when needed (when timer completes). This avoids
+        // constantly stringifying the object every time it is updated.
+        //
+        // TODO: to avoid resetting event details on every startup
+        // there really should be a SetInfoValueCallback.
+        await this.initInfoState('info.unknownEventDetails', () => {
+            const out = [];
+            this.unknownEventDetails.forEach((value, key) => {
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
+            });
+            return JSON.stringify(out);
+        });
     }
-    async initInfoState(id) {
-        var _a;
-        const value = Number((_a = (await this.getStateAsync(id))) === null || _a === void 0 ? void 0 : _a.val);
+    async initInfoState(id, getValueCallback = null) {
+        const state = await this.getStateAsync(id);
+        const initValue = state ? state.val : null;
         this.info.set(id, {
-            value: value,
-            lastSet: value,
+            getValueCallback: getValueCallback,
+            value: initValue,
+            lastSet: initValue,
             timer: null,
         });
     }
@@ -568,19 +583,48 @@ class Loxone extends utils.Adapter {
             }
         });
     }
-    incInfoState(id) {
-        // Increment the given ID
+    getInfoEntry(id) {
         const infoEntry = this.info.get(id);
-        if (infoEntry) {
-            infoEntry.value++;
-            this.setInfoState(id, infoEntry);
-        }
-        else {
+        if (!infoEntry) {
             // This should never happen!
             this.log.error('No info entry for ' + id);
         }
+        return infoEntry;
+    }
+    addUnknownEvent(id, value) {
+        // Increment global counter...
+        this.incInfoState('info.unknownEvents');
+        /// ... and add details of this event to unknown map.
+        const eventEntry = this.unknownEventDetails.get(id);
+        if (eventEntry) {
+            // Add to existing
+            eventEntry.count++;
+            eventEntry.lastValue = value;
+        }
+        else {
+            // New entry
+            this.unknownEventDetails.set(id, { count: 1, lastValue: value });
+        }
+        // Store details in DB
+        const infoEntry = this.getInfoEntry('info.unknownEventDetails');
+        if (infoEntry && !infoEntry.timer) {
+            this.setInfoStateIfChanged('info.unknownEventDetails', infoEntry);
+        }
+    }
+    incInfoState(id) {
+        // Increment the given ID
+        const infoEntry = this.getInfoEntry(id);
+        if (infoEntry && !infoEntry.timer) {
+            // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
+            infoEntry.value = Number(infoEntry.value) + 1;
+            this.setInfoStateIfChanged(id, infoEntry);
+        }
     }
     setInfoStateIfChanged(id, infoEntry, shutdown = false) {
+        // Build the current value with callback if there is one
+        if (infoEntry.getValueCallback) {
+            infoEntry.value = infoEntry.getValueCallback();
+        }
         if (infoEntry.value != infoEntry.lastSet) {
             this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
@@ -599,15 +643,6 @@ class Loxone extends utils.Adapter {
                 id, infoEntry);
             }
         }
-    }
-    setInfoState(id, infoEntry) {
-        this.log.silly('Setting info state ' + id + ': ' + infoEntry.value);
-        // If no timer is running, just set value immediately
-        if (!infoEntry.timer) {
-            this.setInfoStateIfChanged(id, infoEntry);
-        }
-        // Otherwise when the timer completes the current value of the info id
-        // will be read from the global map and set if changed.
     }
     sendCommand(uuid, action) {
         this.log.debug(`Sending command ${uuid} ${action}`);
