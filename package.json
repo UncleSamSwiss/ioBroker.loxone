@@ -6,6 +6,12 @@
     "name": "UncleSamSwiss",
     "email": "samuel.weibel@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "Robin Rainton",
+      "email": "robin@rainton.com"
+    }
+  ],
   "homepage": "https://github.com/UncleSamSwiss/ioBroker.loxone",
   "license": "Apache-2.0",
   "keywords": [
