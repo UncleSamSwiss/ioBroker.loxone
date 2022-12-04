@@ -388,6 +388,19 @@
                 "def": false
             },
             "native": {}
+        },
+        {
+            "_id": "info.unknownEventDetails",
+            "type": "state",
+            "common": {
+                "role": "json",
+                "name": "Array detailing unknown events received",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
         }
     ]
 }
