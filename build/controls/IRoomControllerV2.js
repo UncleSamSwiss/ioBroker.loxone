@@ -20,9 +20,14 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         // TODO: other details not implemented - needed to get temperature unit for example (C/F).
         // TODO: connectedInputs has bits for frost/heat protection but no set control for them. Eh?
         const comfortTemperatureWrite = control.details.connectedInputs & 1 ? false : true;
-        const comfortToleranceWrite = control.details.connectedInputs & 2 ? false : true;
-        const absentMinOffsetWrite = control.details.connectedInputs & 4 ? false : true;
-        const absentMaxOffsetWrite = control.details.connectedInputs & 8 ? false : true;
+        const comfortTemperatureCoolWrite = control.details.connectedInputs & 2 ? false : true;
+        // comfortToleranceWrite marked as deprecated in Loxone doco
+        const comfortToleranceWrite = control.details.connectedInputs & 4 ? false : true;
+        const absentMinOffsetWrite = control.details.connectedInputs & 8 ? false : true;
+        const absentMaxOffsetWrite = control.details.connectedInputs & 16 ? false : true;
+        const shadingHeatTempWrite = control.details.connectedInputs & 32 ? false : true;
+        const shadingCoolTempWrite = control.details.connectedInputs & 64 ? false : true;
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'jLocked', 'string', 'json');
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'modeList');
         await this.createListControlStateObjectAsync(control.name, uuid, control.states, 'overrideEntries');
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'overrideReason', 'number', 'value', {
@@ -88,6 +93,20 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
             });
         }
+        await this.updateStateObjectAsync(uuid + '.comfortTemperatureCool', {
+            name: control.name + ': comfortTemperatureCool',
+            read: true,
+            write: comfortTemperatureCoolWrite,
+            type: 'number',
+            role: comfortTemperatureCoolWrite ? 'level.temperature' : 'value.temperature',
+        }, control.states.comfortTemperatureCool, async (name, value) => {
+            await this.setStateAck(name, value);
+        });
+        if (comfortTemperatureCoolWrite) {
+            this.addStateChangeListener(uuid + '.comfortTemperatureCool', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setComfortTemperatureCool/' + newValue);
+            });
+        }
         await this.updateStateObjectAsync(uuid + '.comfortTolerance', {
             name: control.name + ': comfortTolerance',
             read: true,
@@ -147,6 +166,53 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         this.addStateChangeListener(uuid + '.comfortTemperatureOffset', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, 'setComfortModeTemp/' + newValue);
         });
+        await this.updateStateObjectAsync(uuid + '.shadingHeatTemp', {
+            name: control.name + ': shadingHeatTemp',
+            read: true,
+            write: shadingHeatTempWrite,
+            type: 'number',
+            role: shadingHeatTempWrite ? 'level.temperature' : 'value.temperature',
+        }, control.states.shadingHeatTemp, async (name, value) => {
+            await this.setStateAck(name, value);
+        });
+        if (shadingHeatTempWrite) {
+            this.addStateChangeListener(uuid + '.shadingHeatTemp', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setShadingHeatTemp/' + newValue);
+            });
+        }
+        await this.updateStateObjectAsync(uuid + '.shadingCoolTemp', {
+            name: control.name + ': shadingCoolTemp',
+            read: true,
+            write: shadingCoolTempWrite,
+            type: 'number',
+            role: shadingCoolTempWrite ? 'level.temperature' : 'value.temperature',
+        }, control.states.shadingCoolTemp, async (name, value) => {
+            await this.setStateAck(name, value);
+        });
+        if (shadingHeatTempWrite) {
+            this.addStateChangeListener(uuid + '.shadingCoolTemp', (oldValue, newValue) => {
+                this.sendCommand(control.uuidAction, 'setShadingCoolTemp/' + newValue);
+            });
+        }
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'shadingOut', 'boolean', 'indicator');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'tempActual', 'number', 'value.temperature');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'actualOutdoorTemp', 'number', 'value.temperature');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'averageOutdoorTemp', 'number', 'value.temperature');
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'excessEnergyTempOffset', 'number', 'value.temperature');
+        await this.updateStateObjectAsync(uuid + '.temperatureBoundaryInfo', {
+            name: control.name + ': temperatureBoundaryInfo',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level',
+            states: {
+                0: 'Not enough data',
+                1: 'OK',
+                2: 'No data at all',
+            },
+        }, control.states.temperatureBoundaryInfo, async (name, value) => {
+            await this.setStateAck(name, value);
+        });
         await this.updateStateObjectAsync(uuid + '.tempTarget', {
             name: control.name + ': tempTarget',
             read: true,
@@ -166,6 +232,40 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
             // being worked with.
             // So because of this, just start an override at the given temperature.
             this.sendCommand(control.uuidAction, 'override/3//' + newValue);
+        });
+        // TODO: capabilities is a bitmask, possibility to decode it's meaning?
+        await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'capabilities', 'number', 'value');
+        await this.updateStateObjectAsync(uuid + '.currentMode', {
+            name: control.name + ': currentMode',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level',
+            states: {
+                0: 'No requirement',
+                1: 'Heating',
+                2: 'Cooling',
+                3: 'Heating boost',
+                4: 'Cooling boost',
+                5: 'Service mode',
+                6: 'External Heater',
+            },
+        }, control.states.currentMode, async (name, value) => {
+            await this.setStateAck(name, value);
+        });
+        await this.updateStateObjectAsync(uuid + '.autoMode', {
+            name: control.name + ': autoMode',
+            read: true,
+            write: false,
+            type: 'number',
+            role: 'level',
+            states: {
+                0: 'Heating and cooling',
+                1: 'Heating',
+                2: 'Cooling',
+            },
+        }, control.states.autoMode, async (name, value) => {
+            await this.setStateAck(name, value);
         });
         await this.updateStateObjectAsync(uuid + '.operatingMode', {
             name: control.name + ': operatingMode',
@@ -222,6 +322,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         // modeslist
         // TODO: Subcontrols not yet implemented:
         // IRCV2Daytimer
+        // When done: await this.loadSubControlsAsync(uuid, control);
     }
     // Calculate and update tempTargetMin/Max
     // Should be triggered when any inputs change
