@@ -719,6 +719,8 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+-   (raintonr) Added missing states from IRCv2 (#365)
+
 ### 3.0.0 (2021-12-29)
 
 -   (tdesmet) Changed to lxcommunicator (fixes #210)
