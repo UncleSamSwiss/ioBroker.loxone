@@ -514,9 +514,7 @@ export class IRoomControllerV2 extends ControlBase {
         // set
         // modeslist
 
-        // TODO: Subcontrols not yet implemented:
-        // IRCV2Daytimer
-        // When done: await this.loadSubControlsAsync(uuid, control);
+        await this.loadSubControlsAsync(uuid, control);
     }
 
     // Calculate and update tempTargetMin/Max

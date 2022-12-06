@@ -320,9 +320,7 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
         // setComfortModeTemp (redundant as setComfortTemperature implemented - I think!)
         // set
         // modeslist
-        // TODO: Subcontrols not yet implemented:
-        // IRCV2Daytimer
-        // When done: await this.loadSubControlsAsync(uuid, control);
+        await this.loadSubControlsAsync(uuid, control);
     }
     // Calculate and update tempTargetMin/Max
     // Should be triggered when any inputs change
