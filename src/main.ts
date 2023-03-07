@@ -714,10 +714,12 @@ export class Loxone extends utils.Adapter {
     private incInfoState(id: string): void {
         // Increment the given ID
         const infoEntry = this.getInfoEntry(id);
-        if (infoEntry && !infoEntry.timer) {
+        if (infoEntry) {
             // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
             infoEntry.value = Number(infoEntry.value) + 1;
-            this.setInfoStateIfChanged(id, infoEntry);
+            if (!infoEntry.timer) {
+                this.setInfoStateIfChanged(id, infoEntry);
+            }
         }
     }
 
