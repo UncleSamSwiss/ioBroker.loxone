@@ -732,6 +732,7 @@ Native value from ioBroker &gt; Objects
 
 -   (raintonr) Added info statistics (#364)
 -   (raintonr) Added basic functionality for Remote (Media Controller)
+-   (raintonr) Fixed ack overwrites of fast changing states (#399)
 
 ### 3.0.0 (2021-12-29)
 
