@@ -719,6 +719,10 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+-   (raintonr) Added info statistics (#364)
+
 ### 3.0.0 (2021-12-29)
 
 -   (tdesmet) Changed to lxcommunicator (fixes #210)
