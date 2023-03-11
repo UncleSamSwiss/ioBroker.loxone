@@ -662,24 +662,16 @@ class Loxone extends utils.Adapter {
     }
     buildInfoDetails(src) {
         // TODO: shouldn't this use JSON.stringify?
-        let out = '';
+        const out = [];
         src.forEach((value, key) => {
-            if (out === '') {
-                out += '['; // start of array
+            if (value.lastValue !== undefined) {
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
             }
             else {
-                out += ',';
+                out.push({ id: key, count: value.count });
             }
-            out += `{ "id": "${key}","count":"${value.count}"`;
-            if (value.lastValue !== undefined) {
-                // Only add lastValue if defined
-                // TODO: cater for when lastValue type is object?
-                out += `,"lastValue":"${value.lastValue.toString()}"`;
-            }
-            out += '}';
         });
-        out += ']'; // end of array
-        return out;
+        return JSON.stringify(out);
     }
     setInfoStateIfChanged(id, infoEntry, shutdown = false) {
         if (infoEntry.value != infoEntry.lastSet) {

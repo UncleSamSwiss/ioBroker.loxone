@@ -771,23 +771,15 @@ export class Loxone extends utils.Adapter {
 
     private buildInfoDetails(src: infoDetailsEntryMap): string {
         // TODO: shouldn't this use JSON.stringify?
-        let out = '';
+        const out: any[] = [];
         src.forEach((value, key) => {
-            if (out === '') {
-                out += '['; // start of array
-            } else {
-                out += ',';
-            }
-            out += `{ "id": "${key}","count":"${value.count}"`;
             if (value.lastValue !== undefined) {
-                // Only add lastValue if defined
-                // TODO: cater for when lastValue type is object?
-                out += `,"lastValue":"${value.lastValue.toString()}"`;
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
+            } else {
+                out.push({ id: key, count: value.count });
             }
-            out += '}';
         });
-        out += ']'; // end of array
-        return out;
+        return JSON.stringify(out);
     }
 
     private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
