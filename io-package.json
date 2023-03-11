@@ -364,6 +364,19 @@
             "native": {}
         },
         {
+            "_id": "info.ackTimeoutsDetail",
+            "type": "state",
+            "common": {
+                "role": "json",
+                "name": "Array detailing ack timeouts - for debugging only & not persistant across restarts",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
             "_id": "info.messagesReceived",
             "type": "state",
             "common": {
@@ -429,11 +442,11 @@
             "native": {}
         },
         {
-            "_id": "info.unknownEventDetails",
+            "_id": "info.unknownEventsDetail",
             "type": "state",
             "common": {
                 "role": "json",
-                "name": "Array detailing unknown events received",
+                "name": "Array detailing unknown events - for debugging only & not persistant across restarts",
                 "type": "string",
                 "read": true,
                 "write": false,
