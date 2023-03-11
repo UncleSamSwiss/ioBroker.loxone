@@ -41,7 +41,6 @@ class Loxone extends utils.Adapter {
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.info = new Map();
-        this.unknownEventDetails = new Map();
     }
     /**
      * Is called when databases are connected and adapter received configuration.
@@ -259,7 +258,7 @@ class Loxone extends utils.Adapter {
     handleStateChange(id, stateChangeListener, val) {
         stateChangeListener.ackTimer = this.setTimeout((id, stateChangeListener) => {
             this.log.warn(`Timeout for ack ${id}`);
-            this.incInfoState('info.ackTimeouts');
+            this.incInfoState('info.ackTimeouts', id);
             stateChangeListener.ackTimer = null;
             // Even though this is a timeout, handle any change that may have been delayed waiting for this
             this.handleDelayedStateChange(id, stateChangeListener);
@@ -570,7 +569,7 @@ class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
-            this.addUnknownEvent(evt.uuid, evt.evt);
+            this.incInfoState('info.unknownEvents', evt.uuid, evt.evt);
             return;
         }
         for (const item of stateEventHandlerList) {
@@ -587,35 +586,26 @@ class Loxone extends utils.Adapter {
         // Wait for states to load because if we don't, although the chances
         // of processing starting before this actually completes is small, we
         // should cater for that.
-        await this.initInfoState('info.ackTimeouts');
+        await this.initInfoState('info.ackTimeouts', true);
         await this.initInfoState('info.messagesReceived');
         await this.initInfoState('info.messagesSent');
         await this.initInfoState('info.stateChangesDelayed');
         await this.initInfoState('info.stateChangesDiscarded');
-        await this.initInfoState('info.unknownEvents');
-        // The actual value of info.unknownEventDetails is built with a
-        // callback when needed (when timer completes). This avoids
-        // constantly stringifying the object every time it is updated.
-        //
-        // TODO: to avoid resetting event details on every startup
-        // there really should be a SetInfoValueCallback.
-        await this.initInfoState('info.unknownEventDetails', () => {
-            const out = [];
-            this.unknownEventDetails.forEach((value, key) => {
-                out.push({ id: key, count: value.count, lastValue: value.lastValue });
-            });
-            return JSON.stringify(out);
-        });
+        await this.initInfoState('info.unknownEvents', true);
     }
-    async initInfoState(id, getValueCallback = null) {
+    async initInfoState(id, hasDetails = false) {
         const state = await this.getStateAsync(id);
         const initValue = state ? state.val : null;
-        this.info.set(id, {
-            getValueCallback: getValueCallback,
+        const entry = {
             value: initValue,
             lastSet: initValue,
             timer: null,
-        });
+        };
+        if (hasDetails) {
+            // TODO: Maybe read these in so they persist across restarts?
+            entry.detailsMap = new Map();
+        }
+        this.info.set(id, entry);
     }
     flushInfoStates() {
         // Called on shutdown
@@ -635,46 +625,72 @@ class Loxone extends utils.Adapter {
         }
         return infoEntry;
     }
-    addUnknownEvent(id, value) {
-        // Increment global counter...
-        this.incInfoState('info.unknownEvents');
-        /// ... and add details of this event to unknown map.
-        const eventEntry = this.unknownEventDetails.get(id);
+    addInfoDetailsEntry(details, id, value) {
+        /// ... and add details of this event to the map.
+        const eventEntry = details.get(id);
         if (eventEntry) {
             // Add to existing
             eventEntry.count++;
-            eventEntry.lastValue = value;
+            if (value !== undefined) {
+                eventEntry.lastValue = value;
+            }
         }
         else {
             // New entry
-            this.unknownEventDetails.set(id, { count: 1, lastValue: value });
-        }
-        // Store details in DB
-        const infoEntry = this.getInfoEntry('info.unknownEventDetails');
-        if (infoEntry && !infoEntry.timer) {
-            this.setInfoStateIfChanged('info.unknownEventDetails', infoEntry);
+            if (value !== undefined) {
+                details.set(id, { count: 1, lastValue: value });
+            }
+            else {
+                details.set(id, { count: 1 });
+            }
         }
     }
-    incInfoState(id) {
+    incInfoState(id, detailId, detailValue) {
         // Increment the given ID
         const infoEntry = this.getInfoEntry(id);
         if (infoEntry) {
             // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
             infoEntry.value = Number(infoEntry.value) + 1;
+            // If value given and this entry has details record that
+            if (infoEntry.detailsMap && detailId) {
+                this.addInfoDetailsEntry(infoEntry.detailsMap, detailId, detailValue);
+            }
             if (!infoEntry.timer) {
                 this.setInfoStateIfChanged(id, infoEntry);
             }
         }
     }
+    buildInfoDetails(src) {
+        // TODO: shouldn't this use JSON.stringify?
+        let out = '';
+        src.forEach((value, key) => {
+            if (out === '') {
+                out += '['; // start of array
+            }
+            else {
+                out += ',';
+            }
+            out += `{ "id": "${key}","count":"${value.count}"`;
+            if (value.lastValue !== undefined) {
+                // Only add lastValue if defined
+                // TODO: cater for when lastValue type is object?
+                out += `,"lastValue":"${value.lastValue.toString()}"`;
+            }
+            out += '}';
+        });
+        out += ']'; // end of array
+        return out;
+    }
     setInfoStateIfChanged(id, infoEntry, shutdown = false) {
-        // Build the current value with callback if there is one
-        if (infoEntry.getValueCallback) {
-            infoEntry.value = infoEntry.getValueCallback();
-        }
         if (infoEntry.value != infoEntry.lastSet) {
+            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            // Store counter
             this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
-            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            // Store any details
+            if (infoEntry.detailsMap) {
+                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+            }
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
@@ -767,7 +783,7 @@ class Loxone extends utils.Adapter {
     addStateChangeListener(id, listener, loxoneAcks) {
         this.stateChangeListeners[this.namespace + '.' + id] = {
             listener,
-            loxoneAcks: loxoneAcks ? true : false,
+            loxoneAcks,
             queuedVal: null,
             ackTimer: null,
         };
