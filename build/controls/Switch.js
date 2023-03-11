@@ -27,7 +27,7 @@ class Switch extends control_base_1.ControlBase {
             else {
                 this.sendCommand(control.uuidAction, 'off');
             }
-        }, true);
+        });
     }
 }
 exports.Switch = Switch;

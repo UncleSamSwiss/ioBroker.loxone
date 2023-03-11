@@ -28,13 +28,9 @@ export class Dimmer extends ControlBase {
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'max', 'number', 'value');
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'step', 'number', 'value');
 
-        this.addStateChangeListener(
-            uuid + '.position',
-            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, this.convertStateToInt(newValue).toString());
-            },
-            true,
-        );
+        this.addStateChangeListener(uuid + '.position', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, this.convertStateToInt(newValue).toString());
+        });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
         this.addStateChangeListener(uuid + '.on', () => {
