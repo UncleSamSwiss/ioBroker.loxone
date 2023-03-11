@@ -16,7 +16,8 @@ export abstract class LoxoneHandlerBase {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
     }
 
-    protected addStateChangeListener(id: string, listener: StateChangeListener, loxoneAcks?: boolean): void {
+    protected addStateChangeListener(id: string, listener: StateChangeListener, loxoneAcks = true): void {
+        // TODO: Perhaps loxoneAcks should be more complex to cater for when ack comes back in different state.
         this.adapter.addStateChangeListener(id, listener, loxoneAcks);
     }
 
