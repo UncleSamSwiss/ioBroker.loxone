@@ -359,7 +359,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -372,7 +372,7 @@
                 "type": "string",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": ""
             },
             "native": {}
         },
@@ -385,7 +385,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -398,7 +398,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -411,7 +411,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -424,7 +424,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -437,7 +437,7 @@
                 "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         },
@@ -450,7 +450,7 @@
                 "type": "string",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": ""
             },
             "native": {}
         }
