@@ -18,7 +18,6 @@ export abstract class LoxoneHandlerBase {
     }
 
     protected addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
-        // TODO: Perhaps loxoneAcks should be more complex to cater for when ack comes back in different state.
         this.adapter.addStateChangeListener(id, listener, opts);
     }
 
