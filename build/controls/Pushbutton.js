@@ -18,16 +18,13 @@ class Pushbutton extends control_base_1.ControlBase {
             // TODO: re-add: smartIgnore: type == 'channel',
         });
         this.addStateChangeListener(uuid + '.active', (oldValue, newValue) => {
-            if (newValue == oldValue) {
-                return;
-            }
-            else if (newValue) {
+            if (newValue) {
                 this.sendCommand(control.uuidAction, 'on');
             }
             else {
                 this.sendCommand(control.uuidAction, 'off');
             }
-        });
+        }, { notIfEqual: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
         this.addStateChangeListener(uuid + '.pulse', () => {
             this.sendCommand(control.uuidAction, 'pulse');

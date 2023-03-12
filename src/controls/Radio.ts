@@ -34,16 +34,17 @@ export class Radio extends ControlBase {
                 write: true,
             },
         );
-        this.addStateChangeListener(uuid + '.activeOutput', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue == oldValue) {
-                return;
-            }
-            const value = this.convertStateToInt(newValue);
-            if (value === 0) {
-                this.sendCommand(control.uuidAction, 'reset');
-            } else if (states.hasOwnProperty(value)) {
-                this.sendCommand(control.uuidAction, value.toString());
-            }
-        });
+        this.addStateChangeListener(
+            uuid + '.activeOutput',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                const value = this.convertStateToInt(newValue);
+                if (value === 0) {
+                    this.sendCommand(control.uuidAction, 'reset');
+                } else if (states.hasOwnProperty(value)) {
+                    this.sendCommand(control.uuidAction, value.toString());
+                }
+            },
+            { notIfEqual: true },
+        );
     }
 }

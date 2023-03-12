@@ -20,14 +20,16 @@ export class Switch extends ControlBase {
             // TODO: re-add: smartIgnore: type == 'channel',
         });
 
-        this.addStateChangeListener(uuid + '.active', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue == oldValue) {
-                return;
-            } else if (newValue) {
-                this.sendCommand(control.uuidAction, 'on');
-            } else {
-                this.sendCommand(control.uuidAction, 'off');
-            }
-        });
+        this.addStateChangeListener(
+            uuid + '.active',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                if (newValue) {
+                    this.sendCommand(control.uuidAction, 'on');
+                } else {
+                    this.sendCommand(control.uuidAction, 'off');
+                }
+            },
+            { notIfEqual: true },
+        );
     }
 }
