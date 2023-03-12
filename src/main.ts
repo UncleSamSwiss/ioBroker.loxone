@@ -74,6 +74,7 @@ export class Loxone extends utils.Adapter {
     public readonly reportedMissingControls = new Set<string>();
     private readonly reportedUnsupportedStateChanges = new Set<string>();
     private reconnectTimer?: ioBroker.Timeout;
+    private lxConnected = false;
 
     private info: Map<string, InfoEntry>;
 
@@ -108,7 +109,7 @@ export class Loxone extends utils.Adapter {
         this.existingObjects = await this.getAdapterObjectsAsync();
 
         // Reset the connection indicator during startup
-        this.setState('info.connection', false, true);
+        this.setConnectionState(false);
         this.uuid = v4();
         // connect to Loxone Miniserver
         const webSocketConfig = new WebSocketConfig(
@@ -140,6 +141,7 @@ export class Loxone extends utils.Adapter {
             },
             socketOnConnectionClosed: (socket: any, code: string) => {
                 this.log.info('Socket closed ' + code);
+                this.setConnectionState(false);
 
                 // Stop queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
@@ -148,7 +150,6 @@ export class Loxone extends utils.Adapter {
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
-                this.setState('info.connection', false, true);
 
                 if (code != LxCommunicator.SupportCode.WEBSOCKET_MANUAL_CLOSE) {
                     this.reconnect();
@@ -206,6 +207,7 @@ export class Loxone extends utils.Adapter {
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't get structure file`);
+            this.socket.close();
             this.reconnect();
             return false;
         }
@@ -222,7 +224,7 @@ export class Loxone extends utils.Adapter {
             this.log.debug('structure file successfully loaded');
 
             // we are ready, let's set the connection indicator
-            this.setState('info.connection', true, true);
+            this.setConnectionState(true);
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't load structure file`);
@@ -255,6 +257,11 @@ export class Loxone extends utils.Adapter {
                 this.reconnect();
             });
         }, 5000);
+    }
+
+    private setConnectionState(connected: boolean): void {
+        this.lxConnected = connected;
+        this.setState('info.connection', this.lxConnected, true);
     }
 
     /**
@@ -297,6 +304,9 @@ export class Loxone extends utils.Adapter {
                         sentry.captureMessage(msg, SentryNode.Severity.Warning);
                     });
                 }
+            } else if (!this.lxConnected) {
+                this.log.warn(`stateChange ${id} while disconnected, discarding`);
+                this.incInfoState('info.stateChangesDiscarded');
             } else {
                 const stateChangeListener = this.stateChangeListeners[id];
                 if (stateChangeListener.ackTimer) {
