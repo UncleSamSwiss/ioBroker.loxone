@@ -130,15 +130,15 @@ class Jalousie extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
         this.addStateChangeListener(uuid + '.fullUp', () => {
             this.sendCommand(control.uuidAction, 'FullUp');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullDown');
         this.addStateChangeListener(uuid + '.fullDown', () => {
             this.sendCommand(control.uuidAction, 'FullDown');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'shade');
         this.addStateChangeListener(uuid + '.shade', () => {
             this.sendCommand(control.uuidAction, 'shade');
-        });
+        }, { selfAck: true });
     }
     async upDownChangeHandler() {
         if (this.upDownAutoCommandHandled) {

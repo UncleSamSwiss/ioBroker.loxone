@@ -33,8 +33,12 @@ export class Pushbutton extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
-        this.addStateChangeListener(uuid + '.pulse', () => {
-            this.sendCommand(control.uuidAction, 'pulse');
-        });
+        this.addStateChangeListener(
+            uuid + '.pulse',
+            () => {
+                this.sendCommand(control.uuidAction, 'pulse');
+            },
+            { selfAck: true },
+        );
     }
 }

@@ -27,6 +27,7 @@ export type StateChangeListenerOpts = {
     minInt?: number; // Values below minInt will be set to this value
     maxInt?: number; // Values above maxInt will be set to this value
     ackTimeoutMs?: number; // Override default timeout
+    selfAck?: boolean; // Acknowledge ourself (don't wait for Loxone)
 };
 export type StateChangeListenEntry = {
     listener: StateChangeListener;
@@ -345,20 +346,30 @@ export class Loxone extends utils.Adapter {
             this.log.debug(`State value is unchanged, no listener+self-ack: ${id} ${val}`);
             await this.setStateAck(id, val);
         } else {
-            // Change will be handled by listener - set ack timeout and call it
-            stateChangeListener.ackTimer = this.setTimeout(
-                async (id: string, stateChangeListener: StateChangeListenEntry) => {
-                    this.log.warn(`Timeout for ack ${id}`);
-                    this.incInfoState('info.ackTimeouts', id);
-                    stateChangeListener.ackTimer = null;
-                    // Even though this is a timeout, handle any change that may have been delayed waiting for this
-                    await this.handleDelayedStateChange(id, stateChangeListener);
-                },
-                stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
-                id,
-                stateChangeListener,
-            );
+            if (!stateChangeListener.opts?.selfAck) {
+                // Set ack timer before calling listener
+                stateChangeListener.ackTimer = this.setTimeout(
+                    async (id: string, stateChangeListener: StateChangeListenEntry) => {
+                        this.log.warn(`Timeout for ack ${id}`);
+                        this.incInfoState('info.ackTimeouts', id);
+                        stateChangeListener.ackTimer = null;
+                        // Even though this is a timeout, handle any change that may have been delayed waiting for this
+                        await this.handleDelayedStateChange(id, stateChangeListener);
+                    },
+                    stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
+                    id,
+                    stateChangeListener,
+                );
+            }
+
+            // Change will be handled by listener
             stateChangeListener.listener(this.currentStateValues[id], val);
+
+            if (stateChangeListener.opts?.selfAck) {
+                // Loxone is not expected to send an event to acknowledge this so just do it ourself
+                this.log.debug(`Self-ack: ${id} ${val}`);
+                await this.setStateAck(id, val);
+            }
         }
     }
 

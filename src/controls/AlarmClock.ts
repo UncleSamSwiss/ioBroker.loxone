@@ -106,13 +106,21 @@ export class AlarmClock extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'snooze');
-        this.addStateChangeListener(uuid + '.snooze', () => {
-            this.sendCommand(control.uuidAction, 'snooze');
-        });
+        this.addStateChangeListener(
+            uuid + '.snooze',
+            () => {
+                this.sendCommand(control.uuidAction, 'snooze');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'dismiss');
-        this.addStateChangeListener(uuid + '.dismiss', () => {
-            this.sendCommand(control.uuidAction, 'dismiss');
-        });
+        this.addStateChangeListener(
+            uuid + '.dismiss',
+            () => {
+                this.sendCommand(control.uuidAction, 'dismiss');
+            },
+            { selfAck: true },
+        );
     }
 }

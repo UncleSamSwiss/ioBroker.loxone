@@ -23,9 +23,13 @@ export class Intercom extends ControlBase {
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'version', 'string', 'text');
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'answer');
-        this.addStateChangeListener(uuid + '.answer', () => {
-            this.sendCommand(control.uuidAction, 'answer');
-        });
+        this.addStateChangeListener(
+            uuid + '.answer',
+            () => {
+                this.sendCommand(control.uuidAction, 'answer');
+            },
+            { selfAck: true },
+        );
 
         await this.loadSubControlsAsync(uuid, control);
     }
