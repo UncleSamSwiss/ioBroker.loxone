@@ -37,6 +37,7 @@ class Loxone extends utils.Adapter {
         this.queueRunning = false;
         this.reportedMissingControls = new Set();
         this.reportedUnsupportedStateChanges = new Set();
+        this.lxConnected = false;
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -58,7 +59,7 @@ class Loxone extends utils.Adapter {
         // store all existing objects for later use
         this.existingObjects = await this.getAdapterObjectsAsync();
         // Reset the connection indicator during startup
-        this.setState('info.connection', false, true);
+        this.setConnectionState(false);
         this.uuid = (0, uuid_1.v4)();
         // connect to Loxone Miniserver
         const webSocketConfig = new WebSocketConfig(WebSocketConfig.protocol.WS, this.uuid, 'iobroker', WebSocketConfig.permission.APP, false);
@@ -83,6 +84,7 @@ class Loxone extends utils.Adapter {
             },
             socketOnConnectionClosed: (socket, code) => {
                 this.log.info('Socket closed ' + code);
+                this.setConnectionState(false);
                 // Stop queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
                 if (this.eventsQueue.size() > 0) {
@@ -90,7 +92,6 @@ class Loxone extends utils.Adapter {
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
-                this.setState('info.connection', false, true);
                 if (code != LxCommunicator.SupportCode.WEBSOCKET_MANUAL_CLOSE) {
                     this.reconnect();
                 }
@@ -141,6 +142,7 @@ class Loxone extends utils.Adapter {
         catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't get structure file`);
+            this.socket.close();
             this.reconnect();
             return false;
         }
@@ -155,7 +157,7 @@ class Loxone extends utils.Adapter {
             await this.loadStructureFileAsync(file);
             this.log.debug('structure file successfully loaded');
             // we are ready, let's set the connection indicator
-            this.setState('info.connection', true, true);
+            this.setConnectionState(true);
         }
         catch (error) {
             // do not stringify error, it can contain circular references
@@ -188,6 +190,10 @@ class Loxone extends utils.Adapter {
                 this.reconnect();
             });
         }, 5000);
+    }
+    setConnectionState(connected) {
+        this.lxConnected = connected;
+        this.setState('info.connection', this.lxConnected, true);
     }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -231,6 +237,10 @@ class Loxone extends utils.Adapter {
                         sentry.captureMessage(msg, SentryNode.Severity.Warning);
                     });
                 }
+            }
+            else if (!this.lxConnected) {
+                this.log.warn(`stateChange ${id} while disconnected, discarding`);
+                this.incInfoState('info.stateChangesDiscarded');
             }
             else {
                 const stateChangeListener = this.stateChangeListeners[id];
