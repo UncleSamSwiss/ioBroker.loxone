@@ -29,11 +29,11 @@ class AalEmergency extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'trigger');
         this.addStateChangeListener(uuid + '.trigger', () => {
             this.sendCommand(control.uuidAction, 'trigger');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(uuid + '.quit', () => {
             this.sendCommand(control.uuidAction, 'quit');
-        });
+        }, { selfAck: true });
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
         this.addStateChangeListener(uuid + '.disable', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, `disable/${newValue || '0'}`);

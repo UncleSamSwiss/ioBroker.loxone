@@ -283,10 +283,13 @@ export class IRoomControllerV2 extends ControlBase {
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stopOverride');
-        this.addStateChangeListener(uuid + '.stopOverride', () => {
-            this.sendCommand(control.uuidAction, 'stopOverride');
-        });
-
+        this.addStateChangeListener(
+            uuid + '.stopOverride',
+            () => {
+                this.sendCommand(control.uuidAction, 'stopOverride');
+            },
+            { selfAck: true },
+        );
         // When in Eco/Building Protection modes Loxone app/web shows target as min..max range
         // Handy so create derived state for each
         await this.updateObjectAsync(uuid + '.tempTargetMin', {

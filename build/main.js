@@ -14,6 +14,9 @@ const weather_server_handler_1 = require("./weather-server-handler");
 const FormData = require("form-data");
 const Queue = require("queue-fifo");
 const WebSocketConfig = LxCommunicator.WebSocketConfig;
+// Log warnings if no ack event from Loxone in this time
+// TODO: should this be configurable?
+const ackTimeoutMs = 500;
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
         super({
@@ -38,7 +41,6 @@ class Loxone extends utils.Adapter {
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.info = new Map();
-        this.unknownEventDetails = new Map();
     }
     /**
      * Is called when databases are connected and adapter received configuration.
@@ -202,35 +204,104 @@ class Loxone extends utils.Adapter {
             callback();
         }
         this.flushInfoStates();
+        // TODO: clear queued state change timers
     }
     /**
      * Is called if a subscribed state changes
      */
-    onStateChange(id, state) {
+    async onStateChange(id, state) {
         // Warning: state can be null if it was deleted!
         if (!id || !state || state.ack) {
-            return;
+            // Do nothing
         }
-        // Ignore info changes
-        // TODO: can this be done better by ignoring '.info.' in subscribeStates?
-        if (id.includes('.info.')) {
-            return;
+        else if (id.includes('.info.')) {
+            // Ignore info changes
+            // TODO: can this be done better by ignoring '.info.' in subscribeStates?
         }
-        this.log.silly(`stateChange ${id} ${JSON.stringify(state)}`);
-        if (!this.stateChangeListeners.hasOwnProperty(id)) {
-            const msg = 'Unsupported state change: ' + id;
-            this.log.error(msg);
-            if (!this.reportedUnsupportedStateChanges.has(id)) {
-                this.reportedUnsupportedStateChanges.add(id);
-                const sentry = this.getSentry();
-                sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
-                    scope.setExtra('state', state);
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
-                });
+        else {
+            this.log.debug(`stateChange ${id} ${JSON.stringify(state)}`);
+            if (!this.stateChangeListeners.hasOwnProperty(id)) {
+                const msg = 'Unsupported state change: ' + id;
+                this.log.error(msg);
+                if (!this.reportedUnsupportedStateChanges.has(id)) {
+                    this.reportedUnsupportedStateChanges.add(id);
+                    const sentry = this.getSentry();
+                    sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
+                        scope.setExtra('state', state);
+                        sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                    });
+                }
             }
-            return;
+            else {
+                const stateChangeListener = this.stateChangeListeners[id];
+                if (stateChangeListener.ackTimer) {
+                    // Ack timer is running: we didn't get a reply from the previous command yet
+                    if (stateChangeListener.queuedVal !== null) {
+                        // Already a queued state change: we're going to have to discard that and replace with latest
+                        this.log.warn(`State change in progress for ${id}, discarding ${stateChangeListener.queuedVal}`);
+                        this.incInfoState('info.stateChangesDiscarded');
+                    }
+                    else {
+                        // Nothing queued, so this will only be delayed (at least for now)
+                        this.log.warn(`State change in progress for ${id}, delaying ${state.val}`);
+                        this.incInfoState('info.stateChangesDelayed');
+                    }
+                    stateChangeListener.queuedVal = state.val;
+                }
+                else {
+                    // Ack timer is not running, so we're all good to handle this
+                    await this.handleStateChange(id, stateChangeListener, state.val);
+                }
+            }
         }
-        this.stateChangeListeners[id](this.currentStateValues[id], state.val);
+    }
+    convertStateToInt(value) {
+        return !value ? 0 : parseInt(value.toString());
+    }
+    async handleStateChange(id, stateChangeListener, val) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        if ((_a = stateChangeListener.opts) === null || _a === void 0 ? void 0 : _a.convertToInt) {
+            // Convert any values to ints within range if necessary.
+            val = this.convertStateToInt(val);
+            if (((_b = stateChangeListener.opts) === null || _b === void 0 ? void 0 : _b.minInt) !== undefined && val < stateChangeListener.opts.minInt) {
+                val = stateChangeListener.opts.minInt;
+            }
+            if (((_c = stateChangeListener.opts) === null || _c === void 0 ? void 0 : _c.maxInt) !== undefined && val > stateChangeListener.opts.maxInt) {
+                val = stateChangeListener.opts.maxInt;
+            }
+        }
+        if (((_d = stateChangeListener.opts) === null || _d === void 0 ? void 0 : _d.notIfEqual) && this.currentStateValues[id] === val) {
+            // new/old values are the same so don't send update.
+            // However, ack the state change as we have 'handled' this (by doing nothing)
+            this.log.debug(`State value is unchanged, no listener+self-ack: ${id} ${val}`);
+            await this.setStateAck(id, val);
+        }
+        else {
+            if (!((_e = stateChangeListener.opts) === null || _e === void 0 ? void 0 : _e.selfAck)) {
+                // Set ack timer before calling listener
+                stateChangeListener.ackTimer = this.setTimeout(async (id, stateChangeListener) => {
+                    this.log.warn(`Timeout for ack ${id}`);
+                    this.incInfoState('info.ackTimeouts', id);
+                    stateChangeListener.ackTimer = null;
+                    // Even though this is a timeout, handle any change that may have been delayed waiting for this
+                    await this.handleDelayedStateChange(id, stateChangeListener);
+                }, ((_f = stateChangeListener.opts) === null || _f === void 0 ? void 0 : _f.ackTimeoutMs) ? (_g = stateChangeListener.opts) === null || _g === void 0 ? void 0 : _g.ackTimeoutMs : ackTimeoutMs, id, stateChangeListener);
+            }
+            // Change will be handled by listener
+            stateChangeListener.listener(this.currentStateValues[id], val);
+            if ((_h = stateChangeListener.opts) === null || _h === void 0 ? void 0 : _h.selfAck) {
+                // Loxone is not expected to send an event to acknowledge this so just do it ourself
+                this.log.debug(`Self-ack: ${id} ${val}`);
+                await this.setStateAck(id, val);
+            }
+        }
+    }
+    async handleDelayedStateChange(id, stateChangeListener) {
+        if (stateChangeListener.queuedVal !== null) {
+            this.log.debug(`Handling delayed state: ${id} ${stateChangeListener.queuedVal}`);
+            await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
+            stateChangeListener.queuedVal = null;
+        }
     }
     createSentryEventProcessor(data) {
         const sentry = this.getSentry();
@@ -529,7 +600,7 @@ class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
-            this.addUnknownEvent(evt.uuid, evt.evt);
+            this.incInfoState('info.unknownEvents', evt.uuid, evt.evt);
             return;
         }
         for (const item of stateEventHandlerList) {
@@ -546,32 +617,26 @@ class Loxone extends utils.Adapter {
         // Wait for states to load because if we don't, although the chances
         // of processing starting before this actually completes is small, we
         // should cater for that.
+        await this.initInfoState('info.ackTimeouts', true);
         await this.initInfoState('info.messagesReceived');
         await this.initInfoState('info.messagesSent');
-        await this.initInfoState('info.unknownEvents');
-        // The actual value of info.unknownEventDetails is built with a
-        // callback when needed (when timer completes). This avoids
-        // constantly stringifying the object every time it is updated.
-        //
-        // TODO: to avoid resetting event details on every startup
-        // there really should be a SetInfoValueCallback.
-        await this.initInfoState('info.unknownEventDetails', () => {
-            const out = [];
-            this.unknownEventDetails.forEach((value, key) => {
-                out.push({ id: key, count: value.count, lastValue: value.lastValue });
-            });
-            return JSON.stringify(out);
-        });
+        await this.initInfoState('info.stateChangesDelayed');
+        await this.initInfoState('info.stateChangesDiscarded');
+        await this.initInfoState('info.unknownEvents', true);
     }
-    async initInfoState(id, getValueCallback = null) {
+    async initInfoState(id, hasDetails = false) {
         const state = await this.getStateAsync(id);
         const initValue = state ? state.val : null;
-        this.info.set(id, {
-            getValueCallback: getValueCallback,
+        const entry = {
             value: initValue,
             lastSet: initValue,
             timer: null,
-        });
+        };
+        if (hasDetails) {
+            // TODO: Maybe read these in so they persist across restarts?
+            entry.detailsMap = new Map();
+        }
+        this.info.set(id, entry);
     }
     flushInfoStates() {
         // Called on shutdown
@@ -591,46 +656,64 @@ class Loxone extends utils.Adapter {
         }
         return infoEntry;
     }
-    addUnknownEvent(id, value) {
-        // Increment global counter...
-        this.incInfoState('info.unknownEvents');
-        /// ... and add details of this event to unknown map.
-        const eventEntry = this.unknownEventDetails.get(id);
+    addInfoDetailsEntry(details, id, value) {
+        /// ... and add details of this event to the map.
+        const eventEntry = details.get(id);
         if (eventEntry) {
             // Add to existing
             eventEntry.count++;
-            eventEntry.lastValue = value;
+            if (value !== undefined) {
+                eventEntry.lastValue = value;
+            }
         }
         else {
             // New entry
-            this.unknownEventDetails.set(id, { count: 1, lastValue: value });
-        }
-        // Store details in DB
-        const infoEntry = this.getInfoEntry('info.unknownEventDetails');
-        if (infoEntry && !infoEntry.timer) {
-            this.setInfoStateIfChanged('info.unknownEventDetails', infoEntry);
+            if (value !== undefined) {
+                details.set(id, { count: 1, lastValue: value });
+            }
+            else {
+                details.set(id, { count: 1 });
+            }
         }
     }
-    incInfoState(id) {
+    incInfoState(id, detailId, detailValue) {
         // Increment the given ID
         const infoEntry = this.getInfoEntry(id);
         if (infoEntry) {
             // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
             infoEntry.value = Number(infoEntry.value) + 1;
+            // If value given and this entry has details record that
+            if (infoEntry.detailsMap && detailId) {
+                this.addInfoDetailsEntry(infoEntry.detailsMap, detailId, detailValue);
+            }
             if (!infoEntry.timer) {
                 this.setInfoStateIfChanged(id, infoEntry);
             }
         }
     }
+    buildInfoDetails(src) {
+        // TODO: shouldn't this use JSON.stringify?
+        const out = [];
+        src.forEach((value, key) => {
+            if (value.lastValue !== undefined) {
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
+            }
+            else {
+                out.push({ id: key, count: value.count });
+            }
+        });
+        return JSON.stringify(out);
+    }
     setInfoStateIfChanged(id, infoEntry, shutdown = false) {
-        // Build the current value with callback if there is one
-        if (infoEntry.getValueCallback) {
-            infoEntry.value = infoEntry.getValueCallback();
-        }
         if (infoEntry.value != infoEntry.lastSet) {
+            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            // Store counter
             this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
-            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            // Store any details
+            if (infoEntry.detailsMap) {
+                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+            }
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
@@ -720,11 +803,38 @@ class Loxone extends utils.Adapter {
         }
         return found;
     }
-    addStateChangeListener(id, listener) {
-        this.stateChangeListeners[this.namespace + '.' + id] = listener;
+    addStateChangeListener(id, listener, opts) {
+        this.stateChangeListeners[this.namespace + '.' + id] = {
+            listener,
+            opts,
+            queuedVal: null,
+            ackTimer: null,
+        };
+    }
+    async checkStateForAck(id) {
+        const stateChangeListener = this.stateChangeListeners[id];
+        if (stateChangeListener) {
+            // This state change could be a result of a command we sent being ack'd
+            if (stateChangeListener.ackTimer) {
+                // Timer is running so clear it
+                this.log.debug(`Clearing ackTimer for ${id}`);
+                this.clearTimeout(stateChangeListener.ackTimer);
+                stateChangeListener.ackTimer = null;
+                // Send any command that may have been delayed waiting for this ack
+                await this.handleDelayedStateChange(id, stateChangeListener);
+            }
+            else {
+                this.log.debug(`No ackTimer for ${id}`);
+            }
+        }
+        else {
+            this.log.silly(`${id} has no stateChangeListener`);
+        }
     }
     async setStateAck(id, value) {
-        this.currentStateValues[this.namespace + '.' + id] = value;
+        const keyId = this.namespace + '.' + id;
+        this.currentStateValues[keyId] = value;
+        await this.checkStateForAck(keyId);
         await this.setStateAsync(id, { val: value, ack: true });
     }
     getCachedStateValue(id) {

@@ -23,11 +23,11 @@ class Dimmer extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
         this.addStateChangeListener(uuid + '.on', () => {
             this.sendCommand(control.uuidAction, 'on');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
         this.addStateChangeListener(uuid + '.off', () => {
             this.sendCommand(control.uuidAction, 'off');
-        });
+        }, { selfAck: true });
     }
 }
 exports.Dimmer = Dimmer;

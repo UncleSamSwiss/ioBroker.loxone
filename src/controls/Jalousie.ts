@@ -90,45 +90,51 @@ export class Jalousie extends ControlBase {
                 this.sendCommand(control.uuidAction, 'DownOff');
             }
         });
-        this.addStateChangeListener(uuid + '.autoActive', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue == oldValue) {
-                return;
-            } else if (newValue) {
-                this.sendCommand(control.uuidAction, 'auto');
-            } else {
-                this.sendCommand(control.uuidAction, 'NoAuto');
-            }
-        });
+        this.addStateChangeListener(
+            uuid + '.autoActive',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                if (newValue) {
+                    this.sendCommand(control.uuidAction, 'auto');
+                } else {
+                    this.sendCommand(control.uuidAction, 'NoAuto');
+                }
+            },
+            { notIfEqual: true },
+        );
 
         // for Alexa support:
         // ... but this is not really Alexa specific to be fair
         if (control.states.position) {
-            this.addStateChangeListener(uuid + '.position', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                oldValue = this.convertStateToInt(oldValue);
-                newValue = Math.max(0, Math.min(100, this.convertStateToInt(newValue))); // 0 <= newValue <= 100
-                if (oldValue == newValue) {
-                    return;
-                }
+            this.addStateChangeListener(
+                uuid + '.position',
+                (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                    if (typeof oldValue !== 'number' || typeof newValue !== 'number') {
+                        // This should never happen due to convertToInt flag
+                        this.adapter.log.error(`Jalousie position is not a number`);
+                        return;
+                    }
 
-                if (newValue == 100) {
-                    this.sendCommand(control.uuidAction, 'FullDown');
-                    return;
-                }
-                if (newValue === 0) {
-                    this.sendCommand(control.uuidAction, 'FullUp');
-                    return;
-                }
+                    if (newValue === 100) {
+                        this.sendCommand(control.uuidAction, 'FullDown');
+                        return;
+                    }
+                    if (newValue === 0) {
+                        this.sendCommand(control.uuidAction, 'FullUp');
+                        return;
+                    }
 
-                this.upDownAutoCommandHandled = false;
-                if (oldValue < newValue) {
-                    this.positionTarget = (newValue - 5) / 100;
-                    this.sendCommand(control.uuidAction, 'down');
-                } else {
-                    // Negative here because we use -ve numbers to indicate movement up
-                    this.positionTarget = -(newValue + 5) / 100;
-                    this.sendCommand(control.uuidAction, 'up');
-                }
-            });
+                    this.upDownAutoCommandHandled = false;
+                    if (oldValue < newValue) {
+                        this.positionTarget = (newValue - 5) / 100;
+                        this.sendCommand(control.uuidAction, 'down');
+                    } else {
+                        // Negative here because we use -ve numbers to indicate movement up
+                        this.positionTarget = -(newValue + 5) / 100;
+                        this.sendCommand(control.uuidAction, 'up');
+                    }
+                },
+                { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 },
+            );
 
             this.addStateEventHandler(
                 control.states.position,
@@ -156,19 +162,31 @@ export class Jalousie extends ControlBase {
         }
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
-        this.addStateChangeListener(uuid + '.fullUp', () => {
-            this.sendCommand(control.uuidAction, 'FullUp');
-        });
+        this.addStateChangeListener(
+            uuid + '.fullUp',
+            () => {
+                this.sendCommand(control.uuidAction, 'FullUp');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullDown');
-        this.addStateChangeListener(uuid + '.fullDown', () => {
-            this.sendCommand(control.uuidAction, 'FullDown');
-        });
+        this.addStateChangeListener(
+            uuid + '.fullDown',
+            () => {
+                this.sendCommand(control.uuidAction, 'FullDown');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'shade');
-        this.addStateChangeListener(uuid + '.shade', () => {
-            this.sendCommand(control.uuidAction, 'shade');
-        });
+        this.addStateChangeListener(
+            uuid + '.shade',
+            () => {
+                this.sendCommand(control.uuidAction, 'shade');
+            },
+            { selfAck: true },
+        );
     }
 
     // The upDownChangeHandler callback will be triggered when any movement starts or stops.

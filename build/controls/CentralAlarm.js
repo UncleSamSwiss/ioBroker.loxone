@@ -15,15 +15,15 @@ class CentralAlarm extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'armed');
         this.addStateChangeListener(uuid + '.armed', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'delayedOn');
         this.addStateChangeListener(uuid + '.delayedOn', () => {
             this.sendCommand(control.uuidAction, 'delayedon');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(uuid + '.quit', () => {
             this.sendCommand(control.uuidAction, 'quit');
-        });
+        }, { selfAck: true });
     }
 }
 exports.CentralAlarm = CentralAlarm;

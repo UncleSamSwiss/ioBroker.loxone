@@ -105,11 +105,11 @@ class AudioZone extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'prev');
         this.addStateChangeListener(uuid + '.prev', () => {
             this.sendCommand(control.uuidAction, 'prev');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'next');
         this.addStateChangeListener(uuid + '.next', () => {
             this.sendCommand(control.uuidAction, 'next');
-        });
+        }, { selfAck: true });
     }
 }
 exports.AudioZone = AudioZone;

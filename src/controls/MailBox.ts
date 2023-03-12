@@ -51,14 +51,22 @@ export class MailBox extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmPacket');
-        this.addStateChangeListener(uuid + '.confirmPacket', () => {
-            this.sendCommand(control.uuidAction, 'confirmPacket');
-        });
+        this.addStateChangeListener(
+            uuid + '.confirmPacket',
+            () => {
+                this.sendCommand(control.uuidAction, 'confirmPacket');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmMail');
-        this.addStateChangeListener(uuid + '.confirmMail', () => {
-            this.sendCommand(control.uuidAction, 'confirmMail');
-        });
+        this.addStateChangeListener(
+            uuid + '.confirmMail',
+            () => {
+                this.sendCommand(control.uuidAction, 'confirmMail');
+            },
+            { selfAck: true },
+        );
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disableNotifications', 'level.timer');
         this.addStateChangeListener(

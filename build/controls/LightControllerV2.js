@@ -155,11 +155,11 @@ class LightControllerV2 extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
         this.addStateChangeListener(uuid + '.plus', () => {
             this.sendCommand(control.uuidAction, 'plus');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'minus');
         this.addStateChangeListener(uuid + '.minus', () => {
             this.sendCommand(control.uuidAction, 'minus');
-        });
+        }, { selfAck: true });
         // TODO: add Alexa support! (how???)
         // TODO: currently we don't support scene modifications ("learn" and "delete" commands),
         // IMHO this should be done by the user through the Loxone Web interface

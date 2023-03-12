@@ -69,11 +69,11 @@ class Alarm extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'delayedOn');
         this.addStateChangeListener(uuid + '.delayedOn', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, 'delayedon/' + (newValue ? 1 : 0));
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(uuid + '.quit', () => {
             this.sendCommand(control.uuidAction, 'quit');
-        });
+        }, { selfAck: true });
         // subControls are not needed because "sensors" already contains the information from the tracker
     }
 }

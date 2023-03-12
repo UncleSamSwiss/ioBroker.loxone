@@ -23,7 +23,7 @@ class Intercom extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'answer');
         this.addStateChangeListener(uuid + '.answer', () => {
             this.sendCommand(control.uuidAction, 'answer');
-        });
+        }, { selfAck: true });
         await this.loadSubControlsAsync(uuid, control);
     }
 }

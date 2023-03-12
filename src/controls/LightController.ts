@@ -57,14 +57,22 @@ export class LightController extends ControlBase {
         }
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
-        this.addStateChangeListener(uuid + '.plus', () => {
-            this.sendCommand(control.uuidAction, 'plus');
-        });
+        this.addStateChangeListener(
+            uuid + '.plus',
+            () => {
+                this.sendCommand(control.uuidAction, 'plus');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'minus');
-        this.addStateChangeListener(uuid + '.minus', () => {
-            this.sendCommand(control.uuidAction, 'minus');
-        });
+        this.addStateChangeListener(
+            uuid + '.minus',
+            () => {
+                this.sendCommand(control.uuidAction, 'minus');
+            },
+            { selfAck: true },
+        );
 
         // for Alexa support:
         await this.createButtonCommandStateObjectAsync(
@@ -73,13 +81,17 @@ export class LightController extends ControlBase {
             'control',
             /* TODO: re-add: { smartIgnore: false }*/
         );
-        this.addStateChangeListener(uuid + '.control', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue) {
-                this.sendCommand(control.uuidAction, 'on');
-            } else {
-                this.sendCommand(control.uuidAction, '0');
-            }
-        });
+        this.addStateChangeListener(
+            uuid + '.control',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                if (newValue) {
+                    this.sendCommand(control.uuidAction, 'on');
+                } else {
+                    this.sendCommand(control.uuidAction, '0');
+                }
+            },
+            { selfAck: true },
+        );
 
         // TODO: currently we don't support scene modifications ("learn" and "delete" commands),
         // IMHO this should be done by the user through the Loxone Web interface

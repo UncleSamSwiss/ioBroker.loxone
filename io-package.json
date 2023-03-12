@@ -351,6 +351,32 @@
             "native": {}
         },
         {
+            "_id": "info.ackTimeouts",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of commands sent to Loxone not acknowledged within timeout period",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.ackTimeoutsDetail",
+            "type": "state",
+            "common": {
+                "role": "json",
+                "name": "Array detailing ack timeouts - for debugging only & not persistant across restarts",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
             "_id": "info.messagesReceived",
             "type": "state",
             "common": {
@@ -377,6 +403,32 @@
             "native": {}
         },
         {
+            "_id": "info.stateChangesDelayed",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of state changes delayed while waiting for Loxone to acknowledge",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.stateChangesDiscarded",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of state changes discarded while waiting for Loxone to acknowledge",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
             "_id": "info.unknownEvents",
             "type": "state",
             "common": {
@@ -390,11 +442,11 @@
             "native": {}
         },
         {
-            "_id": "info.unknownEventDetails",
+            "_id": "info.unknownEventsDetail",
             "type": "state",
             "common": {
                 "role": "json",
-                "name": "Array detailing unknown events received",
+                "name": "Array detailing unknown events - for debugging only & not persistant across restarts",
                 "type": "string",
                 "read": true,
                 "write": false,

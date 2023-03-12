@@ -71,26 +71,23 @@ class Jalousie extends control_base_1.ControlBase {
             }
         });
         this.addStateChangeListener(uuid + '.autoActive', (oldValue, newValue) => {
-            if (newValue == oldValue) {
-                return;
-            }
-            else if (newValue) {
+            if (newValue) {
                 this.sendCommand(control.uuidAction, 'auto');
             }
             else {
                 this.sendCommand(control.uuidAction, 'NoAuto');
             }
-        });
+        }, { notIfEqual: true });
         // for Alexa support:
         // ... but this is not really Alexa specific to be fair
         if (control.states.position) {
             this.addStateChangeListener(uuid + '.position', (oldValue, newValue) => {
-                oldValue = this.convertStateToInt(oldValue);
-                newValue = Math.max(0, Math.min(100, this.convertStateToInt(newValue))); // 0 <= newValue <= 100
-                if (oldValue == newValue) {
+                if (typeof oldValue !== 'number' || typeof newValue !== 'number') {
+                    // This should never happen due to convertToInt flag
+                    this.adapter.log.error(`Jalousie position is not a number`);
                     return;
                 }
-                if (newValue == 100) {
+                if (newValue === 100) {
                     this.sendCommand(control.uuidAction, 'FullDown');
                     return;
                 }
@@ -108,7 +105,7 @@ class Jalousie extends control_base_1.ControlBase {
                     this.positionTarget = -(newValue + 5) / 100;
                     this.sendCommand(control.uuidAction, 'up');
                 }
-            });
+            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 });
             this.addStateEventHandler(control.states.position, async (value) => {
                 if (typeof this.positionTarget === 'number') {
                     // Below, the actual command ('up' or 'down') is irrelevant but we
@@ -133,15 +130,15 @@ class Jalousie extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
         this.addStateChangeListener(uuid + '.fullUp', () => {
             this.sendCommand(control.uuidAction, 'FullUp');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullDown');
         this.addStateChangeListener(uuid + '.fullDown', () => {
             this.sendCommand(control.uuidAction, 'FullDown');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'shade');
         this.addStateChangeListener(uuid + '.shade', () => {
             this.sendCommand(control.uuidAction, 'shade');
-        });
+        }, { selfAck: true });
     }
     async upDownChangeHandler() {
         if (this.upDownAutoCommandHandled) {

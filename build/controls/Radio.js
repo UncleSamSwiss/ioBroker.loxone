@@ -25,9 +25,6 @@ class Radio extends control_base_1.ControlBase {
             write: true,
         });
         this.addStateChangeListener(uuid + '.activeOutput', (oldValue, newValue) => {
-            if (newValue == oldValue) {
-                return;
-            }
             const value = this.convertStateToInt(newValue);
             if (value === 0) {
                 this.sendCommand(control.uuidAction, 'reset');
@@ -35,7 +32,7 @@ class Radio extends control_base_1.ControlBase {
             else if (states.hasOwnProperty(value)) {
                 this.sendCommand(control.uuidAction, value.toString());
             }
-        });
+        }, { notIfEqual: true });
     }
 }
 exports.Radio = Radio;
