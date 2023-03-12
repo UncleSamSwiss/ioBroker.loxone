@@ -133,7 +133,7 @@ export class Jalousie extends ControlBase {
                         this.sendCommand(control.uuidAction, 'up');
                     }
                 },
-                { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100 },
+                { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 },
             );
 
             this.addStateEventHandler(

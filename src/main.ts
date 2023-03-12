@@ -26,6 +26,7 @@ export type StateChangeListenerOpts = {
     convertToInt?: boolean; // Convert state values to integers
     minInt?: number; // Values below minInt will be set to this value
     maxInt?: number; // Values above maxInt will be set to this value
+    ackTimeoutMs?: number; // Override default timeout
 };
 export type StateChangeListenEntry = {
     listener: StateChangeListener;
@@ -353,7 +354,7 @@ export class Loxone extends utils.Adapter {
                     // Even though this is a timeout, handle any change that may have been delayed waiting for this
                     await this.handleDelayedStateChange(id, stateChangeListener);
                 },
-                ackTimeoutMs,
+                stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
                 id,
                 stateChangeListener,
             );

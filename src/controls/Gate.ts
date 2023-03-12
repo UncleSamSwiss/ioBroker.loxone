@@ -124,7 +124,7 @@ export class Gate extends ControlBase {
                         listenerName,
                     );
                 },
-                { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100 },
+                { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 },
             );
         }
     }

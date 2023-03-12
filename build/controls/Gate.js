@@ -96,7 +96,7 @@ class Gate extends control_base_1.ControlBase {
                         this.sendCommand(control.uuidAction, 'open');
                     }
                 }, listenerName);
-            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100 });
+            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 });
         }
     }
 }

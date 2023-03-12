@@ -259,7 +259,7 @@ class Loxone extends utils.Adapter {
         return !value ? 0 : parseInt(value.toString());
     }
     async handleStateChange(id, stateChangeListener, val) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f;
         if ((_a = stateChangeListener.opts) === null || _a === void 0 ? void 0 : _a.convertToInt) {
             // Convert any values to ints within range if necessary.
             val = this.convertStateToInt(val);
@@ -284,7 +284,7 @@ class Loxone extends utils.Adapter {
                 stateChangeListener.ackTimer = null;
                 // Even though this is a timeout, handle any change that may have been delayed waiting for this
                 await this.handleDelayedStateChange(id, stateChangeListener);
-            }, ackTimeoutMs, id, stateChangeListener);
+            }, ((_e = stateChangeListener.opts) === null || _e === void 0 ? void 0 : _e.ackTimeoutMs) ? (_f = stateChangeListener.opts) === null || _f === void 0 ? void 0 : _f.ackTimeoutMs : ackTimeoutMs, id, stateChangeListener);
             stateChangeListener.listener(this.currentStateValues[id], val);
         }
     }

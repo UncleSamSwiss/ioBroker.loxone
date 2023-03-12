@@ -105,7 +105,7 @@ class Jalousie extends control_base_1.ControlBase {
                     this.positionTarget = -(newValue + 5) / 100;
                     this.sendCommand(control.uuidAction, 'up');
                 }
-            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100 });
+            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 });
             this.addStateEventHandler(control.states.position, async (value) => {
                 if (typeof this.positionTarget === 'number') {
                     // Below, the actual command ('up' or 'down') is irrelevant but we
