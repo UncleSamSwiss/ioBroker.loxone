@@ -5,6 +5,7 @@ import {
     NamedStateEventHandler,
     OldStateValue,
     StateChangeListener,
+    StateChangeListenerOpts,
     StateEventHandler,
 } from './main';
 import { Control, ControlStates } from './structure-file';
@@ -16,9 +17,9 @@ export abstract class LoxoneHandlerBase {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
     }
 
-    protected addStateChangeListener(id: string, listener: StateChangeListener, loxoneAcks = true): void {
+    protected addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
         // TODO: Perhaps loxoneAcks should be more complex to cater for when ack comes back in different state.
-        this.adapter.addStateChangeListener(id, listener, loxoneAcks);
+        this.adapter.addStateChangeListener(id, listener, opts);
     }
 
     protected addStateEventHandler(uuid: string, eventHandler: StateEventHandler, name?: string): void {
@@ -43,7 +44,7 @@ export abstract class LoxoneHandlerBase {
     }
 
     protected convertStateToInt(value: OldStateValue): number {
-        return !value ? 0 : parseInt(value.toString());
+        return this.adapter.convertStateToInt(value);
     }
 
     protected convertStateToFloat(value: OldStateValue): number {
