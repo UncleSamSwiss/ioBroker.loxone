@@ -209,7 +209,7 @@ class Loxone extends utils.Adapter {
     /**
      * Is called if a subscribed state changes
      */
-    onStateChange(id, state) {
+    async onStateChange(id, state) {
         // Warning: state can be null if it was deleted!
         if (!id || !state || state.ack) {
             // Do nothing
@@ -250,25 +250,48 @@ class Loxone extends utils.Adapter {
                 }
                 else {
                     // Ack timer is not running, so we're all good to handle this
-                    this.handleStateChange(id, stateChangeListener, state.val);
+                    await this.handleStateChange(id, stateChangeListener, state.val);
                 }
             }
         }
     }
-    handleStateChange(id, stateChangeListener, val) {
-        stateChangeListener.ackTimer = this.setTimeout((id, stateChangeListener) => {
-            this.log.warn(`Timeout for ack ${id}`);
-            this.incInfoState('info.ackTimeouts', id);
-            stateChangeListener.ackTimer = null;
-            // Even though this is a timeout, handle any change that may have been delayed waiting for this
-            this.handleDelayedStateChange(id, stateChangeListener);
-        }, ackTimeoutMs, id, stateChangeListener);
-        stateChangeListener.listener(this.currentStateValues[id], val);
+    convertStateToInt(value) {
+        return !value ? 0 : parseInt(value.toString());
     }
-    handleDelayedStateChange(id, stateChangeListener) {
+    async handleStateChange(id, stateChangeListener, val) {
+        var _a, _b, _c, _d;
+        if ((_a = stateChangeListener.opts) === null || _a === void 0 ? void 0 : _a.convertToInt) {
+            // Convert any values to ints within range if necessary.
+            val = this.convertStateToInt(val);
+            if (((_b = stateChangeListener.opts) === null || _b === void 0 ? void 0 : _b.minInt) !== undefined && val < stateChangeListener.opts.minInt) {
+                val = stateChangeListener.opts.minInt;
+            }
+            if (((_c = stateChangeListener.opts) === null || _c === void 0 ? void 0 : _c.maxInt) !== undefined && val > stateChangeListener.opts.maxInt) {
+                val = stateChangeListener.opts.maxInt;
+            }
+        }
+        if (((_d = stateChangeListener.opts) === null || _d === void 0 ? void 0 : _d.notIfEqual) && this.currentStateValues[id] === val) {
+            // new/old values are the same so don't send update.
+            // However, ack the state change as we have 'handled' this (by doing nothing)
+            this.log.debug(`State value is unchanged, no listener+self-ack: ${id} ${val}`);
+            await this.setStateAck(id, val);
+        }
+        else {
+            // Change will be handled by listener - set ack timeout and call it
+            stateChangeListener.ackTimer = this.setTimeout(async (id, stateChangeListener) => {
+                this.log.warn(`Timeout for ack ${id}`);
+                this.incInfoState('info.ackTimeouts', id);
+                stateChangeListener.ackTimer = null;
+                // Even though this is a timeout, handle any change that may have been delayed waiting for this
+                await this.handleDelayedStateChange(id, stateChangeListener);
+            }, ackTimeoutMs, id, stateChangeListener);
+            stateChangeListener.listener(this.currentStateValues[id], val);
+        }
+    }
+    async handleDelayedStateChange(id, stateChangeListener) {
         if (stateChangeListener.queuedVal !== null) {
             this.log.debug(`Handling delayed state: ${id} ${stateChangeListener.queuedVal}`);
-            this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
+            await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
             stateChangeListener.queuedVal = null;
         }
     }
@@ -772,17 +795,17 @@ class Loxone extends utils.Adapter {
         }
         return found;
     }
-    addStateChangeListener(id, listener, loxoneAcks) {
+    addStateChangeListener(id, listener, opts) {
         this.stateChangeListeners[this.namespace + '.' + id] = {
             listener,
-            loxoneAcks,
+            opts,
             queuedVal: null,
             ackTimer: null,
         };
     }
-    checkStateForAck(id) {
+    async checkStateForAck(id) {
         const stateChangeListener = this.stateChangeListeners[id];
-        if (stateChangeListener && stateChangeListener.loxoneAcks) {
+        if (stateChangeListener) {
             // This state change could be a result of a command we sent being ack'd
             if (stateChangeListener.ackTimer) {
                 // Timer is running so clear it
@@ -790,20 +813,20 @@ class Loxone extends utils.Adapter {
                 this.clearTimeout(stateChangeListener.ackTimer);
                 stateChangeListener.ackTimer = null;
                 // Send any command that may have been delayed waiting for this ack
-                this.handleDelayedStateChange(id, stateChangeListener);
+                await this.handleDelayedStateChange(id, stateChangeListener);
             }
             else {
                 this.log.debug(`No ackTimer for ${id}`);
             }
         }
         else {
-            this.log.silly(`${id} doesn't expect acks`);
+            this.log.silly(`${id} has no stateChangeListener`);
         }
     }
     async setStateAck(id, value) {
         const keyId = this.namespace + '.' + id;
         this.currentStateValues[keyId] = value;
-        this.checkStateForAck(keyId);
+        await this.checkStateForAck(keyId);
         await this.setStateAsync(id, { val: value, ack: true });
     }
     getCachedStateValue(id) {

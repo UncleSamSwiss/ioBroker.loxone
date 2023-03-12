@@ -21,9 +21,15 @@ export type OldStateValue = ioBroker.StateValue | null | undefined;
 export type CurrentStateValue = ioBroker.StateValue | null;
 
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
+export type StateChangeListenerOpts = {
+    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatically ack state change
+    convertToInt?: boolean; // Convert state values to integers
+    minInt?: number; // Values below minInt will be set to this value
+    maxInt?: number; // Values above maxInt will be set to this value
+};
 export type StateChangeListenEntry = {
     listener: StateChangeListener;
-    loxoneAcks: boolean;
+    opts?: StateChangeListenerOpts;
     queuedVal: ioBroker.StateValue | null;
     ackTimer: ioBroker.Timeout | null;
 };
@@ -269,7 +275,7 @@ export class Loxone extends utils.Adapter {
     /**
      * Is called if a subscribed state changes
      */
-    private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
+    private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         // Warning: state can be null if it was deleted!
         if (!id || !state || state.ack) {
             // Do nothing
@@ -307,32 +313,58 @@ export class Loxone extends utils.Adapter {
                     stateChangeListener.queuedVal = state.val;
                 } else {
                     // Ack timer is not running, so we're all good to handle this
-                    this.handleStateChange(id, stateChangeListener, state.val);
+                    await this.handleStateChange(id, stateChangeListener, state.val);
                 }
             }
         }
     }
 
-    private handleStateChange(id: string, stateChangeListener: StateChangeListenEntry, val: ioBroker.StateValue): void {
-        stateChangeListener.ackTimer = this.setTimeout(
-            (id: string, stateChangeListener: StateChangeListenEntry) => {
-                this.log.warn(`Timeout for ack ${id}`);
-                this.incInfoState('info.ackTimeouts', id);
-                stateChangeListener.ackTimer = null;
-                // Even though this is a timeout, handle any change that may have been delayed waiting for this
-                this.handleDelayedStateChange(id, stateChangeListener);
-            },
-            ackTimeoutMs,
-            id,
-            stateChangeListener,
-        );
-        stateChangeListener.listener(this.currentStateValues[id], val);
+    public convertStateToInt(value: OldStateValue): number {
+        return !value ? 0 : parseInt(value.toString());
     }
 
-    private handleDelayedStateChange(id: string, stateChangeListener: StateChangeListenEntry): void {
+    private async handleStateChange(
+        id: string,
+        stateChangeListener: StateChangeListenEntry,
+        val: ioBroker.StateValue,
+    ): Promise<void> {
+        if (stateChangeListener.opts?.convertToInt) {
+            // Convert any values to ints within range if necessary.
+            val = this.convertStateToInt(val);
+            if (stateChangeListener.opts?.minInt !== undefined && val < stateChangeListener.opts.minInt) {
+                val = stateChangeListener.opts.minInt;
+            }
+            if (stateChangeListener.opts?.maxInt !== undefined && val > stateChangeListener.opts.maxInt) {
+                val = stateChangeListener.opts.maxInt;
+            }
+        }
+        if (stateChangeListener.opts?.notIfEqual && this.currentStateValues[id] === val) {
+            // new/old values are the same so don't send update.
+            // However, ack the state change as we have 'handled' this (by doing nothing)
+            this.log.debug(`State value is unchanged, no listener+self-ack: ${id} ${val}`);
+            await this.setStateAck(id, val);
+        } else {
+            // Change will be handled by listener - set ack timeout and call it
+            stateChangeListener.ackTimer = this.setTimeout(
+                async (id: string, stateChangeListener: StateChangeListenEntry) => {
+                    this.log.warn(`Timeout for ack ${id}`);
+                    this.incInfoState('info.ackTimeouts', id);
+                    stateChangeListener.ackTimer = null;
+                    // Even though this is a timeout, handle any change that may have been delayed waiting for this
+                    await this.handleDelayedStateChange(id, stateChangeListener);
+                },
+                ackTimeoutMs,
+                id,
+                stateChangeListener,
+            );
+            stateChangeListener.listener(this.currentStateValues[id], val);
+        }
+    }
+
+    private async handleDelayedStateChange(id: string, stateChangeListener: StateChangeListenEntry): Promise<void> {
         if (stateChangeListener.queuedVal !== null) {
             this.log.debug(`Handling delayed state: ${id} ${stateChangeListener.queuedVal}`);
-            this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
+            await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
             stateChangeListener.queuedVal = null;
         }
     }
@@ -907,18 +939,18 @@ export class Loxone extends utils.Adapter {
         return found;
     }
 
-    public addStateChangeListener(id: string, listener: StateChangeListener, loxoneAcks: boolean): void {
+    public addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
         this.stateChangeListeners[this.namespace + '.' + id] = {
             listener,
-            loxoneAcks,
+            opts,
             queuedVal: null,
             ackTimer: null,
         };
     }
 
-    private checkStateForAck(id: string): void {
+    private async checkStateForAck(id: string): Promise<void> {
         const stateChangeListener = this.stateChangeListeners[id];
-        if (stateChangeListener && stateChangeListener.loxoneAcks) {
+        if (stateChangeListener) {
             // This state change could be a result of a command we sent being ack'd
             if (stateChangeListener.ackTimer) {
                 // Timer is running so clear it
@@ -926,19 +958,19 @@ export class Loxone extends utils.Adapter {
                 this.clearTimeout(stateChangeListener.ackTimer);
                 stateChangeListener.ackTimer = null;
                 // Send any command that may have been delayed waiting for this ack
-                this.handleDelayedStateChange(id, stateChangeListener);
+                await this.handleDelayedStateChange(id, stateChangeListener);
             } else {
                 this.log.debug(`No ackTimer for ${id}`);
             }
         } else {
-            this.log.silly(`${id} doesn't expect acks`);
+            this.log.silly(`${id} has no stateChangeListener`);
         }
     }
 
     public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
         const keyId = this.namespace + '.' + id;
         this.currentStateValues[keyId] = value;
-        this.checkStateForAck(keyId);
+        await this.checkStateForAck(keyId);
         await this.setStateAsync(id, { val: value, ack: true });
     }
 
