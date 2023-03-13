@@ -17,6 +17,8 @@ const WebSocketConfig = LxCommunicator.WebSocketConfig;
 // Log warnings if no ack event from Loxone in this time
 // TODO: should this be configurable?
 const ackTimeoutMs = 500;
+// Period between connection attempts
+const reconnectTimeoutMs = 5000;
 class Loxone extends utils.Adapter {
     constructor(options = {}) {
         super({
@@ -37,6 +39,7 @@ class Loxone extends utils.Adapter {
         this.queueRunning = false;
         this.reportedMissingControls = new Set();
         this.reportedUnsupportedStateChanges = new Set();
+        this.connectionInProgress = false;
         this.lxConnected = false;
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -123,17 +126,7 @@ class Loxone extends utils.Adapter {
         await this.connect();
         this.subscribeStates('*');
     }
-    async connect() {
-        this.log.info('Trying to connect');
-        try {
-            await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
-        }
-        catch (error) {
-            // do not stringify error, it can contain circular references
-            this.log.error(`Couldn't open socket`);
-            this.reconnect();
-            return false;
-        }
+    async loadStructureFile() {
         let file;
         try {
             const fileString = await this.socket.send('data/LoxAPP3.json');
@@ -142,8 +135,6 @@ class Loxone extends utils.Adapter {
         catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't get structure file`);
-            this.socket.close();
-            this.reconnect();
             return false;
         }
         this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
@@ -156,40 +147,68 @@ class Loxone extends utils.Adapter {
         try {
             await this.loadStructureFileAsync(file);
             this.log.debug('structure file successfully loaded');
-            // we are ready, let's set the connection indicator
-            this.setConnectionState(true);
         }
         catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't load structure file`);
             sentry === null || sentry === void 0 ? void 0 : sentry.captureException(error, { extra: { file } });
-            this.socket.close();
-            this.reconnect();
             return false;
         }
-        try {
-            await this.socket.send('jdev/sps/enablebinstatusupdate');
+        return true; // Success
+    }
+    async connect() {
+        if (this.connectionInProgress) {
+            this.log.warn('Connection already in progress');
         }
-        catch (error) {
-            // do not stringify error, it can contain circular references
-            this.log.error(`Couldn't enable status updates`);
-            this.socket.close();
-            this.reconnect();
-            return false;
+        else {
+            this.log.info('Trying to connect');
+            let success = true; // Assume success
+            try {
+                await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
+            }
+            catch (error) {
+                // do not stringify error, it can contain circular references
+                this.log.error(`Couldn't open socket`);
+                success = false;
+            }
+            if (success) {
+                success = await this.loadStructureFile();
+            }
+            if (success) {
+                try {
+                    await this.socket.send('jdev/sps/enablebinstatusupdate');
+                }
+                catch (error) {
+                    // do not stringify error, it can contain circular references
+                    this.log.error(`Couldn't enable status updates`);
+                    success = false;
+                }
+            }
+            this.connectionInProgress = false;
+            if (!success) {
+                this.log.debug('Connection failed - will retry after delay');
+                this.socket.close();
+                this.reconnect();
+            }
+            else {
+                // We are ready, let's set the connection indicator
+                this.setConnectionState(true);
+            }
         }
-        return true;
     }
     reconnect() {
         if (this.reconnectTimer) {
-            return;
+            this.log.debug('Reconnect called while timer already running');
         }
-        this.reconnectTimer = this.setTimeout(() => {
-            delete this.reconnectTimer;
-            this.connect().catch((e) => {
-                this.log.error(`Couldn't reconnect: ${e}`);
-                this.reconnect();
-            });
-        }, 5000);
+        else {
+            this.reconnectTimer = this.setTimeout(() => {
+                delete this.reconnectTimer;
+                this.connect().catch((e) => {
+                    this.log.error(`Couldn't reconnect: ${e}`);
+                    this.reconnect();
+                });
+            }, reconnectTimeoutMs);
+        }
     }
     setConnectionState(connected) {
         this.lxConnected = connected;
