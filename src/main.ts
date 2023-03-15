@@ -225,6 +225,8 @@ export class Loxone extends utils.Adapter {
             this.log.warn('Connection already in progress');
         } else {
             this.log.info('Trying to connect');
+            this.connectionInProgress = true;
+
             let success = true; // Assume success
 
             try {
@@ -269,6 +271,8 @@ export class Loxone extends utils.Adapter {
     private reconnect(): void {
         if (this.reconnectTimer) {
             this.log.debug('Reconnect called while timer already running');
+        } else if (this.connectionInProgress) {
+            this.log.debug('Reconnect called while connection in progress');
         } else {
             this.reconnectTimer = this.setTimeout(() => {
                 delete this.reconnectTimer;

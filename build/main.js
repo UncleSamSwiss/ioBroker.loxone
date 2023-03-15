@@ -162,6 +162,7 @@ class Loxone extends utils.Adapter {
         }
         else {
             this.log.info('Trying to connect');
+            this.connectionInProgress = true;
             let success = true; // Assume success
             try {
                 await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
@@ -199,6 +200,9 @@ class Loxone extends utils.Adapter {
     reconnect() {
         if (this.reconnectTimer) {
             this.log.debug('Reconnect called while timer already running');
+        }
+        else if (this.connectionInProgress) {
+            this.log.debug('Reconnect called while connection in progress');
         }
         else {
             this.reconnectTimer = this.setTimeout(() => {
