@@ -524,13 +524,14 @@ class Loxone extends utils.Adapter {
         }
     }
     async loadControlAsync(controlType, uuid, control) {
+        var _a;
         const type = control.type || 'None';
         if (type.match(/[^a-z0-9]/i)) {
             throw new Error(`Bad control type: ${type}`);
         }
         let controlObject;
         try {
-            const module = await Promise.resolve().then(() => require(`./controls/${type}`));
+            const module = await (_a = `./controls/${type}`, Promise.resolve().then(() => require(_a)));
             controlObject = new module[type](this);
         }
         catch (error) {
