@@ -118,14 +118,22 @@ export class SmokeAlarm extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'mute');
-        this.addStateChangeListener(uuid + '.mute', () => {
-            this.sendCommand(control.uuidAction, 'mute');
-        });
+        this.addStateChangeListener(
+            uuid + '.mute',
+            () => {
+                this.sendCommand(control.uuidAction, 'mute');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
-        this.addStateChangeListener(uuid + '.quit', () => {
-            this.sendCommand(control.uuidAction, 'quit');
-        });
+        this.addStateChangeListener(
+            uuid + '.quit',
+            () => {
+                this.sendCommand(control.uuidAction, 'quit');
+            },
+            { selfAck: true },
+        );
 
         this.addStateChangeListener(
             uuid + '.timeServiceMode',

@@ -61,9 +61,13 @@ export class AalSmartAlarm extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirm');
-        this.addStateChangeListener(uuid + '.confirm', () => {
-            this.sendCommand(control.uuidAction, 'confirm');
-        });
+        this.addStateChangeListener(
+            uuid + '.confirm',
+            () => {
+                this.sendCommand(control.uuidAction, 'confirm');
+            },
+            { selfAck: true },
+        );
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
         this.addStateChangeListener(uuid + '.disable', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
@@ -71,9 +75,13 @@ export class AalSmartAlarm extends ControlBase {
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'startDrill');
-        this.addStateChangeListener(uuid + '.startDrill', () => {
-            this.sendCommand(control.uuidAction, 'startDrill');
-        });
+        this.addStateChangeListener(
+            uuid + '.startDrill',
+            () => {
+                this.sendCommand(control.uuidAction, 'startDrill');
+            },
+            { selfAck: true },
+        );
 
         await this.loadSubControlsAsync(uuid, control);
     }

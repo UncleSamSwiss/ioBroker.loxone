@@ -31,12 +31,7 @@ class Gate extends control_base_1.ControlBase {
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'preventOpen', 'indicator');
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'preventClose', 'indicator');
         this.addStateChangeListener(uuid + '.active', (oldValue, newValue) => {
-            oldValue = this.convertStateToInt(oldValue);
-            newValue = this.convertStateToInt(newValue);
-            if (newValue === oldValue) {
-                return;
-            }
-            else if (newValue === 1) {
+            if (newValue === 1) {
                 if (oldValue === -1) {
                     // open twice because we are currently closing
                     this.sendCommand(control.uuidAction, 'open');
@@ -58,21 +53,21 @@ class Gate extends control_base_1.ControlBase {
                     this.sendCommand(control.uuidAction, 'open');
                 }
             }
-        });
+        }, { notIfEqual: true, convertToInt: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
         this.addStateChangeListener(uuid + '.open', () => {
             this.sendCommand(control.uuidAction, 'open');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'close');
         this.addStateChangeListener(uuid + '.close', () => {
             this.sendCommand(control.uuidAction, 'close');
-        });
+        }, { selfAck: true });
         // for Alexa support:
         if (control.states.position) {
             this.addStateChangeListener(uuid + '.position', (oldValue, newValue) => {
-                newValue = Math.max(0, Math.min(100, this.convertStateToInt(newValue))); // 0 <= newValue <= 100
-                oldValue = this.convertStateToInt(oldValue);
-                if (oldValue == newValue) {
+                if (typeof oldValue !== 'number' || typeof newValue !== 'number') {
+                    // This should never happen due to convertToInt flag
+                    this.adapter.log.error(`Gate position is not a number`);
                     return;
                 }
                 let targetValue;
@@ -87,7 +82,7 @@ class Gate extends control_base_1.ControlBase {
                     this.sendCommand(control.uuidAction, 'close');
                     isOpening = false;
                 }
-                if (newValue == 100 || newValue === 0) {
+                if (newValue === 100 || newValue === 0) {
                     return;
                 }
                 const listenerName = 'auto';
@@ -101,7 +96,7 @@ class Gate extends control_base_1.ControlBase {
                         this.sendCommand(control.uuidAction, 'open');
                     }
                 }, listenerName);
-            });
+            }, { notIfEqual: true, convertToInt: true, minInt: 0, maxInt: 100, ackTimeoutMs: 2500 });
         }
     }
 }

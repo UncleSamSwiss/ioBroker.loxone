@@ -9,8 +9,8 @@ class LoxoneHandlerBase {
     async loadSubControlsAsync(parentUuid, control) {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
     }
-    addStateChangeListener(id, listener) {
-        this.adapter.addStateChangeListener(id, listener);
+    addStateChangeListener(id, listener, opts) {
+        this.adapter.addStateChangeListener(id, listener, opts);
     }
     addStateEventHandler(uuid, eventHandler, name) {
         this.adapter.addStateEventHandler(uuid, eventHandler, name);
@@ -29,7 +29,7 @@ class LoxoneHandlerBase {
         await this.setStateAck(id, value);
     }
     convertStateToInt(value) {
-        return !value ? 0 : parseInt(value.toString());
+        return this.adapter.convertStateToInt(value);
     }
     convertStateToFloat(value) {
         if (typeof value === 'number') {

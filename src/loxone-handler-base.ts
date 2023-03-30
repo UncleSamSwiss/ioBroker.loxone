@@ -5,6 +5,7 @@ import {
     NamedStateEventHandler,
     OldStateValue,
     StateChangeListener,
+    StateChangeListenerOpts,
     StateEventHandler,
 } from './main';
 import { Control, ControlStates } from './structure-file';
@@ -16,8 +17,8 @@ export abstract class LoxoneHandlerBase {
         return await this.adapter.loadSubControlsAsync(parentUuid, control);
     }
 
-    protected addStateChangeListener(id: string, listener: StateChangeListener): void {
-        this.adapter.addStateChangeListener(id, listener);
+    protected addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
+        this.adapter.addStateChangeListener(id, listener, opts);
     }
 
     protected addStateEventHandler(uuid: string, eventHandler: StateEventHandler, name?: string): void {
@@ -42,7 +43,7 @@ export abstract class LoxoneHandlerBase {
     }
 
     protected convertStateToInt(value: OldStateValue): number {
-        return !value ? 0 : parseInt(value.toString());
+        return this.adapter.convertStateToInt(value);
     }
 
     protected convertStateToFloat(value: OldStateValue): number {

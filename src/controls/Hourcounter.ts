@@ -84,13 +84,21 @@ export class Hourcounter extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'reset');
-        this.addStateChangeListener(uuid + '.reset', () => {
-            this.sendCommand(control.uuidAction, 'reset');
-        });
+        this.addStateChangeListener(
+            uuid + '.reset',
+            () => {
+                this.sendCommand(control.uuidAction, 'reset');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'resetAll');
-        this.addStateChangeListener(uuid + '.resetAll', () => {
-            this.sendCommand(control.uuidAction, 'resetAll');
-        });
+        this.addStateChangeListener(
+            uuid + '.resetAll',
+            () => {
+                this.sendCommand(control.uuidAction, 'resetAll');
+            },
+            { selfAck: true },
+        );
     }
 }

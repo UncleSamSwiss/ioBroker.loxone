@@ -112,7 +112,7 @@ class Daytimer extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
         this.addStateChangeListener(uuid + '.pulse', () => {
             this.sendCommand(control.uuidAction, 'pulse');
-        });
+        }, { selfAck: true });
     }
 }
 exports.Daytimer = Daytimer;

@@ -18,7 +18,7 @@ class Meter extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'reset');
         this.addStateChangeListener(uuid + '.reset', () => {
             this.sendCommand(control.uuidAction, 'reset');
-        });
+        }, { selfAck: true });
         if (!control.hasOwnProperty('details')) {
             return;
         }

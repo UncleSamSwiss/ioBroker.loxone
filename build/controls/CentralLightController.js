@@ -20,7 +20,7 @@ class CentralLightController extends control_base_1.ControlBase {
             else {
                 this.sendCommand(control.uuidAction, 'reset');
             }
-        });
+        }, { selfAck: true });
     }
 }
 exports.CentralLightController = CentralLightController;

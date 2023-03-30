@@ -25,11 +25,11 @@ class MailBox extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmPacket');
         this.addStateChangeListener(uuid + '.confirmPacket', () => {
             this.sendCommand(control.uuidAction, 'confirmPacket');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmMail');
         this.addStateChangeListener(uuid + '.confirmMail', () => {
             this.sendCommand(control.uuidAction, 'confirmMail');
-        });
+        }, { selfAck: true });
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disableNotifications', 'level.timer');
         this.addStateChangeListener(uuid + '.disableNotifications', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, `disableNotifications/${newValue || '0'}`);

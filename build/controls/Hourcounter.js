@@ -35,11 +35,11 @@ class Hourcounter extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'reset');
         this.addStateChangeListener(uuid + '.reset', () => {
             this.sendCommand(control.uuidAction, 'reset');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'resetAll');
         this.addStateChangeListener(uuid + '.resetAll', () => {
             this.sendCommand(control.uuidAction, 'resetAll');
-        });
+        }, { selfAck: true });
     }
 }
 exports.Hourcounter = Hourcounter;

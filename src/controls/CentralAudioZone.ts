@@ -19,8 +19,12 @@ export class CentralAudioZone extends ControlBase {
             'control',
             /* TODO: re-add: { smartIgnore: false }, */
         );
-        this.addStateChangeListener(uuid + '.control', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
-        });
+        this.addStateChangeListener(
+            uuid + '.control',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
+            },
+            { selfAck: true },
+        );
     }
 }
