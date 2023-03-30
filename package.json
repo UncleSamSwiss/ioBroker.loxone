@@ -1,6 +1,6 @@
 {
   "name": "iobroker.loxone",
-  "version": "3.0.1",
+  "version": "3.0.0",
   "description": "Communicates with a Loxone Miniserver.",
   "author": {
     "name": "UncleSamSwiss",
@@ -36,6 +36,9 @@
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.9",
+    "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
+    "@alcalzone/release-script-plugin-license": "^3.5.9",
+    "@alcalzone/release-script-plugin-manual-review": "^3.5.9",
     "@iobroker/adapter-dev": "^1.2.0",
     "@iobroker/testing": "^4.1.0",
     "@types/chai": "^4.3.4",
