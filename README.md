@@ -731,6 +731,7 @@ Native value from ioBroker &gt; Objects
 ### **WORK IN PROGRESS**
 
 -   (raintonr) Added info statistics (#364)
+-   (raintonr) Added missing states from IRCv2 (#365)
 -   (raintonr) Added basic functionality for Remote (Media Controller)
 -   (raintonr) Fixed ack overwrites of fast changing states (#399) and general ack improvements
 -   (raintonr) Fix crash when state changes occur during Miniserver reboot or otherwise unavailable (#298)
