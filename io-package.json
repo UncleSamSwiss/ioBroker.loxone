@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "loxone",
-        "version": "3.0.0",
+        "version": "3.0.1",
         "news": {
+            "3.0.1": {
+                "en": "Added info statistics (#364)\nAdded missing states from IRCv2 (#365)\nAdded basic functionality for Remote (Media Controller)\nFixed ack overwrites of fast changing states (#399) and general ack improvements\nFix crash when state changes occur during Miniserver reboot or otherwise unavailable (#298)",
+                "de": "Zusätzliche Info-Statistik (#364)\nHinzugefügt fehlende Zustände von IRCv2 (#365)\nBasisfunktionalität für Remote (Media Controller) hinzugefügt\nBehobene ack Überschreiben von schnell sich ändernden Zuständen (#399) und allgemeine ack Verbesserungen\nCrash beheben, wenn während des Miniserver-Neustarts Zustandsänderungen auftreten oder sonst nicht verfügbar (#298)",
+                "ru": "Добавлена статистика объявлений (#364)\nДобавлены отсутствующие штаты от IRCv2 (#365)\nДобавлена базовая функциональность для Remote (Media Controller)\nФиксированные перезаписи быстро меняющихся государств (#399) и общие улучшения ack\nИсправление аварии, когда изменения состояния происходят во время перезагрузки Miniserver или в противном случае не доступны (#298)",
+                "pt": "Adicionado estatísticas de informação (#364)\nAdicionado estados ausentes de IRCv2 (#365)\nAdicionada funcionalidade básica para Remote (Media Controller)\nSubstituições de ack fixos de estados de mudança rápida (#399) e melhorias de ack geral\nCorrigir acidente quando as alterações de estado ocorrem durante a reinicialização do Miniserver ou de outra forma indisponível (#298)",
+                "nl": "Vermeld info statistieken (364)\nVermiste staten van IRCV2 (365)\nToegevoegd basis functionaliteit voor verwijdering (Media Controller)\nVertaling:\nVerslag als de staat verandert tijdens het herstarten van Miniserver of anders onbereikbaar (#298)",
+                "fr": "Statistiques d'information supplémentaires (#364)\nAjout d'états manquants de IRCv2 (#365)\nAjout de la fonctionnalité de base pour Remote (Media Controller)\nRéparation des écrasements d'états en évolution rapide (#399) et amélioration générale des ack\nCorrection d'un crash lorsque des changements d'état surviennent pendant le redémarrage de Miniserver ou autrement indisponible (#298)",
+                "it": "Ulteriori informazioni statistiche (#364)\nAggiunto stati mancanti da IRCv2 (#365)\nAggiunta funzionalità di base per Remote (Media Controller)\nRisolto ack sovrascritture di stati in rapida evoluzione (#399) e miglioramenti generali di ack\nFissare l'incidente quando si verificano cambiamenti di stato durante il riavvio Miniserver o altrimenti non disponibile (#298)",
+                "es": "Estadísticas de información agregada (#364)\nEstados desaparecidos adicionales del IRCv2 (#365)\nFunción básica agregada para control remoto (Media Controller)\nSobreescritura fija de estados de cambio rápido (#399) y mejoras en la cubierta general\nCorregir el accidente cuando se producen cambios estatales durante el reinicio de Miniserver o de otra manera no disponible (#298)",
+                "pl": "Dane info (#364)\nZaginięcie stanu z IRCv2 (#365)\nPodstawową funkcjonalność dla Remote (Media Controller)\nFixed acknowledges of fast changing states (#399) \nSzybko rozbije się, gdy stanowe zmiany zachodzą podczas rebootu Miniserver lub w przeciwnym wypadku (#298)",
+                "uk": "Додано статистику інформації (#364)\nДодано відсутні стани з IRCv2 (#365)\nДодано базову функціональність для пульта дистанційного керування (Media Controller)\nВиправлені перезаписи швидко змінених станів (#399) та загальне покращення ack\nВиправлення аварійної ситуації, коли відбуваються зміни в перезавантаженні міні-сервера або іншим чином (#298)",
+                "zh-cn": "增加fo统计(第364号)\nIRCv2(第365)号决议)\n增加遥感基本功能\n固定的快速变化国家(第399号)和总体改进\n当国家变化发生时,在明尼奥岛重新部署或以其他方式无法提供(第298号)"
+            },
             "3.0.0": {
                 "en": "Changed to lxcommunicator (fixes #210)\nUpdated all dependencies",
                 "de": "Zu lxcommunicator geändert (Fixes #210)\nAlle Abhängigkeiten aktualisiert",
