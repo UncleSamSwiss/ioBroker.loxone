@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Unknown = void 0;
-const SentryNode = require("@sentry/node");
 const control_base_1 = require("./control-base");
 /**
  * This class is used if the control has an unknown type.
@@ -22,7 +21,7 @@ class Unknown extends control_base_1.ControlBase {
                 const sentry = this.adapter.getSentry();
                 sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
                     scope.setExtra('control', JSON.stringify(control, null, 2));
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                    sentry.captureMessage(msg, 'warning');
                 });
             }
         }

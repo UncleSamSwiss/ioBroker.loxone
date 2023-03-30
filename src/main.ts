@@ -326,7 +326,7 @@ export class Loxone extends utils.Adapter {
                     const sentry = this.getSentry();
                     sentry?.withScope((scope) => {
                         scope.setExtra('state', state);
-                        sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                        sentry.captureMessage(msg, 'warning');
                     });
                 }
             } else if (!this.lxConnected) {
@@ -428,7 +428,7 @@ export class Loxone extends utils.Adapter {
                             type: 'debug',
                             category: 'started',
                             message: `Structure file added to event ${attachmentEventId}`,
-                            level: SentryNode.Severity.Info,
+                            level: 'info',
                         });
                     }
                     return event;
@@ -440,10 +440,10 @@ export class Loxone extends utils.Adapter {
 
                 attachmentEventId = event.event_id;
 
-                const { host, path, projectId, port, protocol, user } = dsn;
+                const { host, path, projectId, port, protocol, publicKey } = dsn;
                 const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${
                     path !== '' ? `/${path}` : ''
-                }/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${user}&sentry_version=7&sentry_client=custom-javascript`;
+                }/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${publicKey}&sentry_version=7&sentry_client=custom-javascript`;
 
                 const form = new FormData();
                 form.append('att', JSON.stringify(data, null, 2), {
@@ -1041,7 +1041,7 @@ export class Loxone extends utils.Adapter {
 
     public reportError(message: string): void {
         this.log.error(message);
-        this.getSentry()?.captureMessage(message, SentryNode.Severity.Error);
+        this.getSentry()?.captureMessage(message, 'error');
     }
 }
 
