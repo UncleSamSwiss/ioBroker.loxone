@@ -1,4 +1,3 @@
-import * as SentryNode from '@sentry/node';
 import { Control } from '../structure-file';
 import { ControlBase, ControlType } from './control-base';
 
@@ -20,7 +19,7 @@ export class Unknown extends ControlBase {
                 const sentry = this.adapter.getSentry();
                 sentry?.withScope((scope) => {
                     scope.setExtra('control', JSON.stringify(control, null, 2));
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                    sentry.captureMessage(msg, 'warning');
                 });
             }
         }

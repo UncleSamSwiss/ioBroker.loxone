@@ -5,7 +5,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
-const SentryNode = require("@sentry/node");
 const axios_1 = require("axios");
 const LxCommunicator = require("lxcommunicator");
 const uuid_1 = require("uuid");
@@ -257,7 +256,7 @@ class Loxone extends utils.Adapter {
                     const sentry = this.getSentry();
                     sentry === null || sentry === void 0 ? void 0 : sentry.withScope((scope) => {
                         scope.setExtra('state', state);
-                        sentry.captureMessage(msg, SentryNode.Severity.Warning);
+                        sentry.captureMessage(msg, 'warning');
                     });
                 }
             }
@@ -349,7 +348,7 @@ class Loxone extends utils.Adapter {
                             type: 'debug',
                             category: 'started',
                             message: `Structure file added to event ${attachmentEventId}`,
-                            level: SentryNode.Severity.Info,
+                            level: 'info',
                         });
                     }
                     return event;
@@ -359,8 +358,8 @@ class Loxone extends utils.Adapter {
                     return event;
                 }
                 attachmentEventId = event.event_id;
-                const { host, path, projectId, port, protocol, user } = dsn;
-                const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${path !== '' ? `/${path}` : ''}/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${user}&sentry_version=7&sentry_client=custom-javascript`;
+                const { host, path, projectId, port, protocol, publicKey } = dsn;
+                const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${path !== '' ? `/${path}` : ''}/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${publicKey}&sentry_version=7&sentry_client=custom-javascript`;
                 const form = new FormData();
                 form.append('att', JSON.stringify(data, null, 2), {
                     contentType: 'application/json',
@@ -889,7 +888,7 @@ class Loxone extends utils.Adapter {
     reportError(message) {
         var _a;
         this.log.error(message);
-        (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureMessage(message, SentryNode.Severity.Error);
+        (_a = this.getSentry()) === null || _a === void 0 ? void 0 : _a.captureMessage(message, 'error');
     }
 }
 exports.Loxone = Loxone;
