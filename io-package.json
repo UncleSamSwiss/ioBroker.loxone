@@ -243,18 +243,6 @@
                 "es": "Se agregó la creación de un dispositivo vacío para todos los controles no compatibles (ayuda a determinar su configuración)",
                 "pl": "Dodano tworzenie pustego urządzenia dla wszystkich nieobsługiwanych elementów sterujących (pomaga ustalić jego konfigurację)",
                 "zh-cn": "为所有不受支持的控件添加了一个空设备的创建（帮助找出其配置）"
-            },
-            "0.0.1": {
-                "en": "initial commit",
-                "de": "initial commit",
-                "ru": "начальная фиксация",
-                "pt": "commit inicial",
-                "nl": "eerste vastlegging",
-                "fr": "engagement initial",
-                "it": "commit iniziale",
-                "es": "Compromiso inicial",
-                "pl": "wstępne zatwierdzenie",
-                "zh-cn": "初次提交"
             }
         },
         "title": "Loxone Miniserver",
