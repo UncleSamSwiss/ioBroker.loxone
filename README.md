@@ -727,8 +727,7 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 3.0.1 (2023-03-30)
 
 -   (raintonr) Added info statistics (#364)
 -   (raintonr) Added missing states from IRCv2 (#365)
