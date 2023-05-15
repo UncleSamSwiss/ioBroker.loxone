@@ -19,18 +19,30 @@ export class CentralAlarm extends ControlBase {
             'armed',
             /* TODO: re-add: { smartIgnore: false }, */
         );
-        this.addStateChangeListener(uuid + '.armed', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
-        });
+        this.addStateChangeListener(
+            uuid + '.armed',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'delayedOn');
-        this.addStateChangeListener(uuid + '.delayedOn', () => {
-            this.sendCommand(control.uuidAction, 'delayedon');
-        });
+        this.addStateChangeListener(
+            uuid + '.delayedOn',
+            () => {
+                this.sendCommand(control.uuidAction, 'delayedon');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
-        this.addStateChangeListener(uuid + '.quit', () => {
-            this.sendCommand(control.uuidAction, 'quit');
-        });
+        this.addStateChangeListener(
+            uuid + '.quit',
+            () => {
+                this.sendCommand(control.uuidAction, 'quit');
+            },
+            { selfAck: true },
+        );
     }
 }

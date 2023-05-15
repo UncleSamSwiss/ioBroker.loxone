@@ -8,8 +8,8 @@ import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
 import * as LxCommunicator from 'lxcommunicator';
 import { v4 } from 'uuid';
-import { ControlBase, ControlType } from './controls/control-base';
 import { Unknown } from './controls/Unknown';
+import { ControlBase, ControlType } from './controls/control-base';
 import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 import FormData = require('form-data');
@@ -19,12 +19,44 @@ const WebSocketConfig = LxCommunicator.WebSocketConfig;
 
 export type OldStateValue = ioBroker.StateValue | null | undefined;
 export type CurrentStateValue = ioBroker.StateValue | null;
+
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
+export type StateChangeListenerOpts = {
+    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatically ack state change
+    convertToInt?: boolean; // Convert state values to integers
+    minInt?: number; // Values below minInt will be set to this value
+    maxInt?: number; // Values above maxInt will be set to this value
+    ackTimeoutMs?: number; // Override default timeout
+    selfAck?: boolean; // Acknowledge ourself (don't wait for Loxone)
+};
+export type StateChangeListenEntry = {
+    listener: StateChangeListener;
+    opts?: StateChangeListenerOpts;
+    queuedVal: ioBroker.StateValue | null;
+    ackTimer: ioBroker.Timeout | null;
+};
+// Log warnings if no ack event from Loxone in this time
+// TODO: should this be configurable?
+const ackTimeoutMs = 500;
+
+// Period between connection attempts
+const reconnectTimeoutMs = 5000;
+
 export type StateEventHandler = (value: any) => Promise<void>;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
+
+export type FormatInfoDetailsCallback = ((src: infoDetailsEntryMap) => ioBroker.StateValue) | null;
+export type infoDetailsEntry = { count: number; lastValue?: any };
+export type infoDetailsEntryMap = Map<string, infoDetailsEntry>;
+export type InfoEntry = {
+    value: ioBroker.StateValue;
+    lastSet: ioBroker.StateValue;
+    timer: ioBroker.Timeout | null;
+    detailsMap?: infoDetailsEntryMap;
+};
 
 export class Loxone extends utils.Adapter {
     private uuid = '';
@@ -35,7 +67,7 @@ export class Loxone extends utils.Adapter {
     private foundRooms: Record<string, string[]> = {};
     private foundCats: Record<string, string[]> = {};
 
-    private stateChangeListeners: Record<string, StateChangeListener> = {};
+    private stateChangeListeners: Record<string, StateChangeListenEntry> = {};
     private stateEventHandlers: Record<string, StateEventRegistration[]> = {};
 
     private readonly eventsQueue = new Queue<LoxoneEvent>();
@@ -45,6 +77,10 @@ export class Loxone extends utils.Adapter {
     public readonly reportedMissingControls = new Set<string>();
     private readonly reportedUnsupportedStateChanges = new Set<string>();
     private reconnectTimer?: ioBroker.Timeout;
+    private connectionInProgress = false;
+    private lxConnected = false;
+
+    private info: Map<string, InfoEntry>;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -55,12 +91,16 @@ export class Loxone extends utils.Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
+        this.info = new Map<string, InfoEntry>();
     }
 
     /**
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        // Init info
+        await this.initInfoStates();
+
         // store all current (acknowledged) state values
         const allStates = await this.getStatesAsync('*');
         for (const id in allStates) {
@@ -73,7 +113,7 @@ export class Loxone extends utils.Adapter {
         this.existingObjects = await this.getAdapterObjectsAsync();
 
         // Reset the connection indicator during startup
-        this.setState('info.connection', false, true);
+        this.setConnectionState(false);
         this.uuid = v4();
         // connect to Loxone Miniserver
         const webSocketConfig = new WebSocketConfig(
@@ -105,6 +145,7 @@ export class Loxone extends utils.Adapter {
             },
             socketOnConnectionClosed: (socket: any, code: string) => {
                 this.log.info('Socket closed ' + code);
+                this.setConnectionState(false);
 
                 // Stop queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
@@ -113,7 +154,6 @@ export class Loxone extends utils.Adapter {
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
-                this.setState('info.connection', false, true);
 
                 if (code != LxCommunicator.SupportCode.WEBSOCKET_MANUAL_CLOSE) {
                     this.reconnect();
@@ -121,6 +161,7 @@ export class Loxone extends utils.Adapter {
             },
             socketOnEventReceived: (socket: any, events: any, type: number) => {
                 this.log.silly(`socket event received ${type} ${JSON.stringify(events)}`);
+                this.incInfoState('info.messagesReceived');
                 for (const evt of events) {
                     switch (type) {
                         case LxCommunicator.BinaryEvent.Type.EVENT:
@@ -148,21 +189,7 @@ export class Loxone extends utils.Adapter {
         this.subscribeStates('*');
     }
 
-    private async connect(): Promise<boolean> {
-        this.log.info('Trying to connect');
-
-        try {
-            await this.socket.open(
-                this.config.host + ':' + this.config.port,
-                this.config.username,
-                this.config.password,
-            );
-        } catch (error) {
-            // do not stringify error, it can contain circular references
-            this.log.error(`Couldn't open socket`);
-            this.reconnect();
-            return false;
-        }
+    private async loadStructureFile(): Promise<boolean> {
         let file: StructureFile;
         try {
             const fileString = await this.socket.send('data/LoxAPP3.json');
@@ -170,7 +197,6 @@ export class Loxone extends utils.Adapter {
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't get structure file`);
-            this.reconnect();
             return false;
         }
         this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
@@ -184,41 +210,83 @@ export class Loxone extends utils.Adapter {
         try {
             await this.loadStructureFileAsync(file);
             this.log.debug('structure file successfully loaded');
-
-            // we are ready, let's set the connection indicator
-            this.setState('info.connection', true, true);
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't load structure file`);
             sentry?.captureException(error, { extra: { file } });
-            this.socket.close();
-            this.reconnect();
             return false;
         }
 
-        try {
-            await this.socket.send('jdev/sps/enablebinstatusupdate');
-        } catch (error) {
-            // do not stringify error, it can contain circular references
-            this.log.error(`Couldn't enable status updates`);
-            this.socket.close();
-            this.reconnect();
-            return false;
+        return true; // Success
+    }
+
+    private async connect(): Promise<void> {
+        if (this.connectionInProgress) {
+            this.log.warn('Connection already in progress');
+        } else {
+            this.log.info('Trying to connect');
+            this.connectionInProgress = true;
+
+            let success = true; // Assume success
+
+            try {
+                await this.socket.open(
+                    this.config.host + ':' + this.config.port,
+                    this.config.username,
+                    this.config.password,
+                );
+            } catch (error) {
+                // do not stringify error, it can contain circular references
+                this.log.error(`Couldn't open socket`);
+                success = false;
+            }
+
+            if (success) {
+                success = await this.loadStructureFile();
+            }
+
+            if (success) {
+                try {
+                    await this.socket.send('jdev/sps/enablebinstatusupdate');
+                } catch (error) {
+                    // do not stringify error, it can contain circular references
+                    this.log.error(`Couldn't enable status updates`);
+                    success = false;
+                }
+            }
+
+            this.connectionInProgress = false;
+
+            if (!success) {
+                this.log.debug('Connection failed - will retry after delay');
+                this.socket.close();
+                this.reconnect();
+            } else {
+                // We are ready, let's set the connection indicator
+                this.setConnectionState(true);
+            }
         }
-        return true;
     }
 
     private reconnect(): void {
         if (this.reconnectTimer) {
-            return;
+            this.log.debug('Reconnect called while timer already running');
+        } else if (this.connectionInProgress) {
+            this.log.debug('Reconnect called while connection in progress');
+        } else {
+            this.reconnectTimer = this.setTimeout(() => {
+                delete this.reconnectTimer;
+                this.connect().catch((e) => {
+                    this.log.error(`Couldn't reconnect: ${e}`);
+                    this.reconnect();
+                });
+            }, reconnectTimeoutMs);
         }
-        this.reconnectTimer = this.setTimeout(() => {
-            delete this.reconnectTimer;
-            this.connect().catch((e) => {
-                this.log.error(`Couldn't reconnect: ${e}`);
-                this.reconnect();
-            });
-        }, 5000);
+    }
+
+    private setConnectionState(connected: boolean): void {
+        this.lxConnected = connected;
+        this.setState('info.connection', this.lxConnected, true);
     }
 
     /**
@@ -234,33 +302,118 @@ export class Loxone extends utils.Adapter {
         } catch (e) {
             callback();
         }
+        this.flushInfoStates();
+        // TODO: clear queued state change timers
     }
 
     /**
      * Is called if a subscribed state changes
      */
-    private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
+    private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         // Warning: state can be null if it was deleted!
         if (!id || !state || state.ack) {
-            return;
-        }
-
-        this.log.silly(`stateChange ${id} ${JSON.stringify(state)}`);
-        if (!this.stateChangeListeners.hasOwnProperty(id)) {
-            const msg = 'Unsupported state change: ' + id;
-            this.log.error(msg);
-            if (!this.reportedUnsupportedStateChanges.has(id)) {
-                this.reportedUnsupportedStateChanges.add(id);
-                const sentry = this.getSentry();
-                sentry?.withScope((scope) => {
-                    scope.setExtra('state', state);
-                    sentry.captureMessage(msg, SentryNode.Severity.Warning);
-                });
+            // Do nothing
+        } else if (id.includes('.info.')) {
+            // Ignore info changes
+            // TODO: can this be done better by ignoring '.info.' in subscribeStates?
+        } else {
+            this.log.debug(`stateChange ${id} ${JSON.stringify(state)}`);
+            if (!this.stateChangeListeners.hasOwnProperty(id)) {
+                const msg = 'Unsupported state change: ' + id;
+                this.log.error(msg);
+                if (!this.reportedUnsupportedStateChanges.has(id)) {
+                    this.reportedUnsupportedStateChanges.add(id);
+                    const sentry = this.getSentry();
+                    sentry?.withScope((scope) => {
+                        scope.setExtra('state', state);
+                        sentry.captureMessage(msg, 'warning');
+                    });
+                }
+            } else if (!this.lxConnected) {
+                this.log.warn(`stateChange ${id} while disconnected, discarding`);
+                this.incInfoState('info.stateChangesDiscarded');
+            } else {
+                const stateChangeListener = this.stateChangeListeners[id];
+                if (stateChangeListener.ackTimer) {
+                    // Ack timer is running: we didn't get a reply from the previous command yet
+                    if (stateChangeListener.queuedVal !== null) {
+                        // Already a queued state change: we're going to have to discard that and replace with latest
+                        this.log.warn(
+                            `State change in progress for ${id}, discarding ${stateChangeListener.queuedVal}`,
+                        );
+                        this.incInfoState('info.stateChangesDiscarded');
+                    } else {
+                        // Nothing queued, so this will only be delayed (at least for now)
+                        this.log.warn(`State change in progress for ${id}, delaying ${state.val}`);
+                        this.incInfoState('info.stateChangesDelayed');
+                    }
+                    stateChangeListener.queuedVal = state.val;
+                } else {
+                    // Ack timer is not running, so we're all good to handle this
+                    await this.handleStateChange(id, stateChangeListener, state.val);
+                }
             }
-            return;
         }
+    }
 
-        this.stateChangeListeners[id](this.currentStateValues[id], state.val);
+    public convertStateToInt(value: OldStateValue): number {
+        return !value ? 0 : parseInt(value.toString());
+    }
+
+    private async handleStateChange(
+        id: string,
+        stateChangeListener: StateChangeListenEntry,
+        val: ioBroker.StateValue,
+    ): Promise<void> {
+        if (stateChangeListener.opts?.convertToInt) {
+            // Convert any values to ints within range if necessary.
+            val = this.convertStateToInt(val);
+            if (stateChangeListener.opts?.minInt !== undefined && val < stateChangeListener.opts.minInt) {
+                val = stateChangeListener.opts.minInt;
+            }
+            if (stateChangeListener.opts?.maxInt !== undefined && val > stateChangeListener.opts.maxInt) {
+                val = stateChangeListener.opts.maxInt;
+            }
+        }
+        if (stateChangeListener.opts?.notIfEqual && this.currentStateValues[id] === val) {
+            // new/old values are the same so don't send update.
+            // However, ack the state change as we have 'handled' this (by doing nothing)
+            this.log.debug(`State value is unchanged, no listener+self-ack: ${id} ${val}`);
+            await this.setStateAck(id, val);
+        } else {
+            if (!stateChangeListener.opts?.selfAck) {
+                // Set ack timer before calling listener
+                stateChangeListener.ackTimer = this.setTimeout(
+                    async (id: string, stateChangeListener: StateChangeListenEntry) => {
+                        this.log.warn(`Timeout for ack ${id}`);
+                        this.incInfoState('info.ackTimeouts', id);
+                        stateChangeListener.ackTimer = null;
+                        // Even though this is a timeout, handle any change that may have been delayed waiting for this
+                        await this.handleDelayedStateChange(id, stateChangeListener);
+                    },
+                    stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
+                    id,
+                    stateChangeListener,
+                );
+            }
+
+            // Change will be handled by listener
+            stateChangeListener.listener(this.currentStateValues[id], val);
+
+            if (stateChangeListener.opts?.selfAck) {
+                // Loxone is not expected to send an event to acknowledge this so just do it ourself
+                this.log.debug(`Self-ack: ${id} ${val}`);
+                await this.setStateAck(id, val);
+            }
+        }
+    }
+
+    private async handleDelayedStateChange(id: string, stateChangeListener: StateChangeListenEntry): Promise<void> {
+        if (stateChangeListener.queuedVal !== null) {
+            this.log.debug(`Handling delayed state: ${id} ${stateChangeListener.queuedVal}`);
+            await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
+            stateChangeListener.queuedVal = null;
+        }
     }
 
     private createSentryEventProcessor(data: StructureFile): EventProcessor {
@@ -275,7 +428,7 @@ export class Loxone extends utils.Adapter {
                             type: 'debug',
                             category: 'started',
                             message: `Structure file added to event ${attachmentEventId}`,
-                            level: SentryNode.Severity.Info,
+                            level: 'info',
                         });
                     }
                     return event;
@@ -287,10 +440,10 @@ export class Loxone extends utils.Adapter {
 
                 attachmentEventId = event.event_id;
 
-                const { host, path, projectId, port, protocol, user } = dsn;
+                const { host, path, projectId, port, protocol, publicKey } = dsn;
                 const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${
                     path !== '' ? `/${path}` : ''
-                }/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${user}&sentry_version=7&sentry_client=custom-javascript`;
+                }/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${publicKey}&sentry_version=7&sentry_client=custom-javascript`;
 
                 const form = new FormData();
                 form.append('att', JSON.stringify(data, null, 2), {
@@ -597,6 +750,7 @@ export class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
+            this.incInfoState('info.unknownEvents', evt.uuid, evt.evt);
             return;
         }
 
@@ -610,8 +764,141 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    private async initInfoStates(): Promise<void> {
+        // Wait for states to load because if we don't, although the chances
+        // of processing starting before this actually completes is small, we
+        // should cater for that.
+        await this.initInfoState('info.ackTimeouts', true);
+        await this.initInfoState('info.messagesReceived');
+        await this.initInfoState('info.messagesSent');
+        await this.initInfoState('info.stateChangesDelayed');
+        await this.initInfoState('info.stateChangesDiscarded');
+        await this.initInfoState('info.unknownEvents', true);
+    }
+
+    private async initInfoState(id: string, hasDetails = false): Promise<void> {
+        const state = await this.getStateAsync(id);
+        const initValue = state ? state.val : null;
+        const entry: InfoEntry = {
+            value: initValue,
+            lastSet: initValue,
+            timer: null,
+        };
+
+        if (hasDetails) {
+            // TODO: Maybe read these in so they persist across restarts?
+            entry.detailsMap = new Map<string, infoDetailsEntry>();
+        }
+
+        this.info.set(id, entry);
+    }
+
+    private flushInfoStates(): void {
+        // Called on shutdown
+        this.info.forEach((infoEntry, key) => {
+            if (infoEntry.timer) {
+                // Timer running, so cancel it and update state value if changed since last written
+                this.clearTimeout(infoEntry.timer);
+                this.setInfoStateIfChanged(key, infoEntry, true);
+            }
+        });
+    }
+
+    private getInfoEntry(id: string): InfoEntry | undefined {
+        const infoEntry = this.info.get(id);
+        if (!infoEntry) {
+            // This should never happen!
+            this.log.error('No info entry for ' + id);
+        }
+        return infoEntry;
+    }
+
+    private addInfoDetailsEntry(details: infoDetailsEntryMap, id: string, value?: any): void {
+        /// ... and add details of this event to the map.
+        const eventEntry = details.get(id);
+        if (eventEntry) {
+            // Add to existing
+            eventEntry.count++;
+            if (value !== undefined) {
+                eventEntry.lastValue = value;
+            }
+        } else {
+            // New entry
+            if (value !== undefined) {
+                details.set(id, { count: 1, lastValue: value });
+            } else {
+                details.set(id, { count: 1 });
+            }
+        }
+    }
+
+    private incInfoState(id: string, detailId?: string, detailValue?: any): void {
+        // Increment the given ID
+        const infoEntry = this.getInfoEntry(id);
+        if (infoEntry) {
+            // Can't use ++ here because ioBroker.StateValue isn't necessarily a number
+            infoEntry.value = Number(infoEntry.value) + 1;
+            // If value given and this entry has details record that
+            if (infoEntry.detailsMap && detailId) {
+                this.addInfoDetailsEntry(infoEntry.detailsMap, detailId, detailValue);
+            }
+            if (!infoEntry.timer) {
+                this.setInfoStateIfChanged(id, infoEntry);
+            }
+        }
+    }
+
+    private buildInfoDetails(src: infoDetailsEntryMap): string {
+        // TODO: shouldn't this use JSON.stringify?
+        const out: any[] = [];
+        src.forEach((value, key) => {
+            if (value.lastValue !== undefined) {
+                out.push({ id: key, count: value.count, lastValue: value.lastValue });
+            } else {
+                out.push({ id: key, count: value.count });
+            }
+        });
+        return JSON.stringify(out);
+    }
+
+    private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
+        if (infoEntry.value != infoEntry.lastSet) {
+            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+
+            // Store counter
+            this.setState(id, infoEntry.value, true);
+            infoEntry.lastSet = infoEntry.value;
+
+            // Store any details
+            if (infoEntry.detailsMap) {
+                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+            }
+
+            if (!shutdown) {
+                // Start a timer which will set the current value from the info ID map on completion
+                // Obviously don't do this if called from shutdown
+                this.log.silly('Starting timer for ' + id);
+                infoEntry.timer = this.setTimeout(
+                    (cbId, cbInfoEntry) => {
+                        this.log.silly('Timeout for ' + id);
+
+                        // Remove from timer from map as we have just finished
+                        cbInfoEntry.timer = null;
+
+                        // Update the state, but only if the value in the info ID map has changed
+                        this.setInfoStateIfChanged(cbId, cbInfoEntry);
+                    },
+                    30000, // Update every 30s max TODO: make this a config parameter?
+                    id,
+                    infoEntry, // Pass reference to entry
+                );
+            }
+        }
+    }
+
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
+        this.incInfoState('info.messagesSent');
         this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
 
@@ -699,12 +986,38 @@ export class Loxone extends utils.Adapter {
         return found;
     }
 
-    public addStateChangeListener(id: string, listener: StateChangeListener): void {
-        this.stateChangeListeners[this.namespace + '.' + id] = listener;
+    public addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
+        this.stateChangeListeners[this.namespace + '.' + id] = {
+            listener,
+            opts,
+            queuedVal: null,
+            ackTimer: null,
+        };
+    }
+
+    private async checkStateForAck(id: string): Promise<void> {
+        const stateChangeListener = this.stateChangeListeners[id];
+        if (stateChangeListener) {
+            // This state change could be a result of a command we sent being ack'd
+            if (stateChangeListener.ackTimer) {
+                // Timer is running so clear it
+                this.log.debug(`Clearing ackTimer for ${id}`);
+                this.clearTimeout(stateChangeListener.ackTimer);
+                stateChangeListener.ackTimer = null;
+                // Send any command that may have been delayed waiting for this ack
+                await this.handleDelayedStateChange(id, stateChangeListener);
+            } else {
+                this.log.debug(`No ackTimer for ${id}`);
+            }
+        } else {
+            this.log.silly(`${id} has no stateChangeListener`);
+        }
     }
 
     public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
-        this.currentStateValues[this.namespace + '.' + id] = value;
+        const keyId = this.namespace + '.' + id;
+        this.currentStateValues[keyId] = value;
+        await this.checkStateForAck(keyId);
         await this.setStateAsync(id, { val: value, ack: true });
     }
 
@@ -728,7 +1041,7 @@ export class Loxone extends utils.Adapter {
 
     public reportError(message: string): void {
         this.log.error(message);
-        this.getSentry()?.captureMessage(message, SentryNode.Severity.Error);
+        this.getSentry()?.captureMessage(message, 'error');
     }
 }
 

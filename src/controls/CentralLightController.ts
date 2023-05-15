@@ -19,12 +19,16 @@ export class CentralLightController extends ControlBase {
             'control',
             /* TODO: re-add: { smartIgnore: false }, */
         );
-        this.addStateChangeListener(uuid + '.control', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            if (newValue) {
-                this.sendCommand(control.uuidAction, 'on');
-            } else {
-                this.sendCommand(control.uuidAction, 'reset');
-            }
-        });
+        this.addStateChangeListener(
+            uuid + '.control',
+            (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+                if (newValue) {
+                    this.sendCommand(control.uuidAction, 'on');
+                } else {
+                    this.sendCommand(control.uuidAction, 'reset');
+                }
+            },
+            { selfAck: true },
+        );
     }
 }

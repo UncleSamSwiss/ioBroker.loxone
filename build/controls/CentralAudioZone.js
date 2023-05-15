@@ -15,7 +15,7 @@ class CentralAudioZone extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'control');
         this.addStateChangeListener(uuid + '.control', (oldValue, newValue) => {
             this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
-        });
+        }, { selfAck: true });
     }
 }
 exports.CentralAudioZone = CentralAudioZone;

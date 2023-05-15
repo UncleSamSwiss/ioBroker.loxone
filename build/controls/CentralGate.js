@@ -15,15 +15,15 @@ class CentralGate extends control_base_1.ControlBase {
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
         this.addStateChangeListener(uuid + '.open', () => {
             this.sendCommand(control.uuidAction, 'open');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'close');
         this.addStateChangeListener(uuid + '.close', () => {
             this.sendCommand(control.uuidAction, 'close');
-        });
+        }, { selfAck: true });
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stop');
         this.addStateChangeListener(uuid + '.stop', () => {
             this.sendCommand(control.uuidAction, 'stop');
-        });
+        }, { selfAck: true });
     }
 }
 exports.CentralGate = CentralGate;

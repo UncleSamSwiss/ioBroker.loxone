@@ -35,18 +35,30 @@ export class TimedSwitch extends ControlBase {
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
-        this.addStateChangeListener(uuid + '.on', () => {
-            this.sendCommand(control.uuidAction, 'on');
-        });
+        this.addStateChangeListener(
+            uuid + '.on',
+            () => {
+                this.sendCommand(control.uuidAction, 'on');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
-        this.addStateChangeListener(uuid + '.off', () => {
-            this.sendCommand(control.uuidAction, 'off');
-        });
+        this.addStateChangeListener(
+            uuid + '.off',
+            () => {
+                this.sendCommand(control.uuidAction, 'off');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
-        this.addStateChangeListener(uuid + '.pulse', () => {
-            this.sendCommand(control.uuidAction, 'pulse');
-        });
+        this.addStateChangeListener(
+            uuid + '.pulse',
+            () => {
+                this.sendCommand(control.uuidAction, 'pulse');
+            },
+            { selfAck: true },
+        );
     }
 }

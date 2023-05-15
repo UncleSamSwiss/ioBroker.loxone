@@ -197,12 +197,20 @@ export class AudioZone extends ControlBase {
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'prev');
-        this.addStateChangeListener(uuid + '.prev', () => {
-            this.sendCommand(control.uuidAction, 'prev');
-        });
+        this.addStateChangeListener(
+            uuid + '.prev',
+            () => {
+                this.sendCommand(control.uuidAction, 'prev');
+            },
+            { selfAck: true },
+        );
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'next');
-        this.addStateChangeListener(uuid + '.next', () => {
-            this.sendCommand(control.uuidAction, 'next');
-        });
+        this.addStateChangeListener(
+            uuid + '.next',
+            () => {
+                this.sendCommand(control.uuidAction, 'next');
+            },
+            { selfAck: true },
+        );
     }
 }

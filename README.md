@@ -533,6 +533,15 @@ Provided by radio buttons (8x and 16x).
 
 -   `activeOutput` (rw) ID of the currently active output or 0 if none is active ("All Off")
 
+### Remote
+
+Provided by media controller.
+Basic read only functionality only.
+
+-   `active` (ro) true if the Miniserver is sending the commands for switching the modes or power on
+-   `mode` (ro) the key for the current mode or 0 if no mode selected ("All Off")"
+-   `timeout` (ro)  the timeout in milliseconds
+
 ### Slider
 
 Provided by analog virtual inputs.
@@ -718,6 +727,19 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 3.0.1 (2023-03-30)
+
+-   (raintonr) Added info statistics (#364)
+-   (raintonr) Added missing states from IRCv2 (#365)
+-   (raintonr) Added basic functionality for Remote (Media Controller)
+-   (raintonr) Fixed ack overwrites of fast changing states (#399) and general ack improvements
+-   (raintonr) Fix crash when state changes occur during Miniserver reboot or otherwise unavailable (#298)
+-   (raintonr) Release script and other dependency updates
+
+### 3.0.0 (2021-12-29)
+
+-   (tdesmet) Changed to lxcommunicator (fixes #210)
+-   (UncleSamSwiss) Updated all dependencies
 
 ### 3.0.0 (2021-12-29)
 
@@ -839,7 +861,7 @@ Native value from ioBroker &gt; Objects
 
 ## License
 
-Copyright 2022 UncleSamSwiss
+Copyright 2023 UncleSamSwiss
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

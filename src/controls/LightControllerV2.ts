@@ -180,14 +180,22 @@ export class LightControllerV2 extends ControlBase {
         }
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
-        this.addStateChangeListener(uuid + '.plus', () => {
-            this.sendCommand(control.uuidAction, 'plus');
-        });
+        this.addStateChangeListener(
+            uuid + '.plus',
+            () => {
+                this.sendCommand(control.uuidAction, 'plus');
+            },
+            { selfAck: true },
+        );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'minus');
-        this.addStateChangeListener(uuid + '.minus', () => {
-            this.sendCommand(control.uuidAction, 'minus');
-        });
+        this.addStateChangeListener(
+            uuid + '.minus',
+            () => {
+                this.sendCommand(control.uuidAction, 'minus');
+            },
+            { selfAck: true },
+        );
 
         // TODO: add Alexa support! (how???)
 
