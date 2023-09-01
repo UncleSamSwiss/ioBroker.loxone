@@ -53,7 +53,7 @@
     "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
-    "chai": "^4.3.7",
+    "chai": "^4.3.8",
     "chai-as-promised": "^7.1.1",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
