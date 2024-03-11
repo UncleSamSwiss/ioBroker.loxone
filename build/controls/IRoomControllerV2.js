@@ -342,12 +342,6 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 tempTargetMax = comfortTemperature + absentMaxOffset;
                 this.adapter.log.debug(`Mode ${activeMode}: ${absentMinOffset}/${absentMaxOffset}/${comfortTemperature} -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
-            case 1:
-            case 3:
-                // Comfort & manual mode just use direct target
-                tempTargetMin = tempTargetMax = this.convertStateToFloat(this.getCachedStateValue(this.uuid + '.tempTarget'));
-                this.adapter.log.debug(`Mode ${activeMode}: ${tempTargetMin} -> ${tempTargetMin}/${tempTargetMax}`);
-                break;
             case 2:
                 // Building protection uses frost & heat protection
                 tempTargetMin = this.convertStateToFloat(this.getCachedStateValue(this.uuid + '.frostProtectTemperature'));
@@ -355,7 +349,10 @@ class IRoomControllerV2 extends control_base_1.ControlBase {
                 this.adapter.log.debug(`Mode ${activeMode}: -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
             default:
-                this.adapter.reportError(`Unknown IRoomControllerV2 activeMode: ${activeMode}`);
+                // Comfort, manual & override modes just use direct target
+                // TODO: Loxone doco doesn't properly explain what activeMode is on override so just assume it's OK.
+                tempTargetMin = tempTargetMax = this.convertStateToFloat(this.getCachedStateValue(this.uuid + '.tempTarget'));
+                this.adapter.log.debug(`Mode ${activeMode}: ${tempTargetMin} -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
         }
         // Don't do any update if not calculated (can only happen in error condition)
