@@ -23,6 +23,9 @@
     "type": "git",
     "url": "https://github.com/UncleSamSwiss/ioBroker.loxone"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@iobroker/adapter-core": "^3.1.4",
     "@sentry/node": "^7.46.0",
