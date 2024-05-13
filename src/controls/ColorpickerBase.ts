@@ -114,7 +114,7 @@ export abstract class ColorpickerBase extends ControlBase {
             },
             control.states.color,
             async (name: string, value: CurrentStateValue) => {
-                const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+                const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
                     await this.setStateAck(name, brightnessTemperature[0]);
                 }
@@ -132,7 +132,7 @@ export abstract class ColorpickerBase extends ControlBase {
             },
             control.states.color,
             async (name: string, value: CurrentStateValue) => {
-                const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+                const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
                     await this.setStateAck(name, brightnessTemperature[1]);
                 }
@@ -150,7 +150,7 @@ export abstract class ColorpickerBase extends ControlBase {
             },
             control.states.color,
             async (name: string, value: CurrentStateValue) => {
-                const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+                const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
                     await this.setStateAck(
                         name,
@@ -200,7 +200,7 @@ export abstract class ColorpickerBase extends ControlBase {
             },
             control.states.color,
             async (name: string, value: CurrentStateValue) => {
-                const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+                const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
                     await this.setStateAck(name, brightnessTemperature[0]);
                 }
@@ -220,7 +220,7 @@ export abstract class ColorpickerBase extends ControlBase {
             },
             control.states.color,
             async (name: string, value: CurrentStateValue) => {
-                const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+                const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
                 if (brightnessTemperature !== undefined) {
                     await this.setStateAck(name, brightnessTemperature[1]);
                 }
@@ -296,32 +296,14 @@ export abstract class ColorpickerBase extends ControlBase {
         return undefined;
     }
 
-    private loxoneColorToBrightnessTemperature(value: CurrentStateValue): [number, number] | undefined {
+    private lumitechOrLoxoneColorToBrightnessTemperature(value: CurrentStateValue): [number, number] | undefined {
         if (!value) {
             return undefined;
         }
 
         value = value.toString();
 
-        const match = value.match(/temp\((\d+),(\d+)\)/i);
-        if (match) {
-            const brightness = parseFloat(match[1]);
-            const temperature = parseFloat(match[2]);
-
-            return [Math.round(brightness), Math.round(temperature)];
-        }
-
-        return undefined;
-    }
-
-    private lumitechColorToBrightnessTemperature(value: CurrentStateValue): [number, number] | undefined {
-        if (!value) {
-            return undefined;
-        }
-
-        value = value.toString();
-
-        const match = value.match(/lumitech\((\d+),(\d+)\)/i);
+        const match = value.match(/(lumitech|temp)\((\d+),(\d+)\)/i);
         if (match) {
             const brightness = parseFloat(match[1]);
             const temperature = parseFloat(match[2]);
