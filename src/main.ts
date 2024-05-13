@@ -8,8 +8,8 @@ import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
 import * as LxCommunicator from 'lxcommunicator';
 import { v4 } from 'uuid';
-import { ControlBase, ControlType } from './controls/control-base';
 import { Unknown } from './controls/Unknown';
+import { ControlBase, ControlType } from './controls/control-base';
 import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 import FormData = require('form-data');
@@ -33,7 +33,7 @@ export type StateChangeListenEntry = {
     listener: StateChangeListener;
     opts?: StateChangeListenerOpts;
     queuedVal: ioBroker.StateValue | null;
-    ackTimer: ioBroker.Timeout | null;
+    ackTimer: ioBroker.Timeout | undefined;
 };
 // Log warnings if no ack event from Loxone in this time
 // TODO: should this be configurable?
@@ -54,7 +54,7 @@ export type infoDetailsEntryMap = Map<string, infoDetailsEntry>;
 export type InfoEntry = {
     value: ioBroker.StateValue;
     lastSet: ioBroker.StateValue;
-    timer: ioBroker.Timeout | null;
+    timer: ioBroker.Timeout | undefined;
     detailsMap?: infoDetailsEntryMap;
 };
 
@@ -384,10 +384,12 @@ export class Loxone extends utils.Adapter {
             if (!stateChangeListener.opts?.selfAck) {
                 // Set ack timer before calling listener
                 stateChangeListener.ackTimer = this.setTimeout(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     async (id: string, stateChangeListener: StateChangeListenEntry) => {
                         this.log.warn(`Timeout for ack ${id}`);
                         this.incInfoState('info.ackTimeouts', id);
-                        stateChangeListener.ackTimer = null;
+                        stateChangeListener.ackTimer = undefined;
                         // Even though this is a timeout, handle any change that may have been delayed waiting for this
                         await this.handleDelayedStateChange(id, stateChangeListener);
                     },
@@ -782,7 +784,7 @@ export class Loxone extends utils.Adapter {
         const entry: InfoEntry = {
             value: initValue,
             lastSet: initValue,
-            timer: null,
+            timer: undefined,
         };
 
         if (hasDetails) {
@@ -879,11 +881,13 @@ export class Loxone extends utils.Adapter {
                 // Obviously don't do this if called from shutdown
                 this.log.silly('Starting timer for ' + id);
                 infoEntry.timer = this.setTimeout(
-                    (cbId, cbInfoEntry) => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    (cbId: string, cbInfoEntry: InfoEntry) => {
                         this.log.silly('Timeout for ' + id);
 
                         // Remove from timer from map as we have just finished
-                        cbInfoEntry.timer = null;
+                        cbInfoEntry.timer = undefined;
 
                         // Update the state, but only if the value in the info ID map has changed
                         this.setInfoStateIfChanged(cbId, cbInfoEntry);
@@ -991,7 +995,7 @@ export class Loxone extends utils.Adapter {
             listener,
             opts,
             queuedVal: null,
-            ackTimer: null,
+            ackTimer: undefined,
         };
     }
 
@@ -1003,7 +1007,7 @@ export class Loxone extends utils.Adapter {
                 // Timer is running so clear it
                 this.log.debug(`Clearing ackTimer for ${id}`);
                 this.clearTimeout(stateChangeListener.ackTimer);
-                stateChangeListener.ackTimer = null;
+                stateChangeListener.ackTimer = undefined;
                 // Send any command that may have been delayed waiting for this ack
                 await this.handleDelayedStateChange(id, stateChangeListener);
             } else {

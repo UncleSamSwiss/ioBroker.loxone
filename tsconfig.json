@@ -33,8 +33,7 @@
         "target": "es2018",
 
         "sourceMap": false,
-        "inlineSourceMap": false,
-        "watch": false
+        "inlineSourceMap": false
     },
     "include": ["src/**/*.ts", "admin/**/*.ts", "admin/**/*.tsx"],
     "exclude": ["build/**", "node_modules/**"]
