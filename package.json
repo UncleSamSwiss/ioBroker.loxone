@@ -84,7 +84,9 @@
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:ts && npm run test:package",
     "check": "tsc --noEmit",
-    "lint": "eslint --ext .ts src/",
+    "lint": "eslint -c .eslintrc.js --report-unused-disable-directives --max-warnings 0 .",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write --config .prettierrc.js .",
     "translate": "translate-adapter",
     "release": "release-script"
   },
