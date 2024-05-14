@@ -156,14 +156,17 @@ export class Daytimer extends ControlBase {
                             .split(';')
                             .map((pair) => pair.split('=', 2)),
                     )
-                    .reduce((old, pairs) => {
-                        const modePair = pairs.find((p) => p[0] === 'mode');
-                        const namePair = pairs.find((p) => p[0] === 'name');
-                        if (!modePair || !namePair) {
-                            return old;
-                        }
-                        return { ...old, [modePair[1]]: namePair[1].replace(/^\\?"(.+?)\\?"$/g, '$1') };
-                    }, {} as Record<string, string>);
+                    .reduce(
+                        (old, pairs) => {
+                            const modePair = pairs.find((p) => p[0] === 'mode');
+                            const namePair = pairs.find((p) => p[0] === 'name');
+                            if (!modePair || !namePair) {
+                                return old;
+                            }
+                            return { ...old, [modePair[1]]: namePair[1].replace(/^\\?"(.+?)\\?"$/g, '$1') };
+                        },
+                        {} as Record<string, string>,
+                    );
                 await updateModeText();
             });
         }
