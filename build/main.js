@@ -38,7 +38,6 @@ class Loxone extends utils.Adapter {
         this.queueRunning = false;
         this.reportedMissingControls = new Set();
         this.reportedUnsupportedStateChanges = new Set();
-        this.connectionInProgress = false;
         this.lxConnected = false;
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -85,12 +84,12 @@ class Loxone extends utils.Adapter {
                 this.log.debug('token received');
             },
             socketOnConnectionClosed: (socket, code) => {
-                this.log.info('Socket closed ' + code);
+                this.log.info(`Socket closed ${code}`);
                 this.setConnectionState(false);
-                // Stop queue and clear it. Issue a warning if it isn't empty.
+                // Stop the queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
                 if (this.eventsQueue.size() > 0) {
-                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                    this.log.warn(`Event queue is not empty. Discarding ${this.eventsQueue.size()} items`);
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
@@ -141,7 +140,7 @@ class Loxone extends utils.Adapter {
         const sentry = this.getSentry();
         if (sentry) {
             // add a global event processor to upload the structure file (only once)
-            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+            sentry.addEventProcessor(this.createSentryEventProcessor(file));
         }
         try {
             await this.loadStructureFileAsync(file);
@@ -156,19 +155,24 @@ class Loxone extends utils.Adapter {
         return true; // Success
     }
     async connect() {
-        if (this.connectionInProgress) {
+        if (this.connectionInProgressTimer) {
             this.log.warn('Connection already in progress');
         }
         else {
             this.log.info('Trying to connect');
-            this.connectionInProgress = true;
+            this.connectionInProgressTimer = this.setTimeout(() => {
+                this.connectionInProgressTimer = undefined;
+                this.log.debug(`Connection failed because of timeout - will retry after delay in ${reconnectTimeoutMs}ms`);
+                this.socket.close();
+                this.reconnect();
+            }, reconnectTimeoutMs * 2);
             let success = true; // Assume success
             try {
-                await this.socket.open(this.config.host + ':' + this.config.port, this.config.username, this.config.password);
+                await this.socket.open(`${this.config.host}:${this.config.port}`, this.config.username, this.config.password);
             }
             catch (error) {
                 // do not stringify error, it can contain circular references
-                this.log.error(`Couldn't open socket`);
+                this.log.error(`Couldn't open socket: ${(error === null || error === void 0 ? void 0 : error.toString) && error.toString()}`);
                 success = false;
             }
             if (success) {
@@ -184,15 +188,18 @@ class Loxone extends utils.Adapter {
                     success = false;
                 }
             }
-            this.connectionInProgress = false;
-            if (!success) {
-                this.log.debug('Connection failed - will retry after delay');
-                this.socket.close();
-                this.reconnect();
-            }
-            else {
-                // We are ready, let's set the connection indicator
-                this.setConnectionState(true);
+            if (this.connectionInProgressTimer) {
+                this.clearTimeout(this.connectionInProgressTimer);
+                this.connectionInProgressTimer = undefined;
+                if (!success) {
+                    this.log.debug('Connection failed - will retry after delay');
+                    this.socket.close();
+                    this.reconnect();
+                }
+                else {
+                    // We are ready, let's set the connection indicator
+                    this.setConnectionState(true);
+                }
             }
         }
     }
@@ -200,7 +207,7 @@ class Loxone extends utils.Adapter {
         if (this.reconnectTimer) {
             this.log.debug('Reconnect called while timer already running');
         }
-        else if (this.connectionInProgress) {
+        else if (this.connectionInProgressTimer) {
             this.log.debug('Reconnect called while connection in progress');
         }
         else {
@@ -215,7 +222,8 @@ class Loxone extends utils.Adapter {
     }
     setConnectionState(connected) {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        this.setState('info.connection', this.lxConnected, true)
+            .catch((e) => this.log.error(`Couldn't set connection state: ${e}`));
     }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -311,10 +319,13 @@ class Loxone extends utils.Adapter {
         else {
             if (!((_e = stateChangeListener.opts) === null || _e === void 0 ? void 0 : _e.selfAck)) {
                 // Set ack timer before calling listener
-                stateChangeListener.ackTimer = this.setTimeout(async (id, stateChangeListener) => {
+                stateChangeListener.ackTimer = this.setTimeout(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                async (id, stateChangeListener) => {
                     this.log.warn(`Timeout for ack ${id}`);
                     this.incInfoState('info.ackTimeouts', id);
-                    stateChangeListener.ackTimer = null;
+                    stateChangeListener.ackTimer = undefined;
                     // Even though this is a timeout, handle any change that may have been delayed waiting for this
                     await this.handleDelayedStateChange(id, stateChangeListener);
                 }, ((_f = stateChangeListener.opts) === null || _f === void 0 ? void 0 : _f.ackTimeoutMs) ? (_g = stateChangeListener.opts) === null || _g === void 0 ? void 0 : _g.ackTimeoutMs : ackTimeoutMs, id, stateChangeListener);
@@ -455,7 +466,7 @@ class Loxone extends utils.Adapter {
     }
     async setOperatingMode(name, value) {
         await this.setStateAck(name, value);
-        await this.setStateAck(name + '-text', this.operatingModes[value]);
+        await this.setStateAck(`${name}-text`, this.operatingModes[value]);
     }
     async loadControlsAsync(controls) {
         var _a;
@@ -523,14 +534,13 @@ class Loxone extends utils.Adapter {
         }
     }
     async loadControlAsync(controlType, uuid, control) {
-        var _a;
         const type = control.type || 'None';
         if (type.match(/[^a-z0-9]/i)) {
             throw new Error(`Bad control type: ${type}`);
         }
         let controlObject;
         try {
-            const module = await (_a = `./controls/${type}`, Promise.resolve().then(() => require(_a)));
+            const module = await Promise.resolve(`${`./controls/${type}`}`).then(s => require(s));
             controlObject = new module[type](this);
         }
         catch (error) {
@@ -561,11 +571,12 @@ class Loxone extends utils.Adapter {
             }
             const members = [];
             for (const i in found[uuid]) {
-                members.push(this.namespace + '.' + found[uuid][i]);
+                members.push(`${this.namespace}.${found[uuid][i]}`);
             }
             const item = values[uuid];
             const name = item.name.replace(/[\][*.,;'"`<>\\?]+/g, '_');
             const obj = {
+                _id: `${enumName}.${name}`,
                 type: 'enum',
                 common: {
                     name: name,
@@ -573,10 +584,11 @@ class Loxone extends utils.Adapter {
                 },
                 native: item,
             };
-            await this.updateEnumObjectAsync(enumName + '.' + name, obj);
+            await this.updateEnumObjectAsync(obj._id, obj);
         }
     }
     async updateEnumObjectAsync(id, newObj) {
+        var _a;
         // TODO: the parameter newObj should be an EnumObject, but currently that doesn't exist in the type definition
         // similar to hm-rega.js:
         let obj = await this.getForeignObjectAsync(id);
@@ -585,11 +597,11 @@ class Loxone extends utils.Adapter {
             obj = newObj;
             changed = true;
         }
-        else if (newObj && newObj.common && newObj.common.members) {
+        else if ((_a = newObj === null || newObj === void 0 ? void 0 : newObj.common) === null || _a === void 0 ? void 0 : _a.members) {
             obj.common = obj.common || {};
             obj.common.members = obj.common.members || [];
             for (let m = 0; m < newObj.common.members.length; m++) {
-                if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
+                if (!obj.common.members.includes(newObj.common.members[m])) {
                     changed = true;
                     obj.common.members.push(newObj.common.members[m]);
                 }
@@ -663,7 +675,7 @@ class Loxone extends utils.Adapter {
         const entry = {
             value: initValue,
             lastSet: initValue,
-            timer: null,
+            timer: undefined,
         };
         if (hasDetails) {
             // TODO: Maybe read these in so they persist across restarts?
@@ -739,22 +751,27 @@ class Loxone extends utils.Adapter {
     }
     setInfoStateIfChanged(id, infoEntry, shutdown = false) {
         if (infoEntry.value != infoEntry.lastSet) {
-            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            this.log.silly(`value of ${id} changed to ${infoEntry.value}`);
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            this.setState(id, infoEntry.value, true)
+                .catch((e) => this.log.error(`Couldn't set state: ${e}`));
             infoEntry.lastSet = infoEntry.value;
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true)
+                    .catch((e) => this.log.error(`Couldn't set detail state: ${e}`));
             }
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
-                this.log.silly('Starting timer for ' + id);
-                infoEntry.timer = this.setTimeout((cbId, cbInfoEntry) => {
-                    this.log.silly('Timeout for ' + id);
-                    // Remove from timer from map as we have just finished
-                    cbInfoEntry.timer = null;
+                this.log.silly(`Starting timer for ${id}`);
+                infoEntry.timer = this.setTimeout(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                (cbId, cbInfoEntry) => {
+                    this.log.silly(`Timeout for ${id}`);
+                    // Remove from timer from a map as we have just finished
+                    cbInfoEntry.timer = undefined;
                     // Update the state, but only if the value in the info ID map has changed
                     this.setInfoStateIfChanged(cbId, cbInfoEntry);
                 }, 30000, // Update every 30s max TODO: make this a config parameter?
@@ -768,14 +785,14 @@ class Loxone extends utils.Adapter {
         this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
     getExistingObject(id) {
-        const fullId = this.namespace + '.' + id;
+        const fullId = `${this.namespace}.${id}`;
         if (this.existingObjects.hasOwnProperty(fullId)) {
             return this.existingObjects[fullId];
         }
         return undefined;
     }
     async updateObjectAsync(id, obj) {
-        const fullId = this.namespace + '.' + id;
+        const fullId = `${this.namespace}.${id}`;
         if (this.existingObjects.hasOwnProperty(fullId)) {
             const existingObject = this.existingObjects[fullId];
             if (!this.config.syncNames && obj.common) {
@@ -841,7 +858,7 @@ class Loxone extends utils.Adapter {
             listener,
             opts,
             queuedVal: null,
-            ackTimer: null,
+            ackTimer: undefined,
         };
     }
     async checkStateForAck(id) {
@@ -849,10 +866,10 @@ class Loxone extends utils.Adapter {
         if (stateChangeListener) {
             // This state change could be a result of a command we sent being ack'd
             if (stateChangeListener.ackTimer) {
-                // Timer is running so clear it
+                // The timer is running, so clear it
                 this.log.debug(`Clearing ackTimer for ${id}`);
                 this.clearTimeout(stateChangeListener.ackTimer);
-                stateChangeListener.ackTimer = null;
+                stateChangeListener.ackTimer = undefined;
                 // Send any command that may have been delayed waiting for this ack
                 await this.handleDelayedStateChange(id, stateChangeListener);
             }
