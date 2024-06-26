@@ -4,6 +4,7 @@ import { ControlBase, ControlType } from './control-base';
 export class Fronius extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         const systemConfig = await this.adapter.getForeignObjectAsync('system.config');
+        // @ts-expect-error fixed in next js-controller
         const currency = systemConfig?.common.currency;
         await this.updateObjectAsync(uuid, {
             type: type,

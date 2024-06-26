@@ -10,7 +10,16 @@ import * as LxCommunicator from 'lxcommunicator';
 import { v4 } from 'uuid';
 import { Unknown } from './controls/Unknown';
 import { ControlBase, ControlType } from './controls/control-base';
-import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
+import {
+    CatValue,
+    Control,
+    Controls,
+    GlobalStates,
+    OperatingModes,
+    Room,
+    StructureFile,
+    WeatherServer
+} from './structure-file';
 import { WeatherServerHandler } from './weather-server-handler';
 import FormData = require('form-data');
 import Queue = require('queue-fifo');
@@ -22,7 +31,7 @@ export type CurrentStateValue = ioBroker.StateValue | null;
 
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateChangeListenerOpts = {
-    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatically ack state change
+    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatic ack state change
     convertToInt?: boolean; // Convert state values to integers
     minInt?: number; // Values below minInt will be set to this value
     maxInt?: number; // Values above maxInt will be set to this value
@@ -42,14 +51,14 @@ const ackTimeoutMs = 500;
 // Period between connection attempts
 const reconnectTimeoutMs = 5000;
 
-export type StateEventHandler = (value: any) => Promise<void>;
+export type StateEventHandler = (value: ioBroker.StateValue) => Promise<void>;
 export type StateEventRegistration = { name?: string; handler: StateEventHandler };
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
 export type LoxoneEvent = { uuid: string; evt: any };
 export type Sentry = typeof SentryNode;
 
 export type FormatInfoDetailsCallback = ((src: infoDetailsEntryMap) => ioBroker.StateValue) | null;
-export type infoDetailsEntry = { count: number; lastValue?: any };
+export type infoDetailsEntry = { count: number; lastValue?: ioBroker.StateValue };
 export type infoDetailsEntryMap = Map<string, infoDetailsEntry>;
 export type InfoEntry = {
     value: ioBroker.StateValue;
@@ -77,7 +86,7 @@ export class Loxone extends utils.Adapter {
     public readonly reportedMissingControls = new Set<string>();
     private readonly reportedUnsupportedStateChanges = new Set<string>();
     private reconnectTimer?: ioBroker.Timeout;
-    private connectionInProgress = false;
+    private connectionInProgressTimer?: ioBroker.Timeout;
     private lxConnected = false;
 
     private info: Map<string, InfoEntry>;
@@ -144,13 +153,13 @@ export class Loxone extends utils.Adapter {
                 this.log.debug('token received');
             },
             socketOnConnectionClosed: (socket: any, code: string) => {
-                this.log.info('Socket closed ' + code);
+                this.log.info(`Socket closed ${code}`);
                 this.setConnectionState(false);
 
-                // Stop queue and clear it. Issue a warning if it isn't empty.
+                // Stop the queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
                 if (this.eventsQueue.size() > 0) {
-                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                    this.log.warn(`Event queue is not empty. Discarding ${this.eventsQueue.size()} items`);
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
@@ -204,7 +213,7 @@ export class Loxone extends utils.Adapter {
         const sentry = this.getSentry();
         if (sentry) {
             // add a global event processor to upload the structure file (only once)
-            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+            sentry.addEventProcessor(this.createSentryEventProcessor(file));
         }
 
         try {
@@ -221,23 +230,28 @@ export class Loxone extends utils.Adapter {
     }
 
     private async connect(): Promise<void> {
-        if (this.connectionInProgress) {
+        if (this.connectionInProgressTimer) {
             this.log.warn('Connection already in progress');
         } else {
             this.log.info('Trying to connect');
-            this.connectionInProgress = true;
+            this.connectionInProgressTimer = this.setTimeout(() => {
+                this.connectionInProgressTimer = undefined;
+                this.log.debug(`Connection failed because of timeout - will retry after delay in ${reconnectTimeoutMs}ms`);
+                this.socket.close();
+                this.reconnect();
+            }, reconnectTimeoutMs * 2);
 
             let success = true; // Assume success
 
             try {
                 await this.socket.open(
-                    this.config.host + ':' + this.config.port,
+                    `${this.config.host}:${this.config.port}`,
                     this.config.username,
                     this.config.password,
                 );
             } catch (error) {
                 // do not stringify error, it can contain circular references
-                this.log.error(`Couldn't open socket`);
+                this.log.error(`Couldn't open socket: ${error?.toString && error.toString()}`);
                 success = false;
             }
 
@@ -255,15 +269,18 @@ export class Loxone extends utils.Adapter {
                 }
             }
 
-            this.connectionInProgress = false;
+            if (this.connectionInProgressTimer) {
+                this.clearTimeout(this.connectionInProgressTimer);
+                this.connectionInProgressTimer = undefined;
 
-            if (!success) {
-                this.log.debug('Connection failed - will retry after delay');
-                this.socket.close();
-                this.reconnect();
-            } else {
-                // We are ready, let's set the connection indicator
-                this.setConnectionState(true);
+                if (!success) {
+                    this.log.debug('Connection failed - will retry after delay');
+                    this.socket.close();
+                    this.reconnect();
+                } else {
+                    // We are ready, let's set the connection indicator
+                    this.setConnectionState(true);
+                }
             }
         }
     }
@@ -271,7 +288,7 @@ export class Loxone extends utils.Adapter {
     private reconnect(): void {
         if (this.reconnectTimer) {
             this.log.debug('Reconnect called while timer already running');
-        } else if (this.connectionInProgress) {
+        } else if (this.connectionInProgressTimer) {
             this.log.debug('Reconnect called while connection in progress');
         } else {
             this.reconnectTimer = this.setTimeout(() => {
@@ -286,7 +303,8 @@ export class Loxone extends utils.Adapter {
 
     private setConnectionState(connected: boolean): void {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        this.setState('info.connection', this.lxConnected, true)
+            .catch((e) => this.log.error(`Couldn't set connection state: ${e}`));
     }
 
     /**
@@ -556,9 +574,9 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async setOperatingMode(name: string, value: any): Promise<void> {
+    private async setOperatingMode(name: string, value: ioBroker.StateValue): Promise<void> {
         await this.setStateAck(name, value);
-        await this.setStateAck(name + '-text', this.operatingModes[value]);
+        await this.setStateAck(`${name}-text`, this.operatingModes[value as string]);
     }
 
     private async loadControlsAsync(controls: Controls): Promise<void> {
@@ -661,7 +679,7 @@ export class Loxone extends utils.Adapter {
     }
 
     private async loadEnumsAsync(
-        values: Record<string, any>,
+        values: Record<string, Room | CatValue>,
         enumName: string,
         found: Record<string, string[]>,
         enabled: boolean,
@@ -678,12 +696,13 @@ export class Loxone extends utils.Adapter {
 
             const members = [];
             for (const i in found[uuid]) {
-                members.push(this.namespace + '.' + found[uuid][i]);
+                members.push(`${this.namespace}.${found[uuid][i]}`);
             }
 
             const item = values[uuid];
             const name = item.name.replace(/[\][*.,;'"`<>\\?]+/g, '_');
-            const obj = {
+            const obj: ioBroker.EnumObject = {
+                _id: `${enumName}.${name}`,
                 type: 'enum',
                 common: {
                     name: name,
@@ -692,23 +711,23 @@ export class Loxone extends utils.Adapter {
                 native: item,
             };
 
-            await this.updateEnumObjectAsync(enumName + '.' + name, obj);
+            await this.updateEnumObjectAsync(obj._id, obj);
         }
     }
 
-    private async updateEnumObjectAsync(id: string, newObj: any): Promise<void> {
+    private async updateEnumObjectAsync(id: string, newObj: ioBroker.EnumObject): Promise<void> {
         // TODO: the parameter newObj should be an EnumObject, but currently that doesn't exist in the type definition
         // similar to hm-rega.js:
-        let obj: any = await this.getForeignObjectAsync(id);
+        let obj: ioBroker.EnumObject | null = await this.getForeignObjectAsync(id) as ioBroker.EnumObject | null;
         let changed = false;
         if (!obj) {
             obj = newObj;
             changed = true;
-        } else if (newObj && newObj.common && newObj.common.members) {
+        } else if (newObj?.common?.members) {
             obj.common = obj.common || {};
             obj.common.members = obj.common.members || [];
             for (let m = 0; m < newObj.common.members.length; m++) {
-                if (obj.common.members.indexOf(newObj.common.members[m]) === -1) {
+                if (!obj.common.members.includes(newObj.common.members[m])) {
                     changed = true;
                     obj.common.members.push(newObj.common.members[m]);
                 }
@@ -752,7 +771,7 @@ export class Loxone extends utils.Adapter {
         const stateEventHandlerList = this.stateEventHandlers[evt.uuid];
         if (stateEventHandlerList === undefined) {
             this.log.debug(`Unknown event ${evt.uuid}: ${JSON.stringify(evt.evt)}`);
-            this.incInfoState('info.unknownEvents', evt.uuid, evt.evt);
+            this.incInfoState('info.unknownEvents', evt.uuid, evt.evt as ioBroker.StateValue);
             return;
         }
 
@@ -815,7 +834,7 @@ export class Loxone extends utils.Adapter {
         return infoEntry;
     }
 
-    private addInfoDetailsEntry(details: infoDetailsEntryMap, id: string, value?: any): void {
+    private addInfoDetailsEntry(details: infoDetailsEntryMap, id: string, value?: ioBroker.StateValue): void {
         /// ... and add details of this event to the map.
         const eventEntry = details.get(id);
         if (eventEntry) {
@@ -834,7 +853,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private incInfoState(id: string, detailId?: string, detailValue?: any): void {
+    private incInfoState(id: string, detailId?: string, detailValue?: ioBroker.StateValue): void {
         // Increment the given ID
         const infoEntry = this.getInfoEntry(id);
         if (infoEntry) {
@@ -852,7 +871,7 @@ export class Loxone extends utils.Adapter {
 
     private buildInfoDetails(src: infoDetailsEntryMap): string {
         // TODO: shouldn't this use JSON.stringify?
-        const out: any[] = [];
+        const out: { id: string; count: number; lastValue?: ioBroker.StateValue }[] = [];
         src.forEach((value, key) => {
             if (value.lastValue !== undefined) {
                 out.push({ id: key, count: value.count, lastValue: value.lastValue });
@@ -865,28 +884,31 @@ export class Loxone extends utils.Adapter {
 
     private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
         if (infoEntry.value != infoEntry.lastSet) {
-            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            this.log.silly(`value of ${id} changed to ${infoEntry.value}`);
 
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            this.setState(id, infoEntry.value, true)
+                .catch((e) => this.log.error(`Couldn't set state: ${e}`));
+
             infoEntry.lastSet = infoEntry.value;
 
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true)
+                    .catch((e) => this.log.error(`Couldn't set detail state: ${e}`));
             }
 
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
-                this.log.silly('Starting timer for ' + id);
+                this.log.silly(`Starting timer for ${id}`);
                 infoEntry.timer = this.setTimeout(
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (cbId: string, cbInfoEntry: InfoEntry) => {
-                        this.log.silly('Timeout for ' + id);
+                        this.log.silly(`Timeout for ${id}`);
 
-                        // Remove from timer from map as we have just finished
+                        // Remove from timer from a map as we have just finished
                         cbInfoEntry.timer = undefined;
 
                         // Update the state, but only if the value in the info ID map has changed
@@ -907,7 +929,7 @@ export class Loxone extends utils.Adapter {
     }
 
     public getExistingObject(id: string): ioBroker.Object | undefined {
-        const fullId = this.namespace + '.' + id;
+        const fullId = `${this.namespace}.${id}`;
         if (this.existingObjects.hasOwnProperty(fullId)) {
             return this.existingObjects[fullId];
         }
@@ -915,7 +937,7 @@ export class Loxone extends utils.Adapter {
     }
 
     public async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {
-        const fullId = this.namespace + '.' + id;
+        const fullId = `${this.namespace}.${id}`;
         if (this.existingObjects.hasOwnProperty(fullId)) {
             const existingObject = this.existingObjects[fullId];
             if (!this.config.syncNames && obj.common) {
@@ -1004,7 +1026,7 @@ export class Loxone extends utils.Adapter {
         if (stateChangeListener) {
             // This state change could be a result of a command we sent being ack'd
             if (stateChangeListener.ackTimer) {
-                // Timer is running so clear it
+                // The timer is running, so clear it
                 this.log.debug(`Clearing ackTimer for ${id}`);
                 this.clearTimeout(stateChangeListener.ackTimer);
                 stateChangeListener.ackTimer = undefined;
