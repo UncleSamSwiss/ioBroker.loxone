@@ -1,18 +1,23 @@
 {
   "name": "iobroker.loxone",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Communicates with a Loxone Miniserver.",
   "author": {
-    "name": "UncleSamSwiss",
-    "email": "samuel.weibel@gmail.com"
+    "name": "NETbase",
+    "email": "contact@netbase.be"
   },
   "contributors": [
+    {
+      "name": "UncleSamSwiss",
+      "email": "samuel.weibel@gmail.com",
+      "note": "Original author"
+    },
     {
       "name": "Robin Rainton",
       "email": "robin@rainton.com"
     }
   ],
-  "homepage": "https://github.com/UncleSamSwiss/ioBroker.loxone",
+  "homepage": "https://github.com/netbasebe/ioBroker.loxone",
   "license": "Apache-2.0",
   "keywords": [
     "loxone",
@@ -21,7 +26,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/UncleSamSwiss/ioBroker.loxone"
+    "url": "https://github.com/netbasebe/ioBroker.loxone"
   },
   "engines": {
     "node": ">=18"
@@ -87,7 +92,7 @@
     "release": "release-script"
   },
   "bugs": {
-    "url": "https://github.com/UncleSamSwiss/ioBroker.loxone/issues"
+    "url": "https://github.com/netbasebe/ioBroker.loxone/issues"
   },
   "readmeFilename": "README.md"
 }
