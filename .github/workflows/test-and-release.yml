@@ -124,13 +124,28 @@ jobs:
             - name: Create a clean build
               run: npm run build
 
-            - name: Publish package to npm
+            - name: Create release tarball
               run: |
-                  npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-                  npm whoami
-                  npm publish
+                  # Create a tarball with built artifacts for ioBroker installation
+                  tar -czf iobroker-loxone-${{ steps.extract_release.outputs.VERSION }}.tar.gz \
+                    --exclude=node_modules \
+                    --exclude=.git \
+                    --exclude=src \
+                    --exclude=test \
+                    --exclude=.github \
+                    --exclude=.vscode \
+                    --exclude=.idea \
+                    .
+
+            # Skip NPM publishing for fork - can be re-enabled later
+            # - name: Publish package to npm
+            #   run: |
+            #       npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+            #       npm whoami
+            #       npm publish
 
             - name: Create Github Release
+              id: create_release
               uses: actions/create-release@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -141,3 +156,13 @@ jobs:
                   # Prerelease versions create prereleases on Github
                   prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
                   body: ${{ steps.extract_release.outputs.BODY }}
+
+            - name: Upload Release Asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./iobroker-loxone-${{ steps.extract_release.outputs.VERSION }}.tar.gz
+                  asset_name: iobroker-loxone-${{ steps.extract_release.outputs.VERSION }}.tar.gz
+                  asset_content_type: application/gzip
