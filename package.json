@@ -27,15 +27,15 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.1.4",
-    "@sentry/node": "^7.46.0",
-    "axios": "^1.4.0",
+    "@iobroker/adapter-core": "^3.2.3",
+    "@sentry/node": "^9.42.0",
+    "axios": "^1.11.0",
     "color-convert": "^2.0.1",
     "form-data": "^4.0.4",
     "lxcommunicator": "^1.1.1",
     "queue-fifo": "*",
     "sprintf-js": "^1.1.2",
-    "uuid": "^9.0.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.8.0",

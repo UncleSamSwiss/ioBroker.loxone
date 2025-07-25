@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Loxone = void 0;
 const utils = require("@iobroker/adapter-core");
+const SentryNode = require("@sentry/node");
 const axios_1 = require("axios");
 const LxCommunicator = require("lxcommunicator");
 const uuid_1 = require("uuid");
@@ -140,8 +141,8 @@ class Loxone extends utils.Adapter {
         this.log.info(`got structure file; last modified on ${file.lastModified}`);
         const sentry = this.getSentry();
         if (sentry) {
-            // add a global event processor to upload the structure file (only once)
-            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+            // add an event processor to upload the structure file (only once)
+            SentryNode.getGlobalScope().addEventProcessor(this.createSentryEventProcessor(file));
         }
         try {
             await this.loadStructureFileAsync(file);
@@ -187,7 +188,9 @@ class Loxone extends utils.Adapter {
             this.connectionInProgress = false;
             if (!success) {
                 this.log.debug('Connection failed - will retry after delay');
-                this.socket.close();
+                if (this.socket) {
+                    this.socket.close();
+                }
                 this.reconnect();
             }
             else {
@@ -215,7 +218,7 @@ class Loxone extends utils.Adapter {
     }
     setConnectionState(connected) {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        void this.setState('info.connection', this.lxConnected, true);
     }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -311,10 +314,13 @@ class Loxone extends utils.Adapter {
         else {
             if (!((_e = stateChangeListener.opts) === null || _e === void 0 ? void 0 : _e.selfAck)) {
                 // Set ack timer before calling listener
-                stateChangeListener.ackTimer = this.setTimeout(async (id, stateChangeListener) => {
+                stateChangeListener.ackTimer = this.setTimeout(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                async (id, stateChangeListener) => {
                     this.log.warn(`Timeout for ack ${id}`);
                     this.incInfoState('info.ackTimeouts', id);
-                    stateChangeListener.ackTimer = null;
+                    stateChangeListener.ackTimer = undefined;
                     // Even though this is a timeout, handle any change that may have been delayed waiting for this
                     await this.handleDelayedStateChange(id, stateChangeListener);
                 }, ((_f = stateChangeListener.opts) === null || _f === void 0 ? void 0 : _f.ackTimeoutMs) ? (_g = stateChangeListener.opts) === null || _g === void 0 ? void 0 : _g.ackTimeoutMs : ackTimeoutMs, id, stateChangeListener);
@@ -336,7 +342,6 @@ class Loxone extends utils.Adapter {
         }
     }
     createSentryEventProcessor(data) {
-        const sentry = this.getSentry();
         let attachmentEventId;
         return async (event) => {
             var _a;
@@ -353,7 +358,7 @@ class Loxone extends utils.Adapter {
                     }
                     return event;
                 }
-                const dsn = (_a = sentry.getCurrentHub().getClient()) === null || _a === void 0 ? void 0 : _a.getDsn();
+                const dsn = (_a = SentryNode.getClient()) === null || _a === void 0 ? void 0 : _a.getDsn();
                 if (!dsn || !event.event_id) {
                     return event;
                 }
@@ -523,14 +528,13 @@ class Loxone extends utils.Adapter {
         }
     }
     async loadControlAsync(controlType, uuid, control) {
-        var _a;
         const type = control.type || 'None';
         if (type.match(/[^a-z0-9]/i)) {
             throw new Error(`Bad control type: ${type}`);
         }
         let controlObject;
         try {
-            const module = await (_a = `./controls/${type}`, Promise.resolve().then(() => require(_a)));
+            const module = await Promise.resolve(`${`./controls/${type}`}`).then(s => require(s));
             controlObject = new module[type](this);
         }
         catch (error) {
@@ -663,7 +667,7 @@ class Loxone extends utils.Adapter {
         const entry = {
             value: initValue,
             lastSet: initValue,
-            timer: null,
+            timer: undefined,
         };
         if (hasDetails) {
             // TODO: Maybe read these in so they persist across restarts?
@@ -741,20 +745,23 @@ class Loxone extends utils.Adapter {
         if (infoEntry.value != infoEntry.lastSet) {
             this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            void this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+                void this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
             }
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
                 this.log.silly('Starting timer for ' + id);
-                infoEntry.timer = this.setTimeout((cbId, cbInfoEntry) => {
+                infoEntry.timer = this.setTimeout(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                (cbId, cbInfoEntry) => {
                     this.log.silly('Timeout for ' + id);
                     // Remove from timer from map as we have just finished
-                    cbInfoEntry.timer = null;
+                    cbInfoEntry.timer = undefined;
                     // Update the state, but only if the value in the info ID map has changed
                     this.setInfoStateIfChanged(cbId, cbInfoEntry);
                 }, 30000, // Update every 30s max TODO: make this a config parameter?
@@ -841,7 +848,7 @@ class Loxone extends utils.Adapter {
             listener,
             opts,
             queuedVal: null,
-            ackTimer: null,
+            ackTimer: undefined,
         };
     }
     async checkStateForAck(id) {
@@ -852,7 +859,7 @@ class Loxone extends utils.Adapter {
                 // Timer is running so clear it
                 this.log.debug(`Clearing ackTimer for ${id}`);
                 this.clearTimeout(stateChangeListener.ackTimer);
-                stateChangeListener.ackTimer = null;
+                stateChangeListener.ackTimer = undefined;
                 // Send any command that may have been delayed waiting for this ack
                 await this.handleDelayedStateChange(id, stateChangeListener);
             }

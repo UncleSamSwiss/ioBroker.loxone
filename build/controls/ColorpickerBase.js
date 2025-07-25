@@ -87,7 +87,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             max: 100,
             // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
-            const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+            const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
                 await this.setStateAck(name, brightnessTemperature[0]);
             }
@@ -100,7 +100,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.temperature',
             // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
-            const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+            const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
                 await this.setStateAck(name, brightnessTemperature[1]);
             }
@@ -113,7 +113,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             role: 'level.color.temperature',
             // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
-            const brightnessTemperature = this.loxoneColorToBrightnessTemperature(value);
+            const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
                 await this.setStateAck(name, Math.round((brightnessTemperature[1] - 2700) * 1.184210526315789 + 2000));
             }
@@ -152,7 +152,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             max: 100,
             // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
-            const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+            const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
                 await this.setStateAck(name, brightnessTemperature[0]);
             }
@@ -167,7 +167,7 @@ class ColorpickerBase extends control_base_1.ControlBase {
             max: 8000,
             // TODO: re-add: smartIgnore: true,
         }, control.states.color, async (name, value) => {
-            const brightnessTemperature = this.lumitechColorToBrightnessTemperature(value);
+            const brightnessTemperature = this.lumitechOrLoxoneColorToBrightnessTemperature(value);
             if (brightnessTemperature !== undefined) {
                 await this.setStateAck(name, brightnessTemperature[1]);
             }
@@ -232,25 +232,12 @@ class ColorpickerBase extends control_base_1.ControlBase {
         }
         return undefined;
     }
-    loxoneColorToBrightnessTemperature(value) {
+    lumitechOrLoxoneColorToBrightnessTemperature(value) {
         if (!value) {
             return undefined;
         }
         value = value.toString();
-        const match = value.match(/temp\((\d+),(\d+)\)/i);
-        if (match) {
-            const brightness = parseFloat(match[1]);
-            const temperature = parseFloat(match[2]);
-            return [Math.round(brightness), Math.round(temperature)];
-        }
-        return undefined;
-    }
-    lumitechColorToBrightnessTemperature(value) {
-        if (!value) {
-            return undefined;
-        }
-        value = value.toString();
-        const match = value.match(/lumitech\((\d+),(\d+)\)/i);
+        const match = value.match(/(lumitech|temp)\((\d+),(\d+)\)/i);
         if (match) {
             const brightness = parseFloat(match[1]);
             const temperature = parseFloat(match[2]);

@@ -4,7 +4,6 @@
 
 import * as utils from '@iobroker/adapter-core';
 import * as SentryNode from '@sentry/node';
-import { EventProcessor } from '@sentry/types';
 import axios from 'axios';
 import * as LxCommunicator from 'lxcommunicator';
 import { v4 } from 'uuid';
@@ -203,8 +202,8 @@ export class Loxone extends utils.Adapter {
         this.log.info(`got structure file; last modified on ${file.lastModified}`);
         const sentry = this.getSentry();
         if (sentry) {
-            // add a global event processor to upload the structure file (only once)
-            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+            // add an event processor to upload the structure file (only once)
+            SentryNode.getGlobalScope().addEventProcessor(this.createSentryEventProcessor(file));
         }
 
         try {
@@ -288,7 +287,7 @@ export class Loxone extends utils.Adapter {
 
     private setConnectionState(connected: boolean): void {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        void this.setState('info.connection', this.lxConnected, true);
     }
 
     /**
@@ -420,8 +419,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private createSentryEventProcessor(data: StructureFile): EventProcessor {
-        const sentry = this.getSentry()!;
+    private createSentryEventProcessor(data: StructureFile): (event: SentryNode.Event) => Promise<SentryNode.Event> {
         let attachmentEventId: string | undefined;
         return async (event: SentryNode.Event) => {
             try {
@@ -437,7 +435,7 @@ export class Loxone extends utils.Adapter {
                     }
                     return event;
                 }
-                const dsn = sentry.getCurrentHub().getClient()?.getDsn();
+                const dsn = SentryNode.getClient()?.getDsn();
                 if (!dsn || !event.event_id) {
                     return event;
                 }
@@ -870,12 +868,12 @@ export class Loxone extends utils.Adapter {
             this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
 
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            void this.setState(id, infoEntry.value, true);
             infoEntry.lastSet = infoEntry.value;
 
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+                void this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
             }
 
             if (!shutdown) {
