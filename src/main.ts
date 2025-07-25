@@ -259,7 +259,9 @@ export class Loxone extends utils.Adapter {
 
             if (!success) {
                 this.log.debug('Connection failed - will retry after delay');
-                this.socket.close();
+                if (this.socket) {
+                    this.socket.close();
+                }
                 this.reconnect();
             } else {
                 // We are ready, let's set the connection indicator
