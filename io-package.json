@@ -116,7 +116,10 @@
         },
         "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
         "keywords": ["loxone", "miniserver", "smarthome"],
-        "license": "Apache-2.0",
+        "licenseInformation": {
+            "type": "free",
+            "license": "Apache-2.0"
+        },
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
         "icon": "loxone.png",
