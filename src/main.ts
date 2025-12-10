@@ -204,7 +204,7 @@ export class Loxone extends utils.Adapter {
         const sentry = this.getSentry();
         if (sentry) {
             // add a global event processor to upload the structure file (only once)
-            sentry.addGlobalEventProcessor(this.createSentryEventProcessor(file));
+            sentry.addEventProcessor(this.createSentryEventProcessor(file));
         }
 
         try {
