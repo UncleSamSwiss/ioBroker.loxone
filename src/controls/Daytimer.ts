@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Daytimer extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -44,11 +45,11 @@ export class Daytimer extends ControlBase {
                 'value',
             );
 
-            if (control.details.hasOwnProperty('format')) {
+            if ('format' in control.details) {
                 await this.updateStateObjectAsync(
-                    uuid + '.value-formatted',
+                    `${uuid}.value-formatted`,
                     {
-                        name: control.name + ': formatted value',
+                        name: `${control.name}: formatted value`,
                         read: true,
                         write: false,
                         type: 'string',
@@ -71,12 +72,17 @@ export class Daytimer extends ControlBase {
                 'indicator',
             );
 
-            if (control.details.hasOwnProperty('text')) {
-                const text = control.details?.text as { on: string; off: string } | undefined;
+            if ('text' in control.details) {
+                const text = control.details?.text as
+                    | {
+                          on: string;
+                          off: string;
+                      }
+                    | undefined;
                 await this.updateStateObjectAsync(
-                    uuid + '.value-formatted',
+                    `${uuid}.value-formatted`,
                     {
-                        name: control.name + ': formatted value',
+                        name: `${control.name}: formatted value`,
                         read: true,
                         write: false,
                         type: 'string',
@@ -112,11 +118,11 @@ export class Daytimer extends ControlBase {
             'indicator',
         );
 
-        if (control.states.hasOwnProperty('mode') && control.states.hasOwnProperty('modeList')) {
+        if ('mode' in control.states && 'modeList' in control.states) {
             const obj: ioBroker.SettableObjectWorker<ioBroker.StateObject> = {
                 type: 'state',
                 common: {
-                    name: control.name + ': mode as text',
+                    name: `${control.name}: mode as text`,
                     read: true,
                     write: false,
                     type: 'string',
@@ -128,13 +134,13 @@ export class Daytimer extends ControlBase {
                     modeList: control.states.modeList,
                 },
             };
-            await this.updateObjectAsync(uuid + '.mode-text', obj);
+            await this.updateObjectAsync(`${uuid}.mode-text`, obj);
 
             let modeNames: Record<string, string> = {};
             let mode = '-';
             const updateModeText = async (): Promise<void> => {
-                if (modeNames.hasOwnProperty(mode)) {
-                    await this.setStateAck(uuid + '.mode-text', modeNames[mode]);
+                if (mode in modeNames) {
+                    await this.setStateAck(`${uuid}.mode-text`, modeNames[mode]);
                 }
             };
             this.addStateEventHandler(control.states.mode, async (value: ioBroker.StateValue) => {
@@ -150,16 +156,16 @@ export class Daytimer extends ControlBase {
                 modeNames = value
                     .toString()
                     .split(',')
-                    .map((item) =>
+                    .map(item =>
                         item
                             .split(':', 2)[1]
                             .split(';')
-                            .map((pair) => pair.split('=', 2)),
+                            .map(pair => pair.split('=', 2)),
                     )
                     .reduce(
                         (old, pairs) => {
-                            const modePair = pairs.find((p) => p[0] === 'mode');
-                            const namePair = pairs.find((p) => p[0] === 'name');
+                            const modePair = pairs.find(p => p[0] === 'mode');
+                            const namePair = pairs.find(p => p[0] === 'name');
                             if (!modePair || !namePair) {
                                 return old;
                             }
@@ -173,7 +179,7 @@ export class Daytimer extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
         this.addStateChangeListener(
-            uuid + '.pulse',
+            `${uuid}.pulse`,
             () => {
                 this.sendCommand(control.uuidAction, 'pulse');
             },

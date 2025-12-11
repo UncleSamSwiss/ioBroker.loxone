@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class MailBox extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -52,7 +53,7 @@ export class MailBox extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmPacket');
         this.addStateChangeListener(
-            uuid + '.confirmPacket',
+            `${uuid}.confirmPacket`,
             () => {
                 this.sendCommand(control.uuidAction, 'confirmPacket');
             },
@@ -61,7 +62,7 @@ export class MailBox extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirmMail');
         this.addStateChangeListener(
-            uuid + '.confirmMail',
+            `${uuid}.confirmMail`,
             () => {
                 this.sendCommand(control.uuidAction, 'confirmMail');
             },
@@ -70,7 +71,7 @@ export class MailBox extends ControlBase {
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disableNotifications', 'level.timer');
         this.addStateChangeListener(
-            uuid + '.disableNotifications',
+            `${uuid}.disableNotifications`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 this.sendCommand(control.uuidAction, `disableNotifications/${newValue || '0'}`);
             },

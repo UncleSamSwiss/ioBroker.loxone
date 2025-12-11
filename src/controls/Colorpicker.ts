@@ -1,6 +1,6 @@
-import { Control } from '../structure-file';
+import type { Control } from '../structure-file';
 import { ColorpickerBase } from './ColorpickerBase';
-import { ControlType } from './control-base';
+import type { ControlType } from './control-base';
 
 export class Colorpicker extends ColorpickerBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {

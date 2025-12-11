@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class CentralAudioZone extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -20,7 +21,7 @@ export class CentralAudioZone extends ControlBase {
             /* TODO: re-add: { smartIgnore: false }, */
         );
         this.addStateChangeListener(
-            uuid + '.control',
+            `${uuid}.control`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 this.sendCommand(control.uuidAction, newValue ? 'play' : 'pause');
             },

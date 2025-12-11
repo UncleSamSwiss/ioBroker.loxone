@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class ValueSelector extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -22,7 +23,7 @@ export class ValueSelector extends ControlBase {
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'max', 'number', 'value');
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'step', 'number', 'value');
 
-        this.addStateChangeListener(uuid + '.value', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.value`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, this.convertStateToInt(newValue).toString());
         });
     }

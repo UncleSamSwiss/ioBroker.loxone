@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class TimedSwitch extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -36,7 +37,7 @@ export class TimedSwitch extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
         this.addStateChangeListener(
-            uuid + '.on',
+            `${uuid}.on`,
             () => {
                 this.sendCommand(control.uuidAction, 'on');
             },
@@ -45,7 +46,7 @@ export class TimedSwitch extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
         this.addStateChangeListener(
-            uuid + '.off',
+            `${uuid}.off`,
             () => {
                 this.sendCommand(control.uuidAction, 'off');
             },
@@ -54,7 +55,7 @@ export class TimedSwitch extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'pulse');
         this.addStateChangeListener(
-            uuid + '.pulse',
+            `${uuid}.pulse`,
             () => {
                 this.sendCommand(control.uuidAction, 'pulse');
             },

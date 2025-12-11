@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Fronius extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -200,7 +201,7 @@ export class Fronius extends ControlBase {
             'online',
             'indicator.reachable',
             {},
-            (value) => value != 1, // according to docs: 0 = online, 1 = offline
+            value => value != 1, // according to docs: 0 = online, 1 = offline
         );
     }
 }

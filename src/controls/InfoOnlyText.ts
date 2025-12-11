@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class InfoOnlyText extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -16,15 +17,15 @@ export class InfoOnlyText extends ControlBase {
 
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'text', 'string', 'text');
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('format')) {
+        if ('format' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.text-formatted',
+                `${uuid}.text-formatted`,
                 {
-                    name: control.name + ': formatted value',
+                    name: `${control.name}: formatted value`,
                     read: true,
                     write: false,
                     type: 'string',

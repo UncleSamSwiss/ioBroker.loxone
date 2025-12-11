@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Switch extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -21,7 +22,7 @@ export class Switch extends ControlBase {
         });
 
         this.addStateChangeListener(
-            uuid + '.active',
+            `${uuid}.active`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'on');

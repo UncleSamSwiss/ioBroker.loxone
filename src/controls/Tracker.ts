@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Tracker extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {

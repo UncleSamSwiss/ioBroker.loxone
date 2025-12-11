@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Meter extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -33,22 +34,22 @@ export class Meter extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'reset');
         this.addStateChangeListener(
-            uuid + '.reset',
+            `${uuid}.reset`,
             () => {
                 this.sendCommand(control.uuidAction, 'reset');
             },
             { selfAck: true },
         );
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('actualFormat')) {
+        if ('actualFormat' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.actual-formatted',
+                `${uuid}.actual-formatted`,
                 {
-                    name: control.name + ': formatted actual value',
+                    name: `${control.name}: formatted actual value`,
                     read: true,
                     write: false,
                     type: 'string',
@@ -62,11 +63,11 @@ export class Meter extends ControlBase {
             );
         }
 
-        if (control.details.hasOwnProperty('totalFormat')) {
+        if ('totalFormat' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.total-formatted',
+                `${uuid}.total-formatted`,
                 {
-                    name: control.name + ': formatted total value',
+                    name: `${control.name}: formatted total value`,
                     read: true,
                     write: false,
                     type: 'string',

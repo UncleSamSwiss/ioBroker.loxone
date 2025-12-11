@@ -1,0 +1,79 @@
+{
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "host": {
+            "type": "text",
+            "label": "host",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "port": {
+            "type": "number",
+            "label": "port",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "username": {
+            "type": "text",
+            "label": "username",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "password": {
+            "type": "password",
+            "label": "password",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "synchronize": {
+            "type": "staticText",
+            "label": "synchronize",
+            "xs": 12,
+            "sm": 3
+        },
+        "syncNames": {
+            "type": "checkbox",
+            "label": "syncNames",
+            "xs": 12,
+            "sm": 3
+        },
+        "syncRooms": {
+            "type": "checkbox",
+            "label": "syncRooms",
+            "xs": 12,
+            "sm": 3
+        },
+        "syncFunctions": {
+            "type": "checkbox",
+            "label": "syncFunctions",
+            "newLine": true,
+            "xs": 12,
+            "sm": 3
+        },
+        "weatherServer": {
+            "type": "select",
+            "label": "weatherServer",
+            "options": [
+                { "value": "off", "label": "weatherServerOff" },
+                { "value": "current", "label": "weatherServerCurrent" },
+                { "value": "1day", "label": "weatherServer1day" },
+                { "value": "all", "label": "weatherServerAll" }
+            ]
+        }
+    }
+}

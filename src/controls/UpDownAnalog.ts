@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class UpDownAnalog extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -16,7 +17,7 @@ export class UpDownAnalog extends ControlBase {
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['value', 'error']);
 
         const common: Partial<ioBroker.StateCommon> = { write: true };
-        if (control.hasOwnProperty('details')) {
+        if ('details' in control) {
             common.min = control.details.min as number;
             common.max = control.details.max as number;
         }
@@ -30,7 +31,7 @@ export class UpDownAnalog extends ControlBase {
             'level',
             common,
         );
-        this.addStateChangeListener(uuid + '.value', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.value`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, (newValue || '0').toString());
         });
 
@@ -42,15 +43,15 @@ export class UpDownAnalog extends ControlBase {
             'indicator.maintenance',
         );
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('format')) {
+        if ('format' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.value-formatted',
+                `${uuid}.value-formatted`,
                 {
-                    name: control.name + ': formatted value',
+                    name: `${control.name}: formatted value`,
                     read: true,
                     write: false,
                     type: 'string',

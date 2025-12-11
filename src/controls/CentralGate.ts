@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class CentralGate extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -14,7 +15,7 @@ export class CentralGate extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
         this.addStateChangeListener(
-            uuid + '.open',
+            `${uuid}.open`,
             () => {
                 this.sendCommand(control.uuidAction, 'open');
             },
@@ -23,7 +24,7 @@ export class CentralGate extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'close');
         this.addStateChangeListener(
-            uuid + '.close',
+            `${uuid}.close`,
             () => {
                 this.sendCommand(control.uuidAction, 'close');
             },
@@ -32,7 +33,7 @@ export class CentralGate extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stop');
         this.addStateChangeListener(
-            uuid + '.stop',
+            `${uuid}.stop`,
             () => {
                 this.sendCommand(control.uuidAction, 'stop');
             },

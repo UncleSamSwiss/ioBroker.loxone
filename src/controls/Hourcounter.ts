@@ -1,5 +1,6 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Hourcounter extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -85,7 +86,7 @@ export class Hourcounter extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'reset');
         this.addStateChangeListener(
-            uuid + '.reset',
+            `${uuid}.reset`,
             () => {
                 this.sendCommand(control.uuidAction, 'reset');
             },
@@ -94,7 +95,7 @@ export class Hourcounter extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'resetAll');
         this.addStateChangeListener(
-            uuid + '.resetAll',
+            `${uuid}.resetAll`,
             () => {
                 this.sendCommand(control.uuidAction, 'resetAll');
             },

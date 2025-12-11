@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class Gate extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -22,8 +23,8 @@ export class Gate extends ControlBase {
 
         const activeStates = {
             '-1': 'close',
-            '0': 'not moving',
-            '1': 'open',
+            0: 'not moving',
+            1: 'open',
         };
         await this.createPercentageControlStateObjectAsync(control.name, uuid, control.states, 'position', 'level', {
             write: true,
@@ -48,7 +49,7 @@ export class Gate extends ControlBase {
         );
 
         this.addStateChangeListener(
-            uuid + '.active',
+            `${uuid}.active`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 if (newValue === 1) {
                     if (oldValue === -1) {
@@ -75,7 +76,7 @@ export class Gate extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'open');
         this.addStateChangeListener(
-            uuid + '.open',
+            `${uuid}.open`,
             () => {
                 this.sendCommand(control.uuidAction, 'open');
             },
@@ -83,7 +84,7 @@ export class Gate extends ControlBase {
         );
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'close');
         this.addStateChangeListener(
-            uuid + '.close',
+            `${uuid}.close`,
             () => {
                 this.sendCommand(control.uuidAction, 'close');
             },
@@ -93,7 +94,7 @@ export class Gate extends ControlBase {
         // for Alexa support:
         if (control.states.position) {
             this.addStateChangeListener(
-                uuid + '.position',
+                `${uuid}.position`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                     if (typeof oldValue !== 'number' || typeof newValue !== 'number') {
                         // This should never happen due to convertToInt flag
@@ -120,7 +121,7 @@ export class Gate extends ControlBase {
                     const listenerName = 'auto';
                     this.addStateEventHandler(
                         control.states.position,
-                        async (value: any) => {
+                        (value: any) => {
                             if (isOpening && value >= targetValue) {
                                 this.removeStateEventHandler(control.states.position, listenerName);
                                 this.sendCommand(control.uuidAction, 'close');

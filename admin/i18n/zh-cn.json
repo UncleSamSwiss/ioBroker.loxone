@@ -1,0 +1,18 @@
+{
+    "host": "小型服务器主机名/IP",
+    "loxone adapter settings": "loxone的适配器设置",
+    "option1": "选项1",
+    "option2": "选项2",
+    "password": "迷你服务器密码",
+    "port": "小型服务器端口",
+    "syncFunctions": "功能",
+    "syncNames": "名称",
+    "syncRooms": "客房",
+    "synchronize": "同步",
+    "username": "迷你服务器用户名",
+    "weatherServer": "天气服务器",
+    "weatherServer1day": "同步24小时天气预报",
+    "weatherServerAll": "同步整个天气预报",
+    "weatherServerCurrent": "仅同步当前天气",
+    "weatherServerOff": "不同步天气数据"
+}

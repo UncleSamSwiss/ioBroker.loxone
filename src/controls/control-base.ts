@@ -1,6 +1,6 @@
 import { LoxoneHandlerBase } from '../loxone-handler-base';
-import { Loxone } from '../main';
-import { Control } from '../structure-file';
+import type { Loxone } from '../main';
+import type { Control } from '../structure-file';
 
 export type ControlType = 'device' | 'channel';
 

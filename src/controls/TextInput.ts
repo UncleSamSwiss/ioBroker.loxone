@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control, ControlStates } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control, ControlStates } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class TextInput extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -26,19 +27,19 @@ export class TextInput extends ControlBase {
             'text',
             common,
         );
-        this.addStateChangeListener(uuid + '.text', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.text`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, (newValue || '').toString());
         });
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('format')) {
+        if ('format' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.value-formatted',
+                `${uuid}.value-formatted`,
                 {
-                    name: control.name + ': formatted value',
+                    name: `${control.name}: formatted value`,
                     read: true,
                     write: false,
                     type: 'string',
@@ -62,9 +63,9 @@ export class TextInput extends ControlBase {
         role: string,
         commonExt?: Partial<ioBroker.StateCommon>,
     ): Promise<void> {
-        if (states !== undefined && states.hasOwnProperty(name)) {
+        if (states !== undefined && name in states) {
             let common: ioBroker.StateCommon = {
-                name: controlName + ': ' + name,
+                name: `${controlName}: ${name}`,
                 read: false,
                 write: true,
                 type: type,
@@ -75,7 +76,7 @@ export class TextInput extends ControlBase {
                 common = { ...common, ...commonExt };
             }
             await this.updateStateObjectAsync(
-                uuid + '.' + this.normalizeName(name),
+                `${uuid}.${this.normalizeName(name)}`,
                 common,
                 states[name],
                 this.setStateAck.bind(this),

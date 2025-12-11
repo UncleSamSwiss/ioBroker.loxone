@@ -1,0 +1,18 @@
+{
+    "host": "Ім'я/IP хоста мінісервера",
+    "loxone adapter settings": "Налаштування адаптера для loxone",
+    "option1": "варіант1",
+    "option2": "варіант2",
+    "password": "Пароль мінісервера",
+    "port": "Порт мінісервера",
+    "syncFunctions": "Функції",
+    "syncNames": "імена",
+    "syncRooms": "Кімнати",
+    "synchronize": "Синхронізувати",
+    "username": "Ім'я користувача мінісервера",
+    "weatherServer": "Сервер погоди",
+    "weatherServer1day": "Синхронізація прогнозу погоди на 24 години",
+    "weatherServerAll": "Синхронізувати весь прогноз погоди",
+    "weatherServerCurrent": "Синхронізувати лише поточну погоду",
+    "weatherServerOff": "Не синхронізувати дані про погоду"
+}

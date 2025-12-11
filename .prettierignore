@@ -1,6 +1,2 @@
-.*
 package.json
 package-lock.json
-build/
-admin/words.js
-!.github

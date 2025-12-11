@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class AalSmartAlarm extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -22,9 +23,9 @@ export class AalSmartAlarm extends ControlBase {
         ]);
 
         const levelStates = {
-            '0': 'None',
-            '1': 'Immediate',
-            '2': 'Delayed',
+            0: 'None',
+            1: 'Immediate',
+            2: 'Delayed',
         };
         await this.createSimpleControlStateObjectAsync(
             control.name,
@@ -62,7 +63,7 @@ export class AalSmartAlarm extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirm');
         this.addStateChangeListener(
-            uuid + '.confirm',
+            `${uuid}.confirm`,
             () => {
                 this.sendCommand(control.uuidAction, 'confirm');
             },
@@ -70,13 +71,13 @@ export class AalSmartAlarm extends ControlBase {
         );
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
-        this.addStateChangeListener(uuid + '.disable', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.disable`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, `disable/${newValue || '0'}`);
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'startDrill');
         this.addStateChangeListener(
-            uuid + '.startDrill',
+            `${uuid}.startDrill`,
             () => {
                 this.sendCommand(control.uuidAction, 'startDrill');
             },

@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class AlarmClock extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -86,28 +87,28 @@ export class AlarmClock extends ControlBase {
             { write: true },
         );
 
-        this.addStateChangeListener(uuid + '.isEnabled', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'setActive/' + (newValue ? '0' : '1')); // yes, really, this is inverted!
+        this.addStateChangeListener(`${uuid}.isEnabled`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `setActive/${newValue ? '0' : '1'}`); // yes, really, this is inverted!
         });
-        this.addStateChangeListener(uuid + '.ringDuration', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'setRingDuration/' + newValue);
+        this.addStateChangeListener(`${uuid}.ringDuration`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `setRingDuration/${newValue}`);
         });
         this.addStateChangeListener(
-            uuid + '.prepareDuration',
+            `${uuid}.prepareDuration`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setPrepDuration/' + newValue);
+                this.sendCommand(control.uuidAction, `setPrepDuration/${newValue}`);
             },
         );
         this.addStateChangeListener(
-            uuid + '.snoozeDuration',
+            `${uuid}.snoozeDuration`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setSnoozeDuration/' + newValue);
+                this.sendCommand(control.uuidAction, `setSnoozeDuration/${newValue}`);
             },
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'snooze');
         this.addStateChangeListener(
-            uuid + '.snooze',
+            `${uuid}.snooze`,
             () => {
                 this.sendCommand(control.uuidAction, 'snooze');
             },
@@ -116,7 +117,7 @@ export class AlarmClock extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'dismiss');
         this.addStateChangeListener(
-            uuid + '.dismiss',
+            `${uuid}.dismiss`,
             () => {
                 this.sendCommand(control.uuidAction, 'dismiss');
             },

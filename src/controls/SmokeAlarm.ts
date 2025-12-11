@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class SmokeAlarm extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -27,31 +28,31 @@ export class SmokeAlarm extends ControlBase {
         ]);
 
         const levelStates = {
-            '0': 'None',
-            '1': 'Silent',
-            '2': 'Acustic',
-            '3': 'Optical',
-            '4': 'Internal',
-            '5': 'External',
-            '6': 'Remote',
+            0: 'None',
+            1: 'Silent',
+            2: 'Acustic',
+            3: 'Optical',
+            4: 'Internal',
+            5: 'External',
+            6: 'Remote',
         };
         const causeStates = {
-            '0': 'None',
-            '1': 'Smoke',
-            '2': 'Water',
-            '3': 'Smoke & Water',
-            '4': 'Temperature',
-            '5': 'Temperature & Smoke',
-            '6': 'Temperature & Water',
-            '7': 'Temperature & Smoke & Water',
-            '8': 'Arc Fault',
-            '9': 'Arc Fault & Smoke',
-            '10': 'Arc Fault & Water',
-            '11': 'Arc Fault & Smoke & Water',
-            '12': 'Arc Fault & Temperature',
-            '13': 'Arc Fault & Temperature & Smoke',
-            '14': 'Arc Fault & Temperature & Water',
-            '15': 'Arc Fault & Temperature & Smoke & Water',
+            0: 'None',
+            1: 'Smoke',
+            2: 'Water',
+            3: 'Smoke & Water',
+            4: 'Temperature',
+            5: 'Temperature & Smoke',
+            6: 'Temperature & Water',
+            7: 'Temperature & Smoke & Water',
+            8: 'Arc Fault',
+            9: 'Arc Fault & Smoke',
+            10: 'Arc Fault & Water',
+            11: 'Arc Fault & Smoke & Water',
+            12: 'Arc Fault & Temperature',
+            13: 'Arc Fault & Temperature & Smoke',
+            14: 'Arc Fault & Temperature & Water',
+            15: 'Arc Fault & Temperature & Smoke & Water',
         };
         await this.createSimpleControlStateObjectAsync(
             control.name,
@@ -119,7 +120,7 @@ export class SmokeAlarm extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'mute');
         this.addStateChangeListener(
-            uuid + '.mute',
+            `${uuid}.mute`,
             () => {
                 this.sendCommand(control.uuidAction, 'mute');
             },
@@ -128,7 +129,7 @@ export class SmokeAlarm extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(
-            uuid + '.quit',
+            `${uuid}.quit`,
             () => {
                 this.sendCommand(control.uuidAction, 'quit');
             },
@@ -136,14 +137,14 @@ export class SmokeAlarm extends ControlBase {
         );
 
         this.addStateChangeListener(
-            uuid + '.timeServiceMode',
+            `${uuid}.timeServiceMode`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 newValue = this.convertStateToInt(newValue);
                 if (newValue === undefined || newValue < 0) {
                     return;
                 }
 
-                this.sendCommand(control.uuidAction, 'servicemode/' + newValue);
+                this.sendCommand(control.uuidAction, `servicemode/${newValue}`);
             },
         );
 

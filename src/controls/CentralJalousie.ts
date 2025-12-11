@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class CentralJalousie extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -15,7 +16,7 @@ export class CentralJalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'autoActive');
         this.addStateChangeListener(
-            uuid + '.autoActive',
+            `${uuid}.autoActive`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'auto');
@@ -28,7 +29,7 @@ export class CentralJalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
         this.addStateChangeListener(
-            uuid + '.fullUp',
+            `${uuid}.fullUp`,
             () => {
                 this.sendCommand(control.uuidAction, 'FullUp');
             },
@@ -37,7 +38,7 @@ export class CentralJalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullDown');
         this.addStateChangeListener(
-            uuid + '.fullDown',
+            `${uuid}.fullDown`,
             () => {
                 this.sendCommand(control.uuidAction, 'FullDown');
             },
@@ -46,7 +47,7 @@ export class CentralJalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'shade');
         this.addStateChangeListener(
-            uuid + '.shade',
+            `${uuid}.shade`,
             () => {
                 this.sendCommand(control.uuidAction, 'shade');
             },

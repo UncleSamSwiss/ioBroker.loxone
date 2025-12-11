@@ -1,6 +1,8 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
+
 export class IRoomControllerV2 extends ControlBase {
     private uuid = '';
 
@@ -88,17 +90,17 @@ export class IRoomControllerV2 extends ControlBase {
             'value.temperature',
         );
         // Add event handler to frost/heat protection values so we re-calc target min/max if they change
-        this.addStateEventHandler(uuid + '.frostProtectTemperature', async () => {
+        this.addStateEventHandler(`${uuid}.frostProtectTemperature`, async () => {
             await this.updateTempTargetMinMax();
         });
-        this.addStateEventHandler(uuid + '.heatProtectTemperature', async () => {
+        this.addStateEventHandler(`${uuid}.heatProtectTemperature`, async () => {
             await this.updateTempTargetMinMax();
         });
 
         await this.updateStateObjectAsync(
-            uuid + '.activeMode',
+            `${uuid}.activeMode`,
             {
-                name: control.name + ': activeMode',
+                name: `${control.name}: activeMode`,
                 read: true,
                 write: true,
                 type: 'number',
@@ -116,14 +118,14 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.updateTempTargetMinMax();
             },
         );
-        this.addStateChangeListener(uuid + '.activeMode', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'override/' + newValue);
+        this.addStateChangeListener(`${uuid}.activeMode`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `override/${newValue}`);
         });
 
         await this.updateStateObjectAsync(
-            uuid + '.comfortTemperature',
+            `${uuid}.comfortTemperature`,
             {
-                name: control.name + ': comfortTemperature',
+                name: `${control.name}: comfortTemperature`,
                 read: true,
                 write: comfortTemperatureWrite,
                 type: 'number',
@@ -136,17 +138,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (comfortTemperatureWrite) {
             this.addStateChangeListener(
-                uuid + '.comfortTemperature',
+                `${uuid}.comfortTemperature`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setComfortTemperature/' + newValue);
+                    this.sendCommand(control.uuidAction, `setComfortTemperature/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.comfortTemperatureCool',
+            `${uuid}.comfortTemperatureCool`,
             {
-                name: control.name + ': comfortTemperatureCool',
+                name: `${control.name}: comfortTemperatureCool`,
                 read: true,
                 write: comfortTemperatureCoolWrite,
                 type: 'number',
@@ -159,17 +161,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (comfortTemperatureCoolWrite) {
             this.addStateChangeListener(
-                uuid + '.comfortTemperatureCool',
+                `${uuid}.comfortTemperatureCool`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setComfortTemperatureCool/' + newValue);
+                    this.sendCommand(control.uuidAction, `setComfortTemperatureCool/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.comfortTolerance',
+            `${uuid}.comfortTolerance`,
             {
-                name: control.name + ': comfortTolerance',
+                name: `${control.name}: comfortTolerance`,
                 read: true,
                 write: comfortToleranceWrite,
                 type: 'number',
@@ -184,17 +186,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (comfortToleranceWrite) {
             this.addStateChangeListener(
-                uuid + '.comfortTolerance',
+                `${uuid}.comfortTolerance`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setComfortTolerance/' + newValue);
+                    this.sendCommand(control.uuidAction, `setComfortTolerance/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.absentMinOffset',
+            `${uuid}.absentMinOffset`,
             {
-                name: control.name + ': absentMinOffset',
+                name: `${control.name}: absentMinOffset`,
                 read: true,
                 write: absentMinOffsetWrite,
                 type: 'number',
@@ -208,17 +210,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (absentMinOffsetWrite) {
             this.addStateChangeListener(
-                uuid + '.absentMinOffset',
+                `${uuid}.absentMinOffset`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setAbsentMinTemperature/' + newValue);
+                    this.sendCommand(control.uuidAction, `setAbsentMinTemperature/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.absentMaxOffset',
+            `${uuid}.absentMaxOffset`,
             {
-                name: control.name + ': absentMaxOffset',
+                name: `${control.name}: absentMaxOffset`,
                 read: true,
                 write: absentMaxOffsetWrite,
                 type: 'number',
@@ -232,17 +234,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (absentMaxOffsetWrite) {
             this.addStateChangeListener(
-                uuid + '.absentMaxOffset',
+                `${uuid}.absentMaxOffset`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setAbsentMaxTemperature/' + newValue);
+                    this.sendCommand(control.uuidAction, `setAbsentMaxTemperature/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.comfortTemperatureOffset',
+            `${uuid}.comfortTemperatureOffset`,
             {
-                name: control.name + ': comfortTemperatureOffset',
+                name: `${control.name}: comfortTemperatureOffset`,
                 read: true,
                 write: true,
                 type: 'number',
@@ -255,16 +257,16 @@ export class IRoomControllerV2 extends ControlBase {
             },
         );
         this.addStateChangeListener(
-            uuid + '.comfortTemperatureOffset',
+            `${uuid}.comfortTemperatureOffset`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'setComfortModeTemp/' + newValue);
+                this.sendCommand(control.uuidAction, `setComfortModeTemp/${newValue}`);
             },
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.shadingHeatTemp',
+            `${uuid}.shadingHeatTemp`,
             {
-                name: control.name + ': shadingHeatTemp',
+                name: `${control.name}: shadingHeatTemp`,
                 read: true,
                 write: shadingHeatTempWrite,
                 type: 'number',
@@ -277,17 +279,17 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (shadingHeatTempWrite) {
             this.addStateChangeListener(
-                uuid + '.shadingHeatTemp',
+                `${uuid}.shadingHeatTemp`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setShadingHeatTemp/' + newValue);
+                    this.sendCommand(control.uuidAction, `setShadingHeatTemp/${newValue}`);
                 },
             );
         }
 
         await this.updateStateObjectAsync(
-            uuid + '.shadingCoolTemp',
+            `${uuid}.shadingCoolTemp`,
             {
-                name: control.name + ': shadingCoolTemp',
+                name: `${control.name}: shadingCoolTemp`,
                 read: true,
                 write: shadingCoolTempWrite,
                 type: 'number',
@@ -300,9 +302,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
         if (shadingHeatTempWrite) {
             this.addStateChangeListener(
-                uuid + '.shadingCoolTemp',
+                `${uuid}.shadingCoolTemp`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                    this.sendCommand(control.uuidAction, 'setShadingCoolTemp/' + newValue);
+                    this.sendCommand(control.uuidAction, `setShadingCoolTemp/${newValue}`);
                 },
             );
         }
@@ -353,9 +355,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.temperatureBoundaryInfo',
+            `${uuid}.temperatureBoundaryInfo`,
             {
-                name: control.name + ': temperatureBoundaryInfo',
+                name: `${control.name}: temperatureBoundaryInfo`,
                 read: true,
                 write: false,
                 type: 'number',
@@ -373,9 +375,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.tempTarget',
+            `${uuid}.tempTarget`,
             {
-                name: control.name + ': tempTarget',
+                name: `${control.name}: tempTarget`,
                 read: true,
                 write: true,
                 type: 'number',
@@ -387,7 +389,7 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.updateTempTargetMinMax();
             },
         );
-        this.addStateChangeListener(uuid + '.tempTarget', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.tempTarget`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             // Target has been set manually so start an override at that value
             // setManualTemperature is redundant in this context as simply setting that value
             // does not actually tell IRC to switch to manual mode.
@@ -395,7 +397,7 @@ export class IRoomControllerV2 extends ControlBase {
             // but that would be illogical as the target now shown would not actually be the target
             // being worked with.
             // So because of this, just start an override at the given temperature.
-            this.sendCommand(control.uuidAction, 'override/3//' + newValue);
+            this.sendCommand(control.uuidAction, `override/3//${newValue}`);
         });
 
         // TODO: capabilities is a bitmask, possibility to decode it's meaning?
@@ -409,9 +411,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.currentMode',
+            `${uuid}.currentMode`,
             {
-                name: control.name + ': currentMode',
+                name: `${control.name}: currentMode`,
                 read: true,
                 write: false,
                 type: 'number',
@@ -433,9 +435,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.autoMode',
+            `${uuid}.autoMode`,
             {
-                name: control.name + ': autoMode',
+                name: `${control.name}: autoMode`,
                 read: true,
                 write: false,
                 type: 'number',
@@ -453,9 +455,9 @@ export class IRoomControllerV2 extends ControlBase {
         );
 
         await this.updateStateObjectAsync(
-            uuid + '.operatingMode',
+            `${uuid}.operatingMode`,
             {
-                name: control.name + ': operatingMode',
+                name: `${control.name}: operatingMode`,
                 read: true,
                 write: true,
                 type: 'number',
@@ -474,13 +476,13 @@ export class IRoomControllerV2 extends ControlBase {
                 await this.setStateAck(name, value);
             },
         );
-        this.addStateChangeListener(uuid + '.operatingMode', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'setOperatingMode/' + newValue);
+        this.addStateChangeListener(`${uuid}.operatingMode`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `setOperatingMode/${newValue}`);
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'stopOverride');
         this.addStateChangeListener(
-            uuid + '.stopOverride',
+            `${uuid}.stopOverride`,
             () => {
                 this.sendCommand(control.uuidAction, 'stopOverride');
             },
@@ -488,10 +490,10 @@ export class IRoomControllerV2 extends ControlBase {
         );
         // When in Eco/Building Protection modes Loxone app/web shows target as min..max range
         // Handy so create derived state for each
-        await this.updateObjectAsync(uuid + '.tempTargetMin', {
+        await this.updateObjectAsync(`${uuid}.tempTargetMin`, {
             type: 'state',
             common: {
-                name: control.name + ': tempTargetMin',
+                name: `${control.name}: tempTargetMin`,
                 type: 'number',
                 role: 'value.temperature',
                 read: true,
@@ -499,10 +501,10 @@ export class IRoomControllerV2 extends ControlBase {
             },
             native: {},
         });
-        await this.updateObjectAsync(uuid + '.tempTargetMax', {
+        await this.updateObjectAsync(`${uuid}.tempTargetMax`, {
             type: 'state',
             common: {
-                name: control.name + ': tempTargetMax',
+                name: `${control.name}: tempTargetMax`,
                 type: 'number',
                 role: 'value.temperature',
                 read: true,
@@ -527,20 +529,20 @@ export class IRoomControllerV2 extends ControlBase {
     // inputs relating to current mode change. Ie. dont call this on absentMinOffset
     // change if mode is 1.
     protected async updateTempTargetMinMax(): Promise<void> {
-        const activeMode = this.convertStateToInt(this.getCachedStateValue(this.uuid + '.activeMode'));
+        const activeMode = this.convertStateToInt(this.getCachedStateValue(`${this.uuid}.activeMode`));
         let tempTargetMin;
         let tempTargetMax;
         switch (activeMode) {
-            case 0:
+            case 0: {
                 // Economy, min/max are target +/- absent offset
                 const absentMinOffset = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.absentMinOffset'),
+                    this.getCachedStateValue(`${this.uuid}.absentMinOffset`),
                 );
                 const absentMaxOffset = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.absentMaxOffset'),
+                    this.getCachedStateValue(`${this.uuid}.absentMaxOffset`),
                 );
                 const comfortTemperature = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.comfortTemperature'),
+                    this.getCachedStateValue(`${this.uuid}.comfortTemperature`),
                 );
 
                 tempTargetMin = comfortTemperature - absentMinOffset;
@@ -549,14 +551,15 @@ export class IRoomControllerV2 extends ControlBase {
                     `Mode ${activeMode}: ${absentMinOffset}/${absentMaxOffset}/${comfortTemperature} -> ${tempTargetMin}/${tempTargetMax}`,
                 );
                 break;
+            }
 
             case 2:
                 // Building protection uses frost & heat protection
                 tempTargetMin = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.frostProtectTemperature'),
+                    this.getCachedStateValue(`${this.uuid}.frostProtectTemperature`),
                 );
                 tempTargetMax = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.heatProtectTemperature'),
+                    this.getCachedStateValue(`${this.uuid}.heatProtectTemperature`),
                 );
                 this.adapter.log.debug(`Mode ${activeMode}: -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
@@ -565,7 +568,7 @@ export class IRoomControllerV2 extends ControlBase {
                 // Comfort, manual & override modes just use direct target
                 // TODO: Loxone doco doesn't properly explain what activeMode is on override so just assume it's OK.
                 tempTargetMin = tempTargetMax = this.convertStateToFloat(
-                    this.getCachedStateValue(this.uuid + '.tempTarget'),
+                    this.getCachedStateValue(`${this.uuid}.tempTarget`),
                 );
                 this.adapter.log.debug(`Mode ${activeMode}: ${tempTargetMin} -> ${tempTargetMin}/${tempTargetMax}`);
                 break;
@@ -573,10 +576,10 @@ export class IRoomControllerV2 extends ControlBase {
 
         // Don't do any update if not calculated (can only happen in error condition)
         if (tempTargetMin !== undefined) {
-            await this.setStateAck(this.uuid + '.tempTargetMin', tempTargetMin);
+            await this.setStateAck(`${this.uuid}.tempTargetMin`, tempTargetMin);
         }
         if (tempTargetMax !== undefined) {
-            await this.setStateAck(this.uuid + '.tempTargetMax', tempTargetMax);
+            await this.setStateAck(`${this.uuid}.tempTargetMax`, tempTargetMax);
         }
     }
 }

@@ -1,6 +1,7 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
 export class EIBDimmer extends ControlBase {
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
@@ -25,13 +26,13 @@ export class EIBDimmer extends ControlBase {
             { write: true },
         );
 
-        this.addStateChangeListener(uuid + '.position', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.position`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, this.convertStateToInt(newValue).toString());
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
         this.addStateChangeListener(
-            uuid + '.on',
+            `${uuid}.on`,
             () => {
                 this.sendCommand(control.uuidAction, 'on');
             },
@@ -40,7 +41,7 @@ export class EIBDimmer extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
         this.addStateChangeListener(
-            uuid + '.off',
+            `${uuid}.off`,
             () => {
                 this.sendCommand(control.uuidAction, 'off');
             },

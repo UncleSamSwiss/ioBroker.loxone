@@ -1,0 +1,18 @@
+{
+    "host": "Nome do host/IP do miniservidor",
+    "loxone adapter settings": "Configurações do adaptador para loxone",
+    "option1": "opção1",
+    "option2": "opção2",
+    "password": "Senha do miniservidor",
+    "port": "Porta miniservidor",
+    "syncFunctions": "Funções",
+    "syncNames": "Nomes",
+    "syncRooms": "Quartos",
+    "synchronize": "Sincronizar",
+    "username": "Nome de usuário do miniservidor",
+    "weatherServer": "Servidor meteorológico",
+    "weatherServer1day": "Sincronize 24 horas de previsão do tempo",
+    "weatherServerAll": "Sincronize toda a previsão do tempo",
+    "weatherServerCurrent": "Sincronizar apenas o clima atual",
+    "weatherServerOff": "Não sincronize dados meteorológicos"
+}
