@@ -17,6 +17,7 @@ import type {
     WeatherServer,
 } from './structure-file.ts';
 import { WeatherServerHandler } from './weather-server-handler';
+import { AllControls } from './controls/all-controls';
 
 const WebSocketConfig = LxCommunicator.WebSocketConfig;
 
@@ -25,19 +26,31 @@ export type CurrentStateValue = ioBroker.StateValue | null;
 
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateChangeListenerOpts = {
-    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatically ack state change
-    convertToInt?: boolean; // Convert state values to integers
-    minInt?: number; // Values below minInt will be set to this value
-    maxInt?: number; // Values above maxInt will be set to this value
-    ackTimeoutMs?: number; // Override default timeout
-    selfAck?: boolean; // Acknowledge ourself (don't wait for Loxone)
+    /** Don't call if new/old vals are the same & automatically ack state change */
+    notIfEqual?: boolean;
+    /** Convert state values to integers */
+    convertToInt?: boolean;
+    /** Values below minInt will be set to this value */
+    minInt?: number;
+    /** Values above maxInt will be set to this value */
+    maxInt?: number;
+    /** Override default timeout */
+    ackTimeoutMs?: number;
+    /** Acknowledge ourself (don't wait for Loxone) */
+    selfAck?: boolean;
 };
+
 export type StateChangeListenEntry = {
+    /** The listener function to call on state change */
     listener: StateChangeListener;
+    /** Options for this listener */
     opts?: StateChangeListenerOpts;
+    /** Queued value if a state change is in progress */
     queuedVal: ioBroker.StateValue | null;
+    /** Timer for ack timeout */
     ackTimer: ioBroker.Timeout | undefined;
 };
+
 // Log warnings if no ack event from Loxone in this time
 // TODO: should this be configurable?
 const ackTimeoutMs = 500;
@@ -46,21 +59,43 @@ const ackTimeoutMs = 500;
 const reconnectTimeoutMs = 5000;
 
 export type StateEventHandler = (value: any) => Promise<void> | void;
-export type StateEventRegistration = { name?: string; handler: StateEventHandler };
+export type StateEventRegistration = {
+    /** The name of the event handler used for removal */
+    name?: string;
+    /** The event handler function */
+    handler: StateEventHandler;
+};
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
-export type LoxoneEvent = { uuid: string; evt: any };
+export type LoxoneEvent = {
+    /** The UUID of the event */
+    uuid: string;
+    /** The event data */
+    evt: any;
+};
 export type Sentry = typeof SentryNode;
 
-export type FormatInfoDetailsCallback = ((src: infoDetailsEntryMap) => ioBroker.StateValue) | null;
-export type infoDetailsEntry = { count: number; lastValue?: any };
-export type infoDetailsEntryMap = Map<string, infoDetailsEntry>;
+export type FormatInfoDetailsCallback = ((src: InfoDetailsEntryMap) => ioBroker.StateValue) | null;
+export type InfoDetailsEntry = {
+    /** The event counter. */
+    count: number;
+    /** The last value received for this event. */
+    lastValue?: any;
+};
+export type InfoDetailsEntryMap = Map<string, InfoDetailsEntry>;
 export type InfoEntry = {
+    /** The current state value */
     value: ioBroker.StateValue;
+    /** The last set state value */
     lastSet: ioBroker.StateValue;
+    /** Timer for state value reset */
     timer: ioBroker.Timeout | undefined;
-    detailsMap?: infoDetailsEntryMap;
+    /** Map of detailed information entries */
+    detailsMap?: InfoDetailsEntryMap;
 };
 
+/**
+ * The Loxone adapter main class.
+ */
 export class Loxone extends utils.Adapter {
     private uuid = '';
     private socket?: any;
@@ -85,6 +120,11 @@ export class Loxone extends utils.Adapter {
 
     private info: Map<string, InfoEntry>;
 
+    /**
+     * Creates an instance of the Loxone adapter.
+     *
+     * @param options The adapter options.
+     */
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : `${__dirname}/../`,
@@ -286,11 +326,13 @@ export class Loxone extends utils.Adapter {
 
     private setConnectionState(connected: boolean): void {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        this.setState('info.connection', this.lxConnected, true).catch(e => this.log.warn(e));
     }
 
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
+     *
+     * @param callback the callback to call when cleanup is done
      */
     private onUnload(callback: () => void): void {
         try {
@@ -307,7 +349,10 @@ export class Loxone extends utils.Adapter {
     }
 
     /**
-     * Is called if a subscribed state changes
+     * Is called if a subscribed state changes.
+     *
+     * @param id the id of the state
+     * @param state the state object
      */
     private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         // Warning: state can be null if it was deleted!
@@ -318,7 +363,7 @@ export class Loxone extends utils.Adapter {
             // TODO: can this be done better by ignoring '.info.' in subscribeStates?
         } else {
             this.log.debug(`stateChange ${id} ${JSON.stringify(state)}`);
-            if (!('id' in this.stateChangeListeners)) {
+            if (!(id in this.stateChangeListeners)) {
                 const msg = `Unsupported state change: ${id}`;
                 this.log.error(msg);
                 if (!this.reportedUnsupportedStateChanges.has(id)) {
@@ -356,6 +401,12 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Convert a state value to an integer.
+     *
+     * @param value The state value to convert.
+     * @returns The integer representation of the state value.
+     */
     public convertStateToInt(value: OldStateValue): number {
         return !value ? 0 : parseInt(value.toString());
     }
@@ -600,6 +651,13 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Load sub-controls of a control.
+     *
+     * @param parentUuid The UUID of the parent control.
+     * @param control The control containing sub-controls.
+     * @returns A promise that resolves when sub-controls are loaded.
+     */
     public async loadSubControlsAsync(parentUuid: string, control: Control): Promise<void> {
         if (!('subControls' in control)) {
             return;
@@ -634,9 +692,9 @@ export class Loxone extends utils.Adapter {
 
         let controlObject: ControlBase;
         try {
-            const module = await import(`./controls/${type}`);
-            controlObject = new module[type](this);
-        } catch {
+            controlObject = new AllControls[type as keyof typeof AllControls](this);
+        } catch (e: any) {
+            this.log.silly(`Couldn't load control type ${type}: ${e}`);
             controlObject = new Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
@@ -787,7 +845,7 @@ export class Loxone extends utils.Adapter {
 
         if (hasDetails) {
             // TODO: Maybe read these in so they persist across restarts?
-            entry.detailsMap = new Map<string, infoDetailsEntry>();
+            entry.detailsMap = new Map<string, InfoDetailsEntry>();
         }
 
         this.info.set(id, entry);
@@ -813,7 +871,7 @@ export class Loxone extends utils.Adapter {
         return infoEntry;
     }
 
-    private addInfoDetailsEntry(details: infoDetailsEntryMap, id: string, value?: any): void {
+    private addInfoDetailsEntry(details: InfoDetailsEntryMap, id: string, value?: any): void {
         /// ... and add details of this event to the map.
         const eventEntry = details.get(id);
         if (eventEntry) {
@@ -848,7 +906,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private buildInfoDetails(src: infoDetailsEntryMap): string {
+    private buildInfoDetails(src: InfoDetailsEntryMap): string {
         // TODO: shouldn't this use JSON.stringify?
         const out: any[] = [];
         src.forEach((value, key) => {
@@ -866,12 +924,14 @@ export class Loxone extends utils.Adapter {
             this.log.silly(`value of ${id} changed to ${infoEntry.value}`);
 
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            this.setState(id, infoEntry.value, true).catch(e => this.log.warn(e));
             infoEntry.lastSet = infoEntry.value;
 
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true);
+                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true).catch(e =>
+                    this.log.warn(e),
+                );
             }
 
             if (!shutdown) {
@@ -898,17 +958,35 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Sends a command to the Loxone Miniserver.
+     *
+     * @param uuid The UUID of the command.
+     * @param action The name of the action to send.
+     */
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
         this.incInfoState('info.messagesSent');
         this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
 
+    /**
+     * Get an existing object by its ID.
+     *
+     * @param id The local ID of the object (without namespace).
+     * @returns The existing object or undefined if not found.
+     */
     public getExistingObject(id: string): ioBroker.Object | undefined {
         const fullId = `${this.namespace}.${id}`;
         return this.existingObjects[fullId];
     }
 
+    /**
+     * Update or create an object asynchronously.
+     *
+     * @param id The local ID of the object (without namespace).
+     * @param obj The object to update or create.
+     */
     public async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {
         const fullId = `${this.namespace}.${id}`;
         if (this.existingObjects[fullId]) {
@@ -926,6 +1004,14 @@ export class Loxone extends utils.Adapter {
         await this.extendObjectAsync(id, obj);
     }
 
+    /**
+     * Update a state object asynchronously.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param commonInfo The common information for the state.
+     * @param stateUuid The UUID of the state.
+     * @param stateEventHandler An optional event handler for state changes.
+     */
     public async updateStateObjectAsync(
         id: string,
         commonInfo: ioBroker.StateCommon,
@@ -957,6 +1043,13 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Add a state event handler for a given UUID.
+     *
+     * @param uuid The UUID of the control.
+     * @param eventHandler The event handler function.
+     * @param name An optional name for the event handler.
+     */
     public addStateEventHandler(uuid: string, eventHandler: StateEventHandler, name?: string): void {
         if (this.stateEventHandlers[uuid] === undefined) {
             this.stateEventHandlers[uuid] = [];
@@ -969,6 +1062,13 @@ export class Loxone extends utils.Adapter {
         this.stateEventHandlers[uuid].push({ name: name, handler: eventHandler });
     }
 
+    /**
+     * Remove a state event handler for a given UUID by name.
+     *
+     * @param uuid The UUID of the control.
+     * @param name The name of the event handler to remove.
+     * @returns True if the handler was found and removed, false otherwise.
+     */
     public removeStateEventHandler(uuid: string, name: string): boolean {
         if (this.stateEventHandlers[uuid] === undefined || !name) {
             return false;
@@ -985,6 +1085,13 @@ export class Loxone extends utils.Adapter {
         return found;
     }
 
+    /**
+     * Add a state change listener for a given state ID.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param listener The state change listener function.
+     * @param opts Optional options for the state change listener.
+     */
     public addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
         this.stateChangeListeners[`${this.namespace}.${id}`] = {
             listener,
@@ -1013,6 +1120,12 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Set state with ack = true and update cached value.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param value The value to set.
+     */
     public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
         const keyId = `${this.namespace}.${id}`;
         this.currentStateValues[keyId] = value;
@@ -1020,11 +1133,22 @@ export class Loxone extends utils.Adapter {
         await this.setStateAsync(id, { val: value, ack: true });
     }
 
+    /**
+     * Get a cached state value.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @returns The cached state value.
+     */
     public getCachedStateValue(id: string): OldStateValue {
         const keyId = `${this.namespace}.${id}`;
         return this.currentStateValues[keyId];
     }
 
+    /**
+     * Get the Sentry instance if available.
+     *
+     * @returns The Sentry instance or undefined if not available.
+     */
     public getSentry(): Sentry | undefined {
         if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
             const sentryInstance = this.getPluginInstance('sentry');
@@ -1034,6 +1158,11 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Report an error message to Sentry.
+     *
+     * @param message The error message to report.
+     */
     public reportError(message: string): void {
         this.log.error(message);
         this.getSentry()?.captureMessage(message, 'error');

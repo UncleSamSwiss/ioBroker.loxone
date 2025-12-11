@@ -121,14 +121,8 @@
             "uk": "Зв’язується з міні-сервером Loxone.",
             "zh-cn": "与 Loxone 迷你服务器通信。"
         },
-        "authors": [
-            "UncleSamSwiss <samuel.weibel@gmail.com>"
-        ],
-        "keywords": [
-            "loxone",
-            "miniserver",
-            "smarthome"
-        ],
+        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>"],
+        "keywords": ["loxone", "miniserver", "smarthome"],
         "licenseInformation": {
             "type": "free",
             "license": "Apache-2.0"
@@ -155,24 +149,18 @@
         ],
         "globalDependencies": [
             {
-                "admin": ">=7.0.23"
+                "admin": ">=7.6.17"
             }
         ],
         "plugins": {
             "sentry": {
                 "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
-                "pathWhitelist": [
-                    "loxone"
-                ]
+                "pathWhitelist": ["loxone"]
             }
         }
     },
-    "encryptedNative": [
-        "password"
-    ],
-    "protectedNative": [
-        "password"
-    ],
+    "encryptedNative": ["password"],
+    "protectedNative": ["password"],
     "native": {
         "host": "0.0.0.0",
         "port": 80,
