@@ -4,40 +4,40 @@
     "items": {
         "host": {
             "type": "text",
-            "label": "host",
+            "label": "miniserverHost",
             "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
-            "lg": 2,
+            "lg": 3,
             "xl": 2
         },
         "port": {
             "type": "number",
-            "label": "port",
+            "label": "miniserverPort",
             "xs": 12,
             "sm": 12,
             "md": 4,
-            "lg": 2,
+            "lg": 3,
             "xl": 2
         },
         "username": {
             "type": "text",
-            "label": "username",
+            "label": "miniserverUsername",
             "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
-            "lg": 2,
+            "lg": 3,
             "xl": 2
         },
         "password": {
             "type": "password",
-            "label": "password",
+            "label": "miniserverPassword",
             "xs": 12,
             "sm": 12,
             "md": 4,
-            "lg": 2,
+            "lg": 3,
             "xl": 2
         },
         "synchronize": {
@@ -45,25 +45,37 @@
             "label": "synchronize",
             "newLine": true,
             "xs": 12,
-            "sm": 3
+            "sm": 3,
+            "md": 3,
+            "lg": 3,
+            "xl": 3
         },
         "syncNames": {
             "type": "checkbox",
             "label": "syncNames",
             "xs": 12,
-            "sm": 3
+            "sm": 3,
+            "md": 3,
+            "lg": 3,
+            "xl": 3
         },
         "syncRooms": {
             "type": "checkbox",
             "label": "syncRooms",
             "xs": 12,
-            "sm": 3
+            "sm": 3,
+            "md": 3,
+            "lg": 3,
+            "xl": 3
         },
         "syncFunctions": {
             "type": "checkbox",
             "label": "syncFunctions",
             "xs": 12,
-            "sm": 3
+            "sm": 3,
+            "md": 3,
+            "lg": 3,
+            "xl": 3
         },
         "weatherServer": {
             "type": "select",
@@ -71,7 +83,7 @@
             "xs": 12,
             "sm": 12,
             "md": 4,
-            "lg": 2,
+            "lg": 3,
             "xl": 2,
             "options": [
                 { "value": "off", "label": "weatherServerOff" },
