@@ -1,5 +1,5 @@
 export interface StructureFile {
-    lastModified: Date;
+    lastModified: string;
     msInfo: MSInfo;
     globalStates: GlobalStates;
     operatingModes: OperatingModes;

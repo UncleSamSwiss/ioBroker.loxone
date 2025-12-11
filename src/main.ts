@@ -200,7 +200,7 @@ export class Loxone extends utils.Adapter {
             return false;
         }
         this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
-        this.log.info(`got structure file; last modified on ${file.lastModified.toISOString()}`);
+        this.log.info(`got structure file; last modified on ${file.lastModified}`);
         const sentry = this.getSentry();
         if (sentry) {
             // add a global event processor to upload the structure file (only once)
