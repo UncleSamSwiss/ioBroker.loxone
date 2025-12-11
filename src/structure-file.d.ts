@@ -1,3 +1,5 @@
+/* eslint-disable jsdoc/require-jsdoc */
+
 export interface StructureFile {
     lastModified: string;
     msInfo: MSInfo;

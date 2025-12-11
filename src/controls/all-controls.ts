@@ -10,7 +10,6 @@ import { CentralGate } from './CentralGate';
 import { CentralJalousie } from './CentralJalousie';
 import { CentralLightController } from './CentralLightController';
 import { Colorpicker } from './Colorpicker';
-import { ColorpickerBase } from './ColorpickerBase';
 import { ColorPickerV2 } from './ColorPickerV2';
 import { Daytimer } from './Daytimer';
 import { Dimmer } from './Dimmer';

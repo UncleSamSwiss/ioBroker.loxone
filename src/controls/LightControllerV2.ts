@@ -3,6 +3,9 @@ import type { Control } from '../structure-file';
 import type { ControlType } from './control-base';
 import { ControlBase } from './control-base';
 
+/**
+ * Handler for LightControllerV2 controls.
+ */
 export class LightControllerV2 extends ControlBase {
     private activeMoods: string[] = [];
     private favoriteMoods: string[] = [];
@@ -13,6 +16,13 @@ export class LightControllerV2 extends ControlBase {
 
     private uuid = '';
 
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         this.uuid = uuid;
         await this.updateObjectAsync(uuid, {

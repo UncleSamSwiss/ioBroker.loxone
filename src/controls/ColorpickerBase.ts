@@ -4,10 +4,20 @@ import type { CurrentStateValue } from '../main';
 import type { Control } from '../structure-file';
 import { ControlBase } from './control-base';
 
+/**
+ * Base class for color picker controls.
+ */
 export abstract class ColorpickerBase extends ControlBase {
     private colorUpdateTimer?: NodeJS.Timeout;
 
-    async loadColorPickerControlBaseAsync(uuid: string, control: Control): Promise<void> {
+    /**
+     * Loads the color picker control and sets up state objects and event handlers.
+     *
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     * @returns A promise that resolves when the loading is complete.
+     */
+    protected async loadColorPickerControlBaseAsync(uuid: string, control: Control): Promise<void> {
         if (!control.states || !('color' in control.states)) {
             return;
         }

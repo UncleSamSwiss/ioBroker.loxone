@@ -2,7 +2,17 @@ import type { Control } from '../structure-file';
 import type { ControlType } from './control-base';
 import { ControlBase } from './control-base';
 
+/**
+ * Handler for Daytimer controls.
+ */
 export class Daytimer extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -75,7 +85,9 @@ export class Daytimer extends ControlBase {
             if ('text' in control.details) {
                 const text = control.details?.text as
                     | {
+                          /** The text to display when the value is on */
                           on: string;
+                          /** The text to display when the value is off */
                           off: string;
                       }
                     | undefined;

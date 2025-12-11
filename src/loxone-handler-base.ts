@@ -10,6 +10,9 @@ import type {
 } from './main';
 import type { Control, ControlStates } from './structure-file';
 
+/**
+ * Base class for Loxone handlers.
+ */
 export abstract class LoxoneHandlerBase {
     protected constructor(protected readonly adapter: Loxone) {}
 

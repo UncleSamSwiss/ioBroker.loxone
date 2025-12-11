@@ -2,7 +2,17 @@ import type { Control } from '../structure-file';
 import type { ControlType } from './control-base';
 import { ControlBase } from './control-base';
 
+/**
+ * Handler for Fronius controls.
+ */
 export class Fronius extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         const systemConfig = await this.adapter.getForeignObjectAsync('system.config');
         const currency = systemConfig?.common.currency;

@@ -3,16 +3,31 @@ import { LoxoneHandlerBase } from './loxone-handler-base';
 import type { Loxone } from './main';
 import type { Format, WeatherServer } from './structure-file';
 
+/**
+ * Handler for Weather Server information.
+ */
 export class WeatherServerHandler extends LoxoneHandlerBase {
     private readonly deviceName = 'WeatherServer';
     private format!: Format;
     private weatherTypeTexts: Record<string, string> = {};
     private forecastChannelsCount = 0;
 
+    /**
+     * Creates an instance of WeatherServerHandler.
+     *
+     * @param adapter The Loxone adapter instance.
+     */
     public constructor(protected readonly adapter: Loxone) {
         super(adapter);
     }
 
+    /**
+     * Loads the weather server data and sets up state objects and event handlers.
+     *
+     * @param data The WeatherServer data from the structure file.
+     * @param filter The filter for forecast data ('current', '1day', or 'all').
+     * @returns A promise that resolves when loading is complete.
+     */
     public async loadAsync(data: WeatherServer, filter: 'current' | '1day' | 'all'): Promise<void> {
         if (data === undefined || !('states' in data) || !('actual' in data.states)) {
             return;
