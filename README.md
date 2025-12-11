@@ -726,8 +726,7 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 4.0.0 (2025-12-11)
 
 - (raintonr) Set correct min/max target on IRCv2 when in override (#528)
 - (raintonr) Fix compatibility with js-controller 7.1 (fixes #730)
