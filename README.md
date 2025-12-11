@@ -732,6 +732,7 @@ Native value from ioBroker &gt; Objects
 - (raintonr) Set correct min/max target on IRCv2 when in override (#528)
 - (raintonr) Fix compatibility with js-controller 7.1 (fixes #730)
 - (UncleSamSwiss) Recreate project structure using latest create-adapter
+- (mpaulustsx) Basic AudioZoneV2 implementation (#430)
 
 ### 3.0.1 (2023-03-30)
 

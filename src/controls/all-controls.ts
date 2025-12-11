@@ -4,6 +4,7 @@ import { Alarm } from './Alarm';
 import { AlarmClock } from './AlarmClock';
 import { Application } from './Application';
 import { AudioZone } from './AudioZone';
+import { AudioZoneV2 } from './AudioZoneV2';
 import { CentralAlarm } from './CentralAlarm';
 import { CentralAudioZone } from './CentralAudioZone';
 import { CentralGate } from './CentralGate';
@@ -53,6 +54,7 @@ export const AllControls = {
     Alarm,
     Application,
     AudioZone,
+    AudioZoneV2,
     CentralAlarm,
     CentralAudioZone,
     CentralGate,
