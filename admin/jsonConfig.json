@@ -5,6 +5,7 @@
         "host": {
             "type": "text",
             "label": "host",
+            "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
@@ -14,7 +15,6 @@
         "port": {
             "type": "number",
             "label": "port",
-            "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
@@ -24,6 +24,7 @@
         "username": {
             "type": "text",
             "label": "username",
+            "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
@@ -33,7 +34,6 @@
         "password": {
             "type": "password",
             "label": "password",
-            "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 4,
@@ -43,6 +43,7 @@
         "synchronize": {
             "type": "staticText",
             "label": "synchronize",
+            "newLine": true,
             "xs": 12,
             "sm": 3
         },
@@ -61,13 +62,17 @@
         "syncFunctions": {
             "type": "checkbox",
             "label": "syncFunctions",
-            "newLine": true,
             "xs": 12,
             "sm": 3
         },
         "weatherServer": {
             "type": "select",
             "label": "weatherServer",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2,
             "options": [
                 { "value": "off", "label": "weatherServerOff" },
                 { "value": "current", "label": "weatherServerCurrent" },
