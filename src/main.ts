@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import * as utils from '@iobroker/adapter-core';
 import type * as SentryNode from '@sentry/node';
 import type { EventProcessor } from '@sentry/types';
