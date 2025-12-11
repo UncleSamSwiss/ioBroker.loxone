@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for AAL Smart Alarm controls.
+ */
 export class AalSmartAlarm extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -22,9 +33,9 @@ export class AalSmartAlarm extends ControlBase {
         ]);
 
         const levelStates = {
-            '0': 'None',
-            '1': 'Immediate',
-            '2': 'Delayed',
+            0: 'None',
+            1: 'Immediate',
+            2: 'Delayed',
         };
         await this.createSimpleControlStateObjectAsync(
             control.name,
@@ -62,7 +73,7 @@ export class AalSmartAlarm extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'confirm');
         this.addStateChangeListener(
-            uuid + '.confirm',
+            `${uuid}.confirm`,
             () => {
                 this.sendCommand(control.uuidAction, 'confirm');
             },
@@ -70,13 +81,13 @@ export class AalSmartAlarm extends ControlBase {
         );
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
-        this.addStateChangeListener(uuid + '.disable', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.disable`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, `disable/${newValue || '0'}`);
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'startDrill');
         this.addStateChangeListener(
-            uuid + '.startDrill',
+            `${uuid}.startDrill`,
             () => {
                 this.sendCommand(control.uuidAction, 'startDrill');
             },

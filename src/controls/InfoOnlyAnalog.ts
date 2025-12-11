@@ -1,7 +1,18 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for InfoOnlyAnalog controls.
+ */
 export class InfoOnlyAnalog extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -14,21 +25,21 @@ export class InfoOnlyAnalog extends ControlBase {
 
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['value']);
 
-        if (!control.hasOwnProperty('states') || !control.states.hasOwnProperty('value')) {
+        if (!('states' in control) || !('value' in control.states)) {
             return;
         }
 
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'value', 'number', 'value');
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('format')) {
+        if ('format' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.value-formatted',
+                `${uuid}.value-formatted`,
                 {
-                    name: control.name + ': formatted value',
+                    name: `${control.name}: formatted value`,
                     read: true,
                     write: false,
                     type: 'string',

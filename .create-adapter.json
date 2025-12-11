@@ -12,8 +12,6 @@
     "connectionType": "local",
     "dataSource": "push",
     "connectionIndicator": "yes",
-    "language": "TypeScript",
-    "adminReact": "no",
     "tools": ["ESLint", "Prettier", "devcontainer"],
     "indentation": "Space (4)",
     "quotes": "single",
@@ -26,5 +24,13 @@
     "license": "Apache License 2.0",
     "ci": "gh-actions",
     "dependabot": "yes",
-    "creatorVersion": "1.31.0"
+    "creatorVersion": "3.1.2",
+    "replay": "/data/.create-adapter.json",
+    "language": "TypeScript (without build)",
+    "nodeVersion": "20",
+    "adminUi": "json",
+    "eslintConfig": "official",
+    "releaseScript": "yes",
+    "devServer": "no",
+    "defaultBranch": "master"
 }

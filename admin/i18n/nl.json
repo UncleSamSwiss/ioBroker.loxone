@@ -1,0 +1,18 @@
+{
+    "miniserverHost": "Hostnaam/IP van miniserver",
+    "loxone adapter settings": "Adapterinstellingen voor loxone",
+    "option1": "optie1",
+    "option2": "optie2",
+    "miniserverPassword": "Miniserver-wachtwoord",
+    "miniserverPort": "Miniserver-poort",
+    "syncFunctions": "Functies",
+    "syncNames": "Namen",
+    "syncRooms": "Kamers",
+    "synchronize": "Synchroniseren",
+    "miniserverUsername": "Miniserver-gebruikersnaam",
+    "weatherServer": "Weerserver",
+    "weatherServer1day": "Synchroniseer 24 uur weersvoorspelling",
+    "weatherServerAll": "Synchroniseer de volledige weersvoorspelling",
+    "weatherServerCurrent": "Synchroniseer alleen het huidige weer",
+    "weatherServerOff": "Synchroniseer weergegevens niet"
+}

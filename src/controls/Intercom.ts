@@ -1,7 +1,18 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for Intercom controls.
+ */
 export class Intercom extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -24,7 +35,7 @@ export class Intercom extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'answer');
         this.addStateChangeListener(
-            uuid + '.answer',
+            `${uuid}.answer`,
             () => {
                 this.sendCommand(control.uuidAction, 'answer');
             },

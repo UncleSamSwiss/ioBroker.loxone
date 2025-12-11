@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for Radio controls.
+ */
 export class Radio extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -16,10 +27,10 @@ export class Radio extends ControlBase {
         await this.loadOtherControlStatesAsync(control.name, uuid, control.states, ['activeOutput']);
 
         let states: Record<string, string> = {};
-        if (control.details.hasOwnProperty('allOff')) {
+        if ('allOff' in control.details) {
             states['0'] = control.details.allOff as string;
         }
-        if (control.details.hasOwnProperty('outputs')) {
+        if ('outputs' in control.details) {
             states = { ...states, ...(control.details.outputs as Record<string, string>) };
         }
         await this.createSimpleControlStateObjectAsync(
@@ -35,12 +46,12 @@ export class Radio extends ControlBase {
             },
         );
         this.addStateChangeListener(
-            uuid + '.activeOutput',
+            `${uuid}.activeOutput`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 const value = this.convertStateToInt(newValue);
                 if (value === 0) {
                     this.sendCommand(control.uuidAction, 'reset');
-                } else if (states.hasOwnProperty(value)) {
+                } else if (value in states) {
                     this.sendCommand(control.uuidAction, value.toString());
                 }
             },

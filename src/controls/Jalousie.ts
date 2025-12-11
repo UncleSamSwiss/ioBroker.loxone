@@ -1,10 +1,21 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for Jalousie controls.
+ */
 export class Jalousie extends ControlBase {
     private positionTarget: number | undefined;
 
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -76,14 +87,14 @@ export class Jalousie extends ControlBase {
             'text',
         );
 
-        this.addStateChangeListener(uuid + '.up', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.up`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'up');
             } else {
                 this.sendCommand(control.uuidAction, 'UpOff');
             }
         });
-        this.addStateChangeListener(uuid + '.down', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.down`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'down');
             } else {
@@ -91,7 +102,7 @@ export class Jalousie extends ControlBase {
             }
         });
         this.addStateChangeListener(
-            uuid + '.autoActive',
+            `${uuid}.autoActive`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'auto');
@@ -106,7 +117,7 @@ export class Jalousie extends ControlBase {
         // ... but this is not really Alexa specific to be fair
         if (control.states.position) {
             this.addStateChangeListener(
-                uuid + '.position',
+                `${uuid}.position`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                     if (typeof oldValue !== 'number' || typeof newValue !== 'number') {
                         // This should never happen due to convertToInt flag
@@ -138,7 +149,7 @@ export class Jalousie extends ControlBase {
 
             this.addStateEventHandler(
                 control.states.position,
-                async (value: any) => {
+                (value: any) => {
                     if (typeof this.positionTarget === 'number') {
                         // Below, the actual command ('up' or 'down') is irrelevant but we
                         // need to know the direction for target test.
@@ -146,13 +157,13 @@ export class Jalousie extends ControlBase {
                             // Going down
                             if (value >= this.positionTarget) {
                                 this.positionTarget = undefined;
-                                await this.sendCommand(control.uuidAction, 'down');
+                                this.sendCommand(control.uuidAction, 'down');
                             }
                         } else {
                             // Going up - don't forget target is negative
                             if (value <= -this.positionTarget) {
                                 this.positionTarget = undefined;
-                                await this.sendCommand(control.uuidAction, 'up');
+                                this.sendCommand(control.uuidAction, 'up');
                             }
                         }
                     }
@@ -163,7 +174,7 @@ export class Jalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullUp');
         this.addStateChangeListener(
-            uuid + '.fullUp',
+            `${uuid}.fullUp`,
             () => {
                 this.sendCommand(control.uuidAction, 'FullUp');
             },
@@ -172,7 +183,7 @@ export class Jalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'fullDown');
         this.addStateChangeListener(
-            uuid + '.fullDown',
+            `${uuid}.fullDown`,
             () => {
                 this.sendCommand(control.uuidAction, 'FullDown');
             },
@@ -181,7 +192,7 @@ export class Jalousie extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'shade');
         this.addStateChangeListener(
-            uuid + '.shade',
+            `${uuid}.shade`,
             () => {
                 this.sendCommand(control.uuidAction, 'shade');
             },
@@ -198,7 +209,7 @@ export class Jalousie extends ControlBase {
     // For this reason we have the below boolean that tells upDownChangeHandler to ignore the
     // first change it sees after an auto-position command is started.
     private upDownAutoCommandHandled = false;
-    private async upDownChangeHandler(): Promise<void> {
+    private upDownChangeHandler(): void {
         if (this.upDownAutoCommandHandled) {
             this.positionTarget = undefined;
         } else {

@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for Alarm controls.
+ */
 export class Alarm extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -27,13 +38,13 @@ export class Alarm extends ControlBase {
         ]);
 
         const levelStates = {
-            '0': 'None',
-            '1': 'Silent',
-            '2': 'Acustic',
-            '3': 'Optical',
-            '4': 'Internal',
-            '5': 'External',
-            '6': 'Remote',
+            0: 'None',
+            1: 'Silent',
+            2: 'Acustic',
+            3: 'Optical',
+            4: 'Internal',
+            5: 'External',
+            6: 'Remote',
         };
         await this.createBooleanControlStateObjectAsync(control.name, uuid, control.states, 'armed', 'switch', {
             write: true,
@@ -96,7 +107,7 @@ export class Alarm extends ControlBase {
             write: true,
         });
 
-        this.addStateChangeListener(uuid + '.armed', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.armed`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'on');
             } else {
@@ -104,7 +115,7 @@ export class Alarm extends ControlBase {
             }
         });
 
-        this.addStateChangeListener(uuid + '.disabledMove', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.disabledMove`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             if (newValue) {
                 this.sendCommand(control.uuidAction, 'dismv/0');
             } else {
@@ -114,16 +125,16 @@ export class Alarm extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'delayedOn');
         this.addStateChangeListener(
-            uuid + '.delayedOn',
+            `${uuid}.delayedOn`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-                this.sendCommand(control.uuidAction, 'delayedon/' + (newValue ? 1 : 0));
+                this.sendCommand(control.uuidAction, `delayedon/${newValue ? 1 : 0}`);
             },
             { selfAck: true },
         );
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(
-            uuid + '.quit',
+            `${uuid}.quit`,
             () => {
                 this.sendCommand(control.uuidAction, 'quit');
             },

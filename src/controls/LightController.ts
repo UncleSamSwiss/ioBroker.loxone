@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for LightController controls.
+ */
 export class LightController extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -24,7 +35,7 @@ export class LightController extends ControlBase {
             'level',
             { write: true },
         );
-        this.addStateChangeListener(uuid + '.activeScene', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.activeScene`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             newValue = this.convertStateToInt(newValue);
             if (newValue === 9) {
                 this.sendCommand(control.uuidAction, 'on');
@@ -33,11 +44,11 @@ export class LightController extends ControlBase {
             }
         });
 
-        if (control.states.hasOwnProperty('sceneList')) {
+        if ('sceneList' in control.states) {
             await this.updateStateObjectAsync(
-                uuid + '.sceneList',
+                `${uuid}.sceneList`,
                 {
-                    name: control.name + ': sceneList',
+                    name: `${control.name}: sceneList`,
                     read: true,
                     write: false,
                     type: 'array',
@@ -47,7 +58,7 @@ export class LightController extends ControlBase {
                 control.states.sceneList,
                 async (name: string, value: any) => {
                     // weird documentation: they say it's 'text' within the struct, but I get the value directly; let's support both
-                    if (value.hasOwnProperty('text')) {
+                    if ('text' in value) {
                         await this.setStateAck(name, value.text.split(','));
                     } else {
                         await this.setStateAck(name, value.toString().split(','));
@@ -58,7 +69,7 @@ export class LightController extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
         this.addStateChangeListener(
-            uuid + '.plus',
+            `${uuid}.plus`,
             () => {
                 this.sendCommand(control.uuidAction, 'plus');
             },
@@ -67,7 +78,7 @@ export class LightController extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'minus');
         this.addStateChangeListener(
-            uuid + '.minus',
+            `${uuid}.minus`,
             () => {
                 this.sendCommand(control.uuidAction, 'minus');
             },
@@ -82,7 +93,7 @@ export class LightController extends ControlBase {
             /* TODO: re-add: { smartIgnore: false }*/
         );
         this.addStateChangeListener(
-            uuid + '.control',
+            `${uuid}.control`,
             (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                 if (newValue) {
                     this.sendCommand(control.uuidAction, 'on');

@@ -1,19 +1,24 @@
-/*
- * Created with @iobroker/create-adapter v1.26.0
- */
-
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import * as utils from '@iobroker/adapter-core';
-import * as SentryNode from '@sentry/node';
-import { EventProcessor } from '@sentry/types';
+import type * as SentryNode from '@sentry/node';
+import type { EventProcessor } from '@sentry/types';
 import axios from 'axios';
+import FormData from 'form-data';
 import * as LxCommunicator from 'lxcommunicator';
+import Queue from 'queue-fifo';
 import { v4 } from 'uuid';
 import { Unknown } from './controls/Unknown';
-import { ControlBase, ControlType } from './controls/control-base';
-import { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file';
+import type { ControlBase, ControlType } from './controls/control-base';
+import type {
+    Control,
+    Controls,
+    GlobalStates,
+    OperatingModes,
+    StructureFile,
+    WeatherServer,
+} from './structure-file.ts';
 import { WeatherServerHandler } from './weather-server-handler';
-import FormData = require('form-data');
-import Queue = require('queue-fifo');
+import { AllControls } from './controls/all-controls';
 
 const WebSocketConfig = LxCommunicator.WebSocketConfig;
 
@@ -22,19 +27,31 @@ export type CurrentStateValue = ioBroker.StateValue | null;
 
 export type StateChangeListener = (oldValue: OldStateValue, newValue: CurrentStateValue) => void;
 export type StateChangeListenerOpts = {
-    notIfEqual?: boolean; // Don't call if new/old vals are the same & automatically ack state change
-    convertToInt?: boolean; // Convert state values to integers
-    minInt?: number; // Values below minInt will be set to this value
-    maxInt?: number; // Values above maxInt will be set to this value
-    ackTimeoutMs?: number; // Override default timeout
-    selfAck?: boolean; // Acknowledge ourself (don't wait for Loxone)
+    /** Don't call if new/old vals are the same & automatically ack state change */
+    notIfEqual?: boolean;
+    /** Convert state values to integers */
+    convertToInt?: boolean;
+    /** Values below minInt will be set to this value */
+    minInt?: number;
+    /** Values above maxInt will be set to this value */
+    maxInt?: number;
+    /** Override default timeout */
+    ackTimeoutMs?: number;
+    /** Acknowledge ourself (don't wait for Loxone) */
+    selfAck?: boolean;
 };
+
 export type StateChangeListenEntry = {
+    /** The listener function to call on state change */
     listener: StateChangeListener;
+    /** Options for this listener */
     opts?: StateChangeListenerOpts;
+    /** Queued value if a state change is in progress */
     queuedVal: ioBroker.StateValue | null;
+    /** Timer for ack timeout */
     ackTimer: ioBroker.Timeout | undefined;
 };
+
 // Log warnings if no ack event from Loxone in this time
 // TODO: should this be configurable?
 const ackTimeoutMs = 500;
@@ -42,22 +59,44 @@ const ackTimeoutMs = 500;
 // Period between connection attempts
 const reconnectTimeoutMs = 5000;
 
-export type StateEventHandler = (value: any) => Promise<void>;
-export type StateEventRegistration = { name?: string; handler: StateEventHandler };
+export type StateEventHandler = (value: any) => Promise<void> | void;
+export type StateEventRegistration = {
+    /** The name of the event handler used for removal */
+    name?: string;
+    /** The event handler function */
+    handler: StateEventHandler;
+};
 export type NamedStateEventHandler = (id: string, value: any) => Promise<void>;
-export type LoxoneEvent = { uuid: string; evt: any };
+export type LoxoneEvent = {
+    /** The UUID of the event */
+    uuid: string;
+    /** The event data */
+    evt: any;
+};
 export type Sentry = typeof SentryNode;
 
-export type FormatInfoDetailsCallback = ((src: infoDetailsEntryMap) => ioBroker.StateValue) | null;
-export type infoDetailsEntry = { count: number; lastValue?: any };
-export type infoDetailsEntryMap = Map<string, infoDetailsEntry>;
+export type FormatInfoDetailsCallback = ((src: InfoDetailsEntryMap) => ioBroker.StateValue) | null;
+export type InfoDetailsEntry = {
+    /** The event counter. */
+    count: number;
+    /** The last value received for this event. */
+    lastValue?: any;
+};
+export type InfoDetailsEntryMap = Map<string, InfoDetailsEntry>;
 export type InfoEntry = {
+    /** The current state value */
     value: ioBroker.StateValue;
+    /** The last set state value */
     lastSet: ioBroker.StateValue;
+    /** Timer for state value reset */
     timer: ioBroker.Timeout | undefined;
-    detailsMap?: infoDetailsEntryMap;
+    /** Map of detailed information entries */
+    detailsMap?: InfoDetailsEntryMap;
 };
 
+/**
+ * The Loxone adapter main class.
+ */
 export class Loxone extends utils.Adapter {
     private uuid = '';
     private socket?: any;
@@ -82,9 +121,14 @@ export class Loxone extends utils.Adapter {
 
     private info: Map<string, InfoEntry>;
 
+    /**
+     * Creates an instance of the Loxone adapter.
+     *
+     * @param options The adapter options.
+     */
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
-            dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : __dirname + '/../',
+            dirname: __dirname.indexOf('node_modules') !== -1 ? undefined : `${__dirname}/../`,
             ...options,
             name: 'loxone',
         });
@@ -127,7 +171,7 @@ export class Loxone extends utils.Adapter {
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
-            this.handleEventQueue().catch((e) => {
+            this.handleEventQueue().catch(e => {
                 this.log.error(`Unhandled error in event ${uuid}: ${e}`);
                 this.getSentry()?.captureException(e, { extra: { uuid, evt } });
             });
@@ -135,7 +179,7 @@ export class Loxone extends utils.Adapter {
 
         webSocketConfig.delegate = {
             socketOnDataProgress: (socket: any, progress: any) => {
-                this.log.debug('data progress ' + progress);
+                this.log.debug(`data progress ${progress}`);
             },
             socketOnTokenConfirmed: (_socket: any, _response: any) => {
                 this.log.debug('token confirmed');
@@ -144,13 +188,13 @@ export class Loxone extends utils.Adapter {
                 this.log.debug('token received');
             },
             socketOnConnectionClosed: (socket: any, code: string) => {
-                this.log.info('Socket closed ' + code);
+                this.log.info(`Socket closed ${code}`);
                 this.setConnectionState(false);
 
                 // Stop queue and clear it. Issue a warning if it isn't empty.
                 this.runQueue = false;
                 if (this.eventsQueue.size() > 0) {
-                    this.log.warn('Event queue is not empty. Discarding ' + this.eventsQueue.size() + ' items');
+                    this.log.warn(`Event queue is not empty. Discarding ${this.eventsQueue.size()} items`);
                 }
                 // Yes - I know this could go in the 'if' above but here 'just in case' ;)
                 this.eventsQueue.clear();
@@ -169,9 +213,6 @@ export class Loxone extends utils.Adapter {
                             break;
                         case LxCommunicator.BinaryEvent.Type.EVENTTEXT:
                             handleAnyEvent(evt.uuid, evt.text);
-                            break;
-                        case LxCommunicator.BinaryEvent.Type.EVENT:
-                            handleAnyEvent(evt.uuid, evt);
                             break;
                         case LxCommunicator.BinaryEvent.Type.WEATHER:
                             handleAnyEvent(evt.uuid, evt);
@@ -194,7 +235,7 @@ export class Loxone extends utils.Adapter {
         try {
             const fileString = await this.socket.send('data/LoxAPP3.json');
             file = JSON.parse(fileString);
-        } catch (error) {
+        } catch {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't get structure file`);
             return false;
@@ -231,11 +272,11 @@ export class Loxone extends utils.Adapter {
 
             try {
                 await this.socket.open(
-                    this.config.host + ':' + this.config.port,
+                    `${this.config.host}:${this.config.port}`,
                     this.config.username,
                     this.config.password,
                 );
-            } catch (error) {
+            } catch {
                 // do not stringify error, it can contain circular references
                 this.log.error(`Couldn't open socket`);
                 success = false;
@@ -248,7 +289,7 @@ export class Loxone extends utils.Adapter {
             if (success) {
                 try {
                     await this.socket.send('jdev/sps/enablebinstatusupdate');
-                } catch (error) {
+                } catch {
                     // do not stringify error, it can contain circular references
                     this.log.error(`Couldn't enable status updates`);
                     success = false;
@@ -276,7 +317,7 @@ export class Loxone extends utils.Adapter {
         } else {
             this.reconnectTimer = this.setTimeout(() => {
                 delete this.reconnectTimer;
-                this.connect().catch((e) => {
+                this.connect().catch(e => {
                     this.log.error(`Couldn't reconnect: ${e}`);
                     this.reconnect();
                 });
@@ -286,11 +327,13 @@ export class Loxone extends utils.Adapter {
 
     private setConnectionState(connected: boolean): void {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true);
+        this.setState('info.connection', this.lxConnected, true).catch(e => this.log.warn(e));
     }
 
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
+     *
+     * @param callback the callback to call when cleanup is done
      */
     private onUnload(callback: () => void): void {
         try {
@@ -299,7 +342,7 @@ export class Loxone extends utils.Adapter {
                 delete this.socket;
             }
             callback();
-        } catch (e) {
+        } catch {
             callback();
         }
         this.flushInfoStates();
@@ -307,7 +350,10 @@ export class Loxone extends utils.Adapter {
     }
 
     /**
-     * Is called if a subscribed state changes
+     * Is called if a subscribed state changes.
+     *
+     * @param id the id of the state
+     * @param state the state object
      */
     private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         // Warning: state can be null if it was deleted!
@@ -318,13 +364,13 @@ export class Loxone extends utils.Adapter {
             // TODO: can this be done better by ignoring '.info.' in subscribeStates?
         } else {
             this.log.debug(`stateChange ${id} ${JSON.stringify(state)}`);
-            if (!this.stateChangeListeners.hasOwnProperty(id)) {
-                const msg = 'Unsupported state change: ' + id;
+            if (!(id in this.stateChangeListeners)) {
+                const msg = `Unsupported state change: ${id}`;
                 this.log.error(msg);
                 if (!this.reportedUnsupportedStateChanges.has(id)) {
                     this.reportedUnsupportedStateChanges.add(id);
                     const sentry = this.getSentry();
-                    sentry?.withScope((scope) => {
+                    sentry?.withScope(scope => {
                         scope.setExtra('state', state);
                         sentry.captureMessage(msg, 'warning');
                     });
@@ -356,6 +402,12 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Convert a state value to an integer.
+     *
+     * @param value The state value to convert.
+     * @returns The integer representation of the state value.
+     */
     public convertStateToInt(value: OldStateValue): number {
         return !value ? 0 : parseInt(value.toString());
     }
@@ -454,7 +506,7 @@ export class Loxone extends utils.Adapter {
                 });
                 await axios.post(endpoint, form, { headers: form.getHeaders() });
                 return event;
-            } catch (ex) {
+            } catch (ex: any) {
                 this.log.error(`Couldn't upload structure file attachment to sentry: ${ex}`);
             }
 
@@ -538,9 +590,7 @@ export class Loxone extends utils.Adapter {
         });
 
         for (const globalStateName in globalStates) {
-            const info = globalStateInfos.hasOwnProperty(globalStateName)
-                ? globalStateInfos[globalStateName]
-                : defaultInfo;
+            const info = globalStateInfos[globalStateName] ?? defaultInfo;
             await this.updateStateObjectAsync(
                 globalStateName,
                 {
@@ -558,20 +608,20 @@ export class Loxone extends utils.Adapter {
 
     private async setOperatingMode(name: string, value: any): Promise<void> {
         await this.setStateAck(name, value);
-        await this.setStateAck(name + '-text', this.operatingModes[value]);
+        await this.setStateAck(`${name}-text`, this.operatingModes[value]);
     }
 
     private async loadControlsAsync(controls: Controls): Promise<void> {
         let hasUnsupported = false;
         for (const uuid in controls) {
             const control = controls[uuid];
-            if (!control.hasOwnProperty('type')) {
+            if (!('type' in control)) {
                 continue;
             }
 
             try {
                 await this.loadControlAsync('device', uuid, control);
-            } catch (e) {
+            } catch (e: any) {
                 this.log.info(`Currently unsupported control type ${control.type}: ${e}`);
                 this.getSentry()?.captureException(e, { extra: { uuid, control } });
 
@@ -587,7 +637,7 @@ export class Loxone extends utils.Adapter {
                     });
                 }
 
-                await this.updateObjectAsync('Unsupported.' + uuid, {
+                await this.updateObjectAsync(`Unsupported.${uuid}`, {
                     type: 'state',
                     common: {
                         name: control.name,
@@ -602,26 +652,33 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Load sub-controls of a control.
+     *
+     * @param parentUuid The UUID of the parent control.
+     * @param control The control containing sub-controls.
+     * @returns A promise that resolves when sub-controls are loaded.
+     */
     public async loadSubControlsAsync(parentUuid: string, control: Control): Promise<void> {
-        if (!control.hasOwnProperty('subControls')) {
+        if (!('subControls' in control)) {
             return;
         }
         for (let uuid in control.subControls) {
             const subControl = control.subControls[uuid];
-            if (!subControl.hasOwnProperty('type')) {
+            if (!('type' in subControl)) {
                 continue;
             }
 
             try {
-                if (uuid.startsWith(parentUuid + '/')) {
+                if (uuid.startsWith(`${parentUuid}/`)) {
                     uuid = uuid.replace('/', '.');
                 } else {
-                    uuid = parentUuid + '.' + uuid.replace('/', '-');
+                    uuid = `${parentUuid}.${uuid.replace('/', '-')}`;
                 }
-                subControl.name = control.name + ': ' + subControl.name;
+                subControl.name = `${control.name}: ${subControl.name}`;
 
                 await this.loadControlAsync('channel', uuid, subControl);
-            } catch (e) {
+            } catch (e: any) {
                 this.log.info(`Currently unsupported sub-control type ${subControl.type}: ${e}`);
                 this.getSentry()?.captureException(e, { extra: { uuid, subControl } });
             }
@@ -636,23 +693,23 @@ export class Loxone extends utils.Adapter {
 
         let controlObject: ControlBase;
         try {
-            const module = await import(`./controls/${type}`);
-            controlObject = new module[type](this);
-        } catch (error) {
+            controlObject = new AllControls[type as keyof typeof AllControls](this);
+        } catch (e: any) {
+            this.log.silly(`Couldn't load control type ${type}: ${e}`);
             controlObject = new Unknown(this);
         }
         await controlObject.loadAsync(controlType, uuid, control);
 
-        if (control.hasOwnProperty('room')) {
-            if (!this.foundRooms.hasOwnProperty(control.room)) {
-                this.foundRooms[control.room as string] = [];
+        if ('room' in control) {
+            if (!this.foundRooms[control.room]) {
+                this.foundRooms[control.room] = [];
             }
 
             this.foundRooms[control.room].push(uuid);
         }
 
-        if (control.hasOwnProperty('cat')) {
-            if (!this.foundCats.hasOwnProperty(control.cat)) {
+        if ('cat' in control) {
+            if (!this.foundCats[control.cat]) {
                 this.foundCats[control.cat] = [];
             }
 
@@ -671,14 +728,14 @@ export class Loxone extends utils.Adapter {
         }
 
         for (const uuid in values) {
-            if (!found.hasOwnProperty(uuid)) {
+            if (!found[uuid]) {
                 // don't sync room/cat if we have no control that is using it
                 continue;
             }
 
             const members = [];
-            for (const i in found[uuid]) {
-                members.push(this.namespace + '.' + found[uuid][i]);
+            for (const id of found[uuid]) {
+                members.push(`${this.namespace}.${id}`);
             }
 
             const item = values[uuid];
@@ -692,7 +749,7 @@ export class Loxone extends utils.Adapter {
                 native: item,
             };
 
-            await this.updateEnumObjectAsync(enumName + '.' + name, obj);
+            await this.updateEnumObjectAsync(`${enumName}.${name}`, obj);
         }
     }
 
@@ -737,7 +794,7 @@ export class Loxone extends utils.Adapter {
             this.log.silly('Asked to handle the queue, but already in progress');
         } else {
             this.queueRunning = true;
-            this.log.silly('Processing events from queue length: ' + this.eventsQueue.size());
+            this.log.silly(`Processing events from queue length: ${this.eventsQueue.size()}`);
             let evt: LoxoneEvent | null;
             while ((evt = this.eventsQueue.dequeue())) {
                 this.log.silly(`Dequeued event UUID: ${evt.uuid}`);
@@ -759,7 +816,7 @@ export class Loxone extends utils.Adapter {
         for (const item of stateEventHandlerList) {
             try {
                 await item.handler(evt.evt);
-            } catch (e) {
+            } catch (e: any) {
                 this.log.error(`Error while handling event UUID ${evt.uuid}: ${e}`);
                 this.getSentry()?.captureException(e, { extra: { evt } });
             }
@@ -789,7 +846,7 @@ export class Loxone extends utils.Adapter {
 
         if (hasDetails) {
             // TODO: Maybe read these in so they persist across restarts?
-            entry.detailsMap = new Map<string, infoDetailsEntry>();
+            entry.detailsMap = new Map<string, InfoDetailsEntry>();
         }
 
         this.info.set(id, entry);
@@ -810,12 +867,12 @@ export class Loxone extends utils.Adapter {
         const infoEntry = this.info.get(id);
         if (!infoEntry) {
             // This should never happen!
-            this.log.error('No info entry for ' + id);
+            this.log.error(`No info entry for ${id}`);
         }
         return infoEntry;
     }
 
-    private addInfoDetailsEntry(details: infoDetailsEntryMap, id: string, value?: any): void {
+    private addInfoDetailsEntry(details: InfoDetailsEntryMap, id: string, value?: any): void {
         /// ... and add details of this event to the map.
         const eventEntry = details.get(id);
         if (eventEntry) {
@@ -850,7 +907,7 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private buildInfoDetails(src: infoDetailsEntryMap): string {
+    private buildInfoDetails(src: InfoDetailsEntryMap): string {
         // TODO: shouldn't this use JSON.stringify?
         const out: any[] = [];
         src.forEach((value, key) => {
@@ -865,26 +922,28 @@ export class Loxone extends utils.Adapter {
 
     private setInfoStateIfChanged(id: string, infoEntry: InfoEntry, shutdown = false): void {
         if (infoEntry.value != infoEntry.lastSet) {
-            this.log.silly('value of ' + id + ' changed to ' + infoEntry.value);
+            this.log.silly(`value of ${id} changed to ${infoEntry.value}`);
 
             // Store counter
-            this.setState(id, infoEntry.value, true);
+            this.setState(id, infoEntry.value, true).catch(e => this.log.warn(e));
             infoEntry.lastSet = infoEntry.value;
 
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(id + 'Detail', this.buildInfoDetails(infoEntry.detailsMap), true);
+                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true).catch(e =>
+                    this.log.warn(e),
+                );
             }
 
             if (!shutdown) {
                 // Start a timer which will set the current value from the info ID map on completion
                 // Obviously don't do this if called from shutdown
-                this.log.silly('Starting timer for ' + id);
+                this.log.silly(`Starting timer for ${id}`);
                 infoEntry.timer = this.setTimeout(
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (cbId: string, cbInfoEntry: InfoEntry) => {
-                        this.log.silly('Timeout for ' + id);
+                        this.log.silly(`Timeout for ${id}`);
 
                         // Remove from timer from map as we have just finished
                         cbInfoEntry.timer = undefined;
@@ -900,23 +959,38 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Sends a command to the Loxone Miniserver.
+     *
+     * @param uuid The UUID of the command.
+     * @param action The name of the action to send.
+     */
     public sendCommand(uuid: string, action: string): void {
         this.log.debug(`Sending command ${uuid} ${action}`);
         this.incInfoState('info.messagesSent');
         this.socket.send(`jdev/sps/io/${uuid}/${action}`, 2);
     }
 
+    /**
+     * Get an existing object by its ID.
+     *
+     * @param id The local ID of the object (without namespace).
+     * @returns The existing object or undefined if not found.
+     */
     public getExistingObject(id: string): ioBroker.Object | undefined {
-        const fullId = this.namespace + '.' + id;
-        if (this.existingObjects.hasOwnProperty(fullId)) {
-            return this.existingObjects[fullId];
-        }
-        return undefined;
+        const fullId = `${this.namespace}.${id}`;
+        return this.existingObjects[fullId];
     }
 
+    /**
+     * Update or create an object asynchronously.
+     *
+     * @param id The local ID of the object (without namespace).
+     * @param obj The object to update or create.
+     */
     public async updateObjectAsync(id: string, obj: ioBroker.SettableObject): Promise<void> {
-        const fullId = this.namespace + '.' + id;
-        if (this.existingObjects.hasOwnProperty(fullId)) {
+        const fullId = `${this.namespace}.${id}`;
+        if (this.existingObjects[fullId]) {
             const existingObject = this.existingObjects[fullId];
             if (!this.config.syncNames && obj.common) {
                 obj.common.name = existingObject.common.name;
@@ -931,6 +1005,14 @@ export class Loxone extends utils.Adapter {
         await this.extendObjectAsync(id, obj);
     }
 
+    /**
+     * Update a state object asynchronously.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param commonInfo The common information for the state.
+     * @param stateUuid The UUID of the state.
+     * @param stateEventHandler An optional event handler for state changes.
+     */
     public async updateStateObjectAsync(
         id: string,
         commonInfo: ioBroker.StateCommon,
@@ -962,6 +1044,13 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Add a state event handler for a given UUID.
+     *
+     * @param uuid The UUID of the control.
+     * @param eventHandler The event handler function.
+     * @param name An optional name for the event handler.
+     */
     public addStateEventHandler(uuid: string, eventHandler: StateEventHandler, name?: string): void {
         if (this.stateEventHandlers[uuid] === undefined) {
             this.stateEventHandlers[uuid] = [];
@@ -974,6 +1063,13 @@ export class Loxone extends utils.Adapter {
         this.stateEventHandlers[uuid].push({ name: name, handler: eventHandler });
     }
 
+    /**
+     * Remove a state event handler for a given UUID by name.
+     *
+     * @param uuid The UUID of the control.
+     * @param name The name of the event handler to remove.
+     * @returns True if the handler was found and removed, false otherwise.
+     */
     public removeStateEventHandler(uuid: string, name: string): boolean {
         if (this.stateEventHandlers[uuid] === undefined || !name) {
             return false;
@@ -990,8 +1086,15 @@ export class Loxone extends utils.Adapter {
         return found;
     }
 
+    /**
+     * Add a state change listener for a given state ID.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param listener The state change listener function.
+     * @param opts Optional options for the state change listener.
+     */
     public addStateChangeListener(id: string, listener: StateChangeListener, opts?: StateChangeListenerOpts): void {
-        this.stateChangeListeners[this.namespace + '.' + id] = {
+        this.stateChangeListeners[`${this.namespace}.${id}`] = {
             listener,
             opts,
             queuedVal: null,
@@ -1018,22 +1121,35 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Set state with ack = true and update cached value.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @param value The value to set.
+     */
     public async setStateAck(id: string, value: CurrentStateValue): Promise<void> {
-        const keyId = this.namespace + '.' + id;
+        const keyId = `${this.namespace}.${id}`;
         this.currentStateValues[keyId] = value;
         await this.checkStateForAck(keyId);
         await this.setStateAsync(id, { val: value, ack: true });
     }
 
+    /**
+     * Get a cached state value.
+     *
+     * @param id The local ID of the state (without namespace).
+     * @returns The cached state value.
+     */
     public getCachedStateValue(id: string): OldStateValue {
-        const keyId = this.namespace + '.' + id;
-        if (this.currentStateValues.hasOwnProperty(keyId)) {
-            return this.currentStateValues[keyId];
-        }
-
-        return undefined;
+        const keyId = `${this.namespace}.${id}`;
+        return this.currentStateValues[keyId];
     }
 
+    /**
+     * Get the Sentry instance if available.
+     *
+     * @returns The Sentry instance or undefined if not available.
+     */
     public getSentry(): Sentry | undefined {
         if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
             const sentryInstance = this.getPluginInstance('sentry');
@@ -1043,13 +1159,17 @@ export class Loxone extends utils.Adapter {
         }
     }
 
+    /**
+     * Report an error message to Sentry.
+     *
+     * @param message The error message to report.
+     */
     public reportError(message: string): void {
         this.log.error(message);
         this.getSentry()?.captureMessage(message, 'error');
     }
 }
-
-if (module.parent) {
+if (require.main !== module) {
     // Export the constructor in compact mode
     module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new Loxone(options);
 } else {

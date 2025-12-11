@@ -1,7 +1,18 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for WindowMonitor controls.
+ */
 export class WindowMonitor extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -71,11 +82,7 @@ export class WindowMonitor extends ControlBase {
             'value',
         );
 
-        if (
-            !control.hasOwnProperty('details') ||
-            !control.details.hasOwnProperty('windows') ||
-            !control.states.hasOwnProperty('windowStates')
-        ) {
+        if (!('details' in control) || !('windows' in control.details) || !('windowStates' in control.states)) {
             return;
         }
         const windowPositions: Record<number, string> = {
@@ -88,11 +95,11 @@ export class WindowMonitor extends ControlBase {
         const windows = control.details.windows as any;
         for (const index in windows) {
             const window = windows[index];
-            const id = uuid + '.' + (parseInt(index) + 1);
+            const id = `${uuid}.${parseInt(index) + 1}`;
             await this.updateObjectAsync(id, {
                 type: 'channel',
                 common: {
-                    name: control.name + ': ' + window.name,
+                    name: `${control.name}: ${window.name}`,
                     role: 'sensor.window.3',
                     // TODO: re-add: smartIgnore: true,
                 },
@@ -103,7 +110,7 @@ export class WindowMonitor extends ControlBase {
                 const obj: ioBroker.SettableObject = {
                     type: 'state',
                     common: {
-                        name: control.name + ': ' + window.name + ': ' + windowPosition,
+                        name: `${control.name}: ${window.name}: ${windowPosition}`,
                         read: true,
                         write: false,
                         type: 'boolean',
@@ -112,7 +119,7 @@ export class WindowMonitor extends ControlBase {
                     },
                     native: {},
                 };
-                await this.updateObjectAsync(id + '.' + windowPosition, obj);
+                await this.updateObjectAsync(`${id}.${windowPosition}`, obj);
             }
         }
 
@@ -122,7 +129,7 @@ export class WindowMonitor extends ControlBase {
                 for (let mask = 1; mask <= 16; mask *= 2) {
                     const windowPosition = windowPositions[mask];
                     await this.setStateAck(
-                        uuid + '.' + (parseInt(index) + 1) + '.' + windowPosition,
+                        `${uuid}.${parseInt(index) + 1}.${windowPosition}`,
                         (parseInt(values[index]) & mask) == mask,
                     );
                 }

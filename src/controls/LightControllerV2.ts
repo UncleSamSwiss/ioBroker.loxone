@@ -1,7 +1,11 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for LightControllerV2 controls.
+ */
 export class LightControllerV2 extends ControlBase {
     private activeMoods: string[] = [];
     private favoriteMoods: string[] = [];
@@ -12,6 +16,13 @@ export class LightControllerV2 extends ControlBase {
 
     private uuid = '';
 
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         this.uuid = uuid;
         await this.updateObjectAsync(uuid, {
@@ -31,15 +42,15 @@ export class LightControllerV2 extends ControlBase {
         ]);
 
         if (
-            control.states.hasOwnProperty('activeMoods') &&
-            control.states.hasOwnProperty('moodList') &&
-            control.states.hasOwnProperty('favoriteMoods') &&
-            control.states.hasOwnProperty('additionalMoods')
+            'activeMoods' in control.states &&
+            'moodList' in control.states &&
+            'favoriteMoods' in control.states &&
+            'additionalMoods' in control.states
         ) {
             await this.updateStateObjectAsync(
-                uuid + '.moodList',
+                `${uuid}.moodList`,
                 {
-                    name: control.name + ': moodList',
+                    name: `${control.name}: moodList`,
                     read: true,
                     write: false,
                     type: 'array',
@@ -54,7 +65,7 @@ export class LightControllerV2 extends ControlBase {
                     this.moodNameToId = {};
                     for (const index in moodList) {
                         const mood = moodList[index];
-                        if (mood.hasOwnProperty('id') && mood.hasOwnProperty('name')) {
+                        if ('id' in mood && 'name' in mood) {
                             this.idToMoodName[mood.id] = mood.name;
                             this.moodNameToId[mood.name] = mood.id;
                             list.push(mood.name);
@@ -68,9 +79,9 @@ export class LightControllerV2 extends ControlBase {
                 },
             );
             await this.updateStateObjectAsync(
-                uuid + '.activeMoods',
+                `${uuid}.activeMoods`,
                 {
-                    name: control.name + ': activeMoods',
+                    name: `${control.name}: activeMoods`,
                     read: true,
                     write: true,
                     type: 'array',
@@ -84,7 +95,7 @@ export class LightControllerV2 extends ControlBase {
                 },
             );
             this.addStateChangeListener(
-                uuid + '.activeMoods',
+                `${uuid}.activeMoods`,
                 (oldValue: OldStateValue, newValue: CurrentStateValue) => {
                     let arrayValue: string[];
                     if (Array.isArray(newValue)) {
@@ -92,7 +103,7 @@ export class LightControllerV2 extends ControlBase {
                     } else {
                         try {
                             newValue = JSON.parse(newValue as string);
-                        } catch (e) {
+                        } catch {
                             // ignore error, continue below
                         }
                         if (!Array.isArray(newValue)) {
@@ -105,14 +116,14 @@ export class LightControllerV2 extends ControlBase {
                     const ids = [];
                     for (let i = 0; i < arrayValue.length; i++) {
                         const moodName = arrayValue[i];
-                        if (!this.moodNameToId.hasOwnProperty(moodName)) {
+                        if (!(moodName in this.moodNameToId)) {
                             this.adapter.reportError(`Can't find mood name '${moodName}', discarding new value`);
                             return;
                         }
                         ids.push(this.moodNameToId[moodName]);
                     }
                     if (ids.length === 0) {
-                        this.adapter.reportError(uuid + ".activeMoods can't have zero IDs, discarding new value");
+                        this.adapter.reportError(`${uuid}.activeMoods can't have zero IDs, discarding new value`);
                         return;
                     }
 
@@ -133,22 +144,22 @@ export class LightControllerV2 extends ControlBase {
                     }
                     if (hasKeepMoods) {
                         for (let i = 0; i < removeMoods.length; i++) {
-                            this.sendCommand(control.uuidAction, 'removeMood/' + removeMoods[i]);
+                            this.sendCommand(control.uuidAction, `removeMood/${removeMoods[i]}`);
                         }
                     } else {
                         const firstId = addMoods.shift();
-                        this.sendCommand(control.uuidAction, 'changeTo/' + firstId);
+                        this.sendCommand(control.uuidAction, `changeTo/${firstId}`);
                     }
 
                     for (let i = 0; i < addMoods.length; i++) {
-                        this.sendCommand(control.uuidAction, 'addMood/' + addMoods[i]);
+                        this.sendCommand(control.uuidAction, `addMood/${addMoods[i]}`);
                     }
                 },
             );
             await this.updateStateObjectAsync(
-                uuid + '.favoriteMoods',
+                `${uuid}.favoriteMoods`,
                 {
-                    name: control.name + ': favoriteMoods',
+                    name: `${control.name}: favoriteMoods`,
                     read: true,
                     write: false,
                     type: 'array',
@@ -162,9 +173,9 @@ export class LightControllerV2 extends ControlBase {
                 },
             );
             await this.updateStateObjectAsync(
-                uuid + '.additionalMoods',
+                `${uuid}.additionalMoods`,
                 {
-                    name: control.name + ': additionalMoods',
+                    name: `${control.name}: additionalMoods`,
                     read: true,
                     write: false,
                     type: 'array',
@@ -181,7 +192,7 @@ export class LightControllerV2 extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'plus');
         this.addStateChangeListener(
-            uuid + '.plus',
+            `${uuid}.plus`,
             () => {
                 this.sendCommand(control.uuidAction, 'plus');
             },
@@ -190,7 +201,7 @@ export class LightControllerV2 extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'minus');
         this.addStateChangeListener(
-            uuid + '.minus',
+            `${uuid}.minus`,
             () => {
                 this.sendCommand(control.uuidAction, 'minus');
             },
@@ -210,16 +221,15 @@ export class LightControllerV2 extends ControlBase {
             return;
         }
         const list = [];
-        for (const index in idList) {
-            const id = idList[index];
-            if (this.idToMoodName.hasOwnProperty(id)) {
+        for (const id of idList) {
+            if (id in this.idToMoodName) {
                 list.push(this.idToMoodName[id]);
             } else {
                 list.push(id);
             }
         }
 
-        await this.setStateAck(this.uuid + '.' + name, JSON.stringify(list));
+        await this.setStateAck(`${this.uuid}.${name}`, JSON.stringify(list));
     }
 
     private async updateActiveMoods(): Promise<void> {

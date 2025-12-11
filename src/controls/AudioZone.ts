@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for AudioZone controls.
+ */
 export class AudioZone extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -39,20 +50,20 @@ export class AudioZone extends ControlBase {
             '-3': 'invalid zone',
             '-2': 'not reachable',
             '-1': 'unknown',
-            '0': 'offline',
-            '1': 'initializing',
-            '2': 'online',
+            0: 'offline',
+            1: 'initializing',
+            2: 'online',
         };
         const playStates = {
             '-1': 'unknown',
-            '0': 'stopped',
-            '1': 'paused',
-            '2': 'playing',
+            0: 'stopped',
+            1: 'paused',
+            2: 'playing',
         };
         const clientStates = {
-            '0': 'offline',
-            '1': 'initializing',
-            '2': 'online',
+            0: 'offline',
+            1: 'initializing',
+            2: 'online',
         };
         await this.createSimpleControlStateObjectAsync(
             control.name,
@@ -169,7 +180,7 @@ export class AudioZone extends ControlBase {
             { write: true },
         );
 
-        this.addStateChangeListener(uuid + '.playState', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.playState`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             newValue = this.convertStateToInt(newValue);
             if (newValue === 0 || newValue === 1) {
                 this.sendCommand(control.uuidAction, 'pause');
@@ -177,28 +188,28 @@ export class AudioZone extends ControlBase {
                 this.sendCommand(control.uuidAction, 'play');
             }
         });
-        this.addStateChangeListener(uuid + '.power', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.power`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, newValue ? 'on' : 'off');
         });
-        this.addStateChangeListener(uuid + '.volume', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'volume/' + newValue);
+        this.addStateChangeListener(`${uuid}.volume`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `volume/${newValue}`);
         });
-        this.addStateChangeListener(uuid + '.shuffle', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'shuffle/' + (newValue ? 1 : 0));
+        this.addStateChangeListener(`${uuid}.shuffle`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `shuffle/${newValue ? 1 : 0}`);
         });
-        this.addStateChangeListener(uuid + '.repeat', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'repeat/' + newValue);
+        this.addStateChangeListener(`${uuid}.repeat`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `repeat/${newValue}`);
         });
-        this.addStateChangeListener(uuid + '.progress', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'progress/' + newValue);
+        this.addStateChangeListener(`${uuid}.progress`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `progress/${newValue}`);
         });
-        this.addStateChangeListener(uuid + '.source', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
-            this.sendCommand(control.uuidAction, 'source/' + newValue);
+        this.addStateChangeListener(`${uuid}.source`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+            this.sendCommand(control.uuidAction, `source/${newValue}`);
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'prev');
         this.addStateChangeListener(
-            uuid + '.prev',
+            `${uuid}.prev`,
             () => {
                 this.sendCommand(control.uuidAction, 'prev');
             },
@@ -206,7 +217,7 @@ export class AudioZone extends ControlBase {
         );
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'next');
         this.addStateChangeListener(
-            uuid + '.next',
+            `${uuid}.next`,
             () => {
                 this.sendCommand(control.uuidAction, 'next');
             },

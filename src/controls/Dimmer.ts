@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for Dimmer controls.
+ */
 export class Dimmer extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -28,13 +39,13 @@ export class Dimmer extends ControlBase {
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'max', 'number', 'value');
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'step', 'number', 'value');
 
-        this.addStateChangeListener(uuid + '.position', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.position`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, this.convertStateToInt(newValue).toString());
         });
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'on');
         this.addStateChangeListener(
-            uuid + '.on',
+            `${uuid}.on`,
             () => {
                 this.sendCommand(control.uuidAction, 'on');
             },
@@ -43,7 +54,7 @@ export class Dimmer extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'off');
         this.addStateChangeListener(
-            uuid + '.off',
+            `${uuid}.off`,
             () => {
                 this.sendCommand(control.uuidAction, 'off');
             },

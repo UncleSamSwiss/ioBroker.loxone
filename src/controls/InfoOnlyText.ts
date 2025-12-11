@@ -1,7 +1,18 @@
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for InfoOnlyText controls.
+ */
 export class InfoOnlyText extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -16,15 +27,15 @@ export class InfoOnlyText extends ControlBase {
 
         await this.createSimpleControlStateObjectAsync(control.name, uuid, control.states, 'text', 'string', 'text');
 
-        if (!control.hasOwnProperty('details')) {
+        if (!('details' in control)) {
             return;
         }
 
-        if (control.details.hasOwnProperty('format')) {
+        if ('format' in control.details) {
             await this.updateStateObjectAsync(
-                uuid + '.text-formatted',
+                `${uuid}.text-formatted`,
                 {
-                    name: control.name + ': formatted value',
+                    name: `${control.name}: formatted value`,
                     read: true,
                     write: false,
                     type: 'string',

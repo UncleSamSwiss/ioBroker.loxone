@@ -1,0 +1,15 @@
+{
+    "miniserverHost": "Miniserver host name / IP",
+    "miniserverPassword": "Miniserver password",
+    "miniserverPort": "Miniserver port",
+    "miniserverUsername": "Miniserver username",
+    "syncFunctions": "Functions",
+    "syncNames": "Names",
+    "syncRooms": "Rooms",
+    "synchronize": "Synchronize",
+    "weatherServerOff": "Don't synchronize weather data",
+    "weatherServer1day": "Synchronize 24 hours of weather forcast",
+    "weatherServerCurrent": "Synchronize current weather only",
+    "weatherServerAll": "Synchronize entire weather forcast",
+    "weatherServer": "Weather Server"
+}

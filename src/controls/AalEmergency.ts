@@ -1,8 +1,19 @@
-import { CurrentStateValue, OldStateValue } from '../main';
-import { Control } from '../structure-file';
-import { ControlBase, ControlType } from './control-base';
+import type { CurrentStateValue, OldStateValue } from '../main';
+import type { Control } from '../structure-file';
+import type { ControlType } from './control-base';
+import { ControlBase } from './control-base';
 
+/**
+ * Handler for AalEmergency controls.
+ */
 export class AalEmergency extends ControlBase {
+    /**
+     * Loads the control and sets up state objects and event handlers.
+     *
+     * @param type The type of the control ('device' or 'channel').
+     * @param uuid The unique identifier of the control.
+     * @param control The control data from the structure file.
+     */
     async loadAsync(type: ControlType, uuid: string, control: Control): Promise<void> {
         await this.updateObjectAsync(uuid, {
             type: type,
@@ -20,10 +31,10 @@ export class AalEmergency extends ControlBase {
         ]);
 
         const statusStates = {
-            '0': 'Running',
-            '1': 'Triggered',
-            '2': 'Reset',
-            '3': 'Disabled',
+            0: 'Running',
+            1: 'Triggered',
+            2: 'Reset',
+            3: 'Disabled',
         };
         await this.createSimpleControlStateObjectAsync(
             control.name,
@@ -53,7 +64,7 @@ export class AalEmergency extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'trigger');
         this.addStateChangeListener(
-            uuid + '.trigger',
+            `${uuid}.trigger`,
             () => {
                 this.sendCommand(control.uuidAction, 'trigger');
             },
@@ -62,7 +73,7 @@ export class AalEmergency extends ControlBase {
 
         await this.createButtonCommandStateObjectAsync(control.name, uuid, 'quit');
         this.addStateChangeListener(
-            uuid + '.quit',
+            `${uuid}.quit`,
             () => {
                 this.sendCommand(control.uuidAction, 'quit');
             },
@@ -70,7 +81,7 @@ export class AalEmergency extends ControlBase {
         );
 
         await this.createNumberInputStateObjectAsync(control.name, uuid, 'disable', 'level.timer');
-        this.addStateChangeListener(uuid + '.disable', (oldValue: OldStateValue, newValue: CurrentStateValue) => {
+        this.addStateChangeListener(`${uuid}.disable`, (oldValue: OldStateValue, newValue: CurrentStateValue) => {
             this.sendCommand(control.uuidAction, `disable/${newValue || '0'}`);
         });
 
