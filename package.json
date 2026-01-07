@@ -47,7 +47,7 @@
     "@iobroker/testing": "^5.2.2",
     "@tsconfig/node20": "^20.1.8",
     "@types/iobroker": "npm:@iobroker/types@^7.1.0",
-    "@types/node": "^20.19.26",
+    "@types/node": "^25.0.3",
     "@types/sprintf-js": "^1.1.4",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
