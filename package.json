@@ -1,6 +1,6 @@
 {
   "name": "iobroker.loxone",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Communicates with a Loxone Miniserver.",
   "author": {
     "name": "UncleSamSwiss",
