@@ -867,7 +867,7 @@ Native value from ioBroker &gt; Objects
 
 ## License
 
-Copyright 2025 UncleSamSwiss
+Copyright 2026 UncleSamSwiss
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
