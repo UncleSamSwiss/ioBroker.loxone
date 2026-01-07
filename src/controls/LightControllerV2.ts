@@ -117,13 +117,13 @@ export class LightControllerV2 extends ControlBase {
                     for (let i = 0; i < arrayValue.length; i++) {
                         const moodName = arrayValue[i];
                         if (!(moodName in this.moodNameToId)) {
-                            this.adapter.reportError(`Can't find mood name '${moodName}', discarding new value`);
+                            this.adapter.log.warn(`Can't find mood name '${moodName}', discarding new value`);
                             return;
                         }
                         ids.push(this.moodNameToId[moodName]);
                     }
                     if (ids.length === 0) {
-                        this.adapter.reportError(`${uuid}.activeMoods can't have zero IDs, discarding new value`);
+                        this.adapter.log.warn(`${uuid}.activeMoods can't have zero IDs, discarding new value`);
                         return;
                     }
 

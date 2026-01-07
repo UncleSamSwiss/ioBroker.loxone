@@ -726,6 +726,11 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (UncleSamSwiss) Remove all special Sentry handling
+
 ### 4.0.0 (2025-12-11)
 
 - (raintonr) Set correct min/max target on IRCv2 when in override (#528)

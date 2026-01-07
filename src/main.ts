@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import * as utils from '@iobroker/adapter-core';
-import type * as SentryNode from '@sentry/node';
-import type { EventProcessor } from '@sentry/types';
-import axios from 'axios';
-import FormData from 'form-data';
 import * as LxCommunicator from 'lxcommunicator';
 import Queue from 'queue-fifo';
 import { v4 } from 'uuid';
 import { Unknown } from './controls/Unknown';
+import { AllControls } from './controls/all-controls';
 import type { ControlBase, ControlType } from './controls/control-base';
 import type {
     Control,
@@ -18,7 +15,6 @@ import type {
     WeatherServer,
 } from './structure-file.ts';
 import { WeatherServerHandler } from './weather-server-handler';
-import { AllControls } from './controls/all-controls';
 
 const WebSocketConfig = LxCommunicator.WebSocketConfig;
 
@@ -73,7 +69,6 @@ export type LoxoneEvent = {
     /** The event data */
     evt: any;
 };
-export type Sentry = typeof SentryNode;
 
 export type FormatInfoDetailsCallback = ((src: InfoDetailsEntryMap) => ioBroker.StateValue) | null;
 export type InfoDetailsEntry = {
@@ -242,11 +237,6 @@ export class Loxone extends utils.Adapter {
         }
         this.log.silly(`get_structure_file ${JSON.stringify(file)}`);
         this.log.info(`got structure file; last modified on ${file.lastModified}`);
-        const sentry = this.getSentry();
-        if (sentry) {
-            // add a global event processor to upload the structure file (only once)
-            sentry.addEventProcessor(this.createSentryEventProcessor(file));
-        }
 
         try {
             await this.loadStructureFileAsync(file);
@@ -254,7 +244,7 @@ export class Loxone extends utils.Adapter {
         } catch (error) {
             // do not stringify error, it can contain circular references
             this.log.error(`Couldn't load structure file`);
-            sentry?.captureException(error, { extra: { file } });
+            this.getSentry()?.captureException(error, { extra: { file } });
             return false;
         }
 
@@ -369,11 +359,6 @@ export class Loxone extends utils.Adapter {
                 this.log.error(msg);
                 if (!this.reportedUnsupportedStateChanges.has(id)) {
                     this.reportedUnsupportedStateChanges.add(id);
-                    const sentry = this.getSentry();
-                    sentry?.withScope(scope => {
-                        scope.setExtra('state', state);
-                        sentry.captureMessage(msg, 'warning');
-                    });
                 }
             } else if (!this.lxConnected) {
                 this.log.warn(`stateChange ${id} while disconnected, discarding`);
@@ -468,50 +453,6 @@ export class Loxone extends utils.Adapter {
             await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
             stateChangeListener.queuedVal = null;
         }
-    }
-
-    private createSentryEventProcessor(data: StructureFile): EventProcessor {
-        const sentry = this.getSentry()!;
-        let attachmentEventId: string | undefined;
-        return async (event: SentryNode.Event) => {
-            try {
-                if (attachmentEventId) {
-                    // structure file was already added
-                    if (event.breadcrumbs) {
-                        event.breadcrumbs.push({
-                            type: 'debug',
-                            category: 'started',
-                            message: `Structure file added to event ${attachmentEventId}`,
-                            level: 'info',
-                        });
-                    }
-                    return event;
-                }
-                const dsn = sentry.getCurrentHub().getClient()?.getDsn();
-                if (!dsn || !event.event_id) {
-                    return event;
-                }
-
-                attachmentEventId = event.event_id;
-
-                const { host, path, projectId, port, protocol, publicKey } = dsn;
-                const endpoint = `${protocol}://${host}${port !== '' ? `:${port}` : ''}${
-                    path !== '' ? `/${path}` : ''
-                }/api/${projectId}/events/${attachmentEventId}/attachments/?sentry_key=${publicKey}&sentry_version=7&sentry_client=custom-javascript`;
-
-                const form = new FormData();
-                form.append('att', JSON.stringify(data, null, 2), {
-                    contentType: 'application/json',
-                    filename: 'LoxAPP3.json',
-                });
-                await axios.post(endpoint, form, { headers: form.getHeaders() });
-                return event;
-            } catch (ex: any) {
-                this.log.error(`Couldn't upload structure file attachment to sentry: ${ex}`);
-            }
-
-            return event;
-        };
     }
 
     private async loadStructureFileAsync(data: StructureFile): Promise<void> {
@@ -1150,23 +1091,13 @@ export class Loxone extends utils.Adapter {
      *
      * @returns The Sentry instance or undefined if not available.
      */
-    public getSentry(): Sentry | undefined {
-        if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
+    public getSentry(): any {
+        if (this.supportsFeature('PLUGINS')) {
             const sentryInstance = this.getPluginInstance('sentry');
             if (sentryInstance) {
                 return sentryInstance.getSentryObject();
             }
         }
-    }
-
-    /**
-     * Report an error message to Sentry.
-     *
-     * @param message The error message to report.
-     */
-    public reportError(message: string): void {
-        this.log.error(message);
-        this.getSentry()?.captureMessage(message, 'error');
     }
 }
 if (require.main !== module) {
