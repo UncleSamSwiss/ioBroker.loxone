@@ -6,7 +6,14 @@ import { v4 } from 'uuid';
 import { Unknown } from './controls/Unknown';
 import { AllControls } from './controls/all-controls';
 import type { ControlBase, ControlType } from './controls/control-base';
-import type { Control, Controls, GlobalStates, OperatingModes, StructureFile, WeatherServer } from './structure-file.ts';
+import type {
+    Control,
+    Controls,
+    GlobalStates,
+    OperatingModes,
+    StructureFile,
+    WeatherServer,
+} from './structure-file.ts';
 import { WeatherServerHandler } from './weather-server-handler';
 
 const WebSocketConfig = LxCommunicator.WebSocketConfig;
@@ -148,12 +155,18 @@ export class Loxone extends utils.Adapter {
         this.setConnectionState(false);
         this.uuid = v4();
         // connect to Loxone Miniserver
-        const webSocketConfig = new WebSocketConfig(WebSocketConfig.protocol.WS, this.uuid, 'iobroker', WebSocketConfig.permission.APP, false);
+        const webSocketConfig = new WebSocketConfig(
+            WebSocketConfig.protocol.WS,
+            this.uuid,
+            'iobroker',
+            WebSocketConfig.permission.APP,
+            false,
+        );
 
         const handleAnyEvent = (uuid: string, evt: any): void => {
             this.log.silly(`received update event: ${JSON.stringify(evt)}: ${uuid}`);
             this.eventsQueue.enqueue({ uuid, evt });
-            this.handleEventQueue().catch((e) => {
+            this.handleEventQueue().catch(e => {
                 this.log.error(`Unhandled error in event ${uuid}: ${e}`);
                 this.getSentry()?.captureException(e, { extra: { uuid, evt } });
             });
@@ -248,7 +261,11 @@ export class Loxone extends utils.Adapter {
             let success = true; // Assume success
 
             try {
-                await this.socket.open(`${this.config.host}:${this.config.port}`, this.config.username, this.config.password);
+                await this.socket.open(
+                    `${this.config.host}:${this.config.port}`,
+                    this.config.username,
+                    this.config.password,
+                );
             } catch {
                 // do not stringify error, it can contain circular references
                 this.log.error(`Couldn't open socket`);
@@ -290,7 +307,7 @@ export class Loxone extends utils.Adapter {
         } else {
             this.reconnectTimer = this.setTimeout(() => {
                 delete this.reconnectTimer;
-                this.connect().catch((e) => {
+                this.connect().catch(e => {
                     this.log.error(`Couldn't reconnect: ${e}`);
                     this.reconnect();
                 });
@@ -300,7 +317,7 @@ export class Loxone extends utils.Adapter {
 
     private setConnectionState(connected: boolean): void {
         this.lxConnected = connected;
-        this.setState('info.connection', this.lxConnected, true).catch((e) => this.log.warn(e));
+        this.setState('info.connection', this.lxConnected, true).catch(e => this.log.warn(e));
     }
 
     /**
@@ -352,7 +369,9 @@ export class Loxone extends utils.Adapter {
                     // Ack timer is running: we didn't get a reply from the previous command yet
                     if (stateChangeListener.queuedVal !== null) {
                         // Already a queued state change: we're going to have to discard that and replace with latest
-                        this.log.warn(`State change in progress for ${id}, discarding ${stateChangeListener.queuedVal} for ${state.val}`);
+                        this.log.warn(
+                            `State change in progress for ${id}, discarding ${stateChangeListener.queuedVal} for ${state.val}`,
+                        );
                         this.incInfoState('info.stateChangesDiscarded');
                     } else {
                         // Nothing queued, so this will only be delayed (at least for now)
@@ -378,7 +397,11 @@ export class Loxone extends utils.Adapter {
         return !value ? 0 : parseInt(value.toString());
     }
 
-    private async handleStateChange(id: string, stateChangeListener: StateChangeListenEntry, val: ioBroker.StateValue): Promise<void> {
+    private async handleStateChange(
+        id: string,
+        stateChangeListener: StateChangeListenEntry,
+        val: ioBroker.StateValue,
+    ): Promise<void> {
         if (stateChangeListener.opts?.convertToInt) {
             // Convert any values to ints within range if necessary.
             val = this.convertStateToInt(val);
@@ -416,7 +439,10 @@ export class Loxone extends utils.Adapter {
                         // things getting stuck in a loop.
                         // TODO: after an ack is missed (for unknown reasons) this causes a one-time
                         // retry. Something more robust would be better.
-                        if (stateChangeListener.queuedVal === null && typeof this.currentStateValues[id] !== 'undefined') {
+                        if (
+                            stateChangeListener.queuedVal === null &&
+                            typeof this.currentStateValues[id] !== 'undefined'
+                        ) {
                             this.log.debug(`No queued values, will add ours: ${id} ${val}`);
                             stateChangeListener.queuedVal = val;
                         }
@@ -661,7 +687,12 @@ export class Loxone extends utils.Adapter {
         }
     }
 
-    private async loadEnumsAsync(values: Record<string, any>, enumName: string, found: Record<string, string[]>, enabled: boolean): Promise<void> {
+    private async loadEnumsAsync(
+        values: Record<string, any>,
+        enumName: string,
+        found: Record<string, string[]>,
+        enabled: boolean,
+    ): Promise<void> {
         if (!enabled) {
             return;
         }
@@ -864,12 +895,14 @@ export class Loxone extends utils.Adapter {
             this.log.silly(`value of ${id} changed to ${infoEntry.value}`);
 
             // Store counter
-            this.setState(id, infoEntry.value, true).catch((e) => this.log.warn(e));
+            this.setState(id, infoEntry.value, true).catch(e => this.log.warn(e));
             infoEntry.lastSet = infoEntry.value;
 
             // Store any details
             if (infoEntry.detailsMap) {
-                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true).catch((e) => this.log.warn(e));
+                this.setState(`${id}Detail`, this.buildInfoDetails(infoEntry.detailsMap), true).catch(e =>
+                    this.log.warn(e),
+                );
             }
 
             if (!shutdown) {
