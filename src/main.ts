@@ -48,10 +48,6 @@ export type StateChangeListenEntry = {
     ackTimer: ioBroker.Timeout | undefined;
 };
 
-// Log warnings if no ack event from Loxone in this time
-// TODO: should this be configurable?
-const ackTimeoutMs = 500;
-
 // Period between connection attempts
 const reconnectTimeoutMs = 5000;
 
@@ -137,6 +133,12 @@ export class Loxone extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        // Handle upgrade scenario where no config.ackTimeoutMs exists
+        // TODO: remove this with next major version release
+        if (!this.config.ackTimeoutMs) {
+            this.config.ackTimeoutMs = 500;
+        }
+
         // Init info
         await this.initInfoStates();
 
@@ -452,7 +454,9 @@ export class Loxone extends utils.Adapter {
 
                         await this.handleDelayedStateChange(id, stateChangeListener);
                     },
-                    stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
+                    stateChangeListener.opts?.ackTimeoutMs
+                        ? stateChangeListener.opts?.ackTimeoutMs
+                        : this.config.ackTimeoutMs,
                     id,
                     val,
                     stateChangeListener,
