@@ -1,4 +1,5 @@
 {
+    "ackTimeoutMs": "Timeout for acknowledgements from Miniserver",
     "miniserverHost": "Miniserver host name / IP",
     "miniserverPassword": "Miniserver password",
     "miniserverPort": "Miniserver port",

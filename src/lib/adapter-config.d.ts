@@ -8,6 +8,7 @@ declare global {
             port: number;
             username: string;
             password: string;
+            ackTimeoutMs: number;
             syncNames: boolean;
             syncRooms: boolean;
             syncFunctions: boolean;
