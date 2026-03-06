@@ -370,7 +370,7 @@ export class Loxone extends utils.Adapter {
                     if (stateChangeListener.queuedVal !== null) {
                         // Already a queued state change: we're going to have to discard that and replace with latest
                         this.log.warn(
-                            `State change in progress for ${id}, discarding ${stateChangeListener.queuedVal}`,
+                            `State change in progress for ${id}, discarding ${stateChangeListener.queuedVal} for ${state.val}`,
                         );
                         this.incInfoState('info.stateChangesDiscarded');
                     } else {
@@ -423,15 +423,38 @@ export class Loxone extends utils.Adapter {
                 stateChangeListener.ackTimer = this.setTimeout(
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
-                    async (id: string, stateChangeListener: StateChangeListenEntry) => {
-                        this.log.warn(`Timeout for ack ${id}`);
+                    async (id: string, val: ioBroker.StateValue, stateChangeListener: StateChangeListenEntry) => {
+                        // Sometimes the ack from Loxone is simply lost. ** I do not know why! :( **
+                        // Lost ack causes this timer to trigger but we cannot know if the state
+                        // change actually registered in Loxone or not.
+                        // In this scenario best we can do is retry a change, either a queued one (if
+                        // there have been other state changes since waiting for an ack) or if none
+                        // are queued, add the current value that was not ack'd.
+
+                        this.log.warn(`Timeout for ack ${id} ${val}`);
                         this.incInfoState('info.ackTimeouts', id);
                         stateChangeListener.ackTimer = undefined;
-                        // Even though this is a timeout, handle any change that may have been delayed waiting for this
+
+                        // Only queue the current value when currentStateValues is undefined, which stops
+                        // things getting stuck in a loop.
+                        // TODO: after an ack is missed (for unknown reasons) this causes a one-time
+                        // retry. Something more robust would be better.
+                        if (
+                            stateChangeListener.queuedVal === null &&
+                            typeof this.currentStateValues[id] !== 'undefined'
+                        ) {
+                            this.log.debug(`No queued values, will add ours: ${id} ${val}`);
+                            stateChangeListener.queuedVal = val;
+                        }
+
+                        // As the ack timed out, we cannot know what value Loxone has
+                        this.currentStateValues[id] = undefined;
+
                         await this.handleDelayedStateChange(id, stateChangeListener);
                     },
                     stateChangeListener.opts?.ackTimeoutMs ? stateChangeListener.opts?.ackTimeoutMs : ackTimeoutMs,
                     id,
+                    val,
                     stateChangeListener,
                 );
             }
@@ -448,10 +471,16 @@ export class Loxone extends utils.Adapter {
     }
 
     private async handleDelayedStateChange(id: string, stateChangeListener: StateChangeListenEntry): Promise<void> {
-        if (stateChangeListener.queuedVal !== null) {
-            this.log.debug(`Handling delayed state: ${id} ${stateChangeListener.queuedVal}`);
-            await this.handleStateChange(id, stateChangeListener, stateChangeListener.queuedVal);
+        if (stateChangeListener.queuedVal === null) {
+            this.log.debug(`No delayed changes to process for ${id}`);
+        } else {
+            // Note value and clear queue before processing it
+            const val = stateChangeListener.queuedVal;
             stateChangeListener.queuedVal = null;
+
+            // Logging here is warn to match those in onStateChange (and delayed updates aren't good)
+            this.log.warn(`Handling delayed state: ${id} ${val}`);
+            await this.handleStateChange(id, stateChangeListener, val);
         }
     }
 

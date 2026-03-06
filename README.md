@@ -726,6 +726,11 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (raintonr) Better handling of ack timeouts from Loxone (#751)
+
 ### 4.0.1 (2026-01-07)
 
 - (UncleSamSwiss) Remove all special Sentry handling
