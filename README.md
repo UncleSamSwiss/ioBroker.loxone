@@ -731,6 +731,7 @@ Native value from ioBroker &gt; Objects
 
 - (raintonr) Better handling of ack timeouts from Loxone (#751)
 - (raintonr) Default ackTimeoutMs is now configurable (#522)
+- (UncleSamSwiss) Updated icon to match the latest Loxone logo
 
 ### 4.0.1 (2026-01-07)
 
