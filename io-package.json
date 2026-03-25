@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "loxone",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "news": {
+      "4.0.2": {
+        "en": "Better handling of ack timeouts from Loxone (#751)\nDefault ackTimeoutMs is now configurable (#522)\nUpdated icon to match the latest Loxone logo",
+        "de": "Bessere Handhabung von Ack Timeouts von Loxone (#751)\nDefault ackTimeout Ms ist nun konfigurierbar (#522)\nAktualisiertes Icon zum neuesten Loxone-Logo",
+        "ru": "Лучшее управление тайм-аутами от Loxone (#751)\nСкачать Default AckTimeout Ms теперь настраивается (#522)\nОбновленный значок, чтобы соответствовать последнему логотипу Loxone",
+        "pt": "Melhor manuseio de tempo limite de ack de Loxone (# 751)\nTempo- limite padrão Ms está agora configurável (# 522)\nÍcone atualizado para corresponder ao último logotipo do Loxone",
+        "nl": "Betere behandeling van ach timeouts van Loxone (#751)\nStandaard ackTimeout Mevrouw is nu configureerbaar (#522)\nBijgewerkt pictogram om bij het nieuwste Loxone-logo te komen",
+        "fr": "Meilleure gestion des temps d'attente de Loxone (#751)\nAckTimeout par défaut Mme est maintenant configurable (#522)\nIcône mise à jour pour correspondre au dernier logo Loxone",
+        "it": "Migliore gestione dei timeout di ack da Loxone (#751)\nDefault ackTimeout La signora è ora configurabile (#522)\nIcona aggiornata per abbinare l'ultimo logo Loxone",
+        "es": "Mejor manejo de los tiempo de ack de Loxone (#751)\nDefault ackTimeout Ms is now configurable (#522)\nIcono actualizado para que coincida con el último logo de Loxone",
+        "pl": "Lepsza obsługa ack timeout z Loxone (# 751)\nDomyślny ackTimeout Ms jest teraz konfigurowalne (# 522)\nAktualizacja ikony do najnowszego logo Loxone",
+        "uk": "Краще обслуговування стійок від Loxone (#751)\nЗа замовчуванням ackTimeout Ms тепер налаштований (#522)\nОновлена ікона, щоб відповідати останню логотипу Loxone",
+        "zh-cn": "更好地处理来自Loxone的事故超时(# 751)\n默认时断 女士现在可配置(# 522)\n更新图标以匹配最新的 Loxone 标志"
+      },
       "4.0.1": {
         "en": "Remove all special Sentry handling",
         "de": "Alle speziellen Sentry Handling entfernen",
@@ -80,19 +93,6 @@
         "pl": "Jawne ustawienie warstwy karty na 2.\nDodano wsparcie dla Daytimera (IOBROKER-LOXONE-1Z)\nDodano obsługę radia (IOBROKER-LOXONE-21)\nDodano obsługę Fronius (IOBROKER-LOXONE-1Y)\nDodano wsparcie dla IRCdaytimer (IOBROKER-LOXONE-27)\nDodano obsługę licznika godzin (IOBROKER-LOXONE-23)\nDodano wsparcie dla InfoOnlyText (IOBROKER-LOXONE-29)\nNaprawiono problemy z próbnikami kolorów Lumitech (nr 150)",
         "zh-cn": "将适配器层显式设置为 2。\n添加了对 Daytimer (IOBROKER-LOXONE-1Z) 的支持\n添加了对无线电的支持 (IOBROKER-LOXONE-21)\n添加了对 Fronius (IOBROKER-LOXONE-1Y) 的支持\n添加了对 IRCDaytimer (IOBROKER-LOXONE-27) 的支持\n添加了对计时 (IOBROKER-LOXONE-23) 的支持\n添加了对 InfoOnlyText (IOBROKER-LOXONE-29) 的支持\n修复了 Lumitech 颜色选择器 (#150) 的问题",
         "uk": "Явне встановлення рівня адаптера на 2.\nДодана підтримка Daytimer (IOBROKER-LOXONE-1Z)\nДодана підтримка радіо (IOBROKER-LOXONE-21)\nДодана підтримка Fronius (IOBROKER-LOXONE-1Y)\nДодано підтримку IRCDaytimer (IOBROKER-LOXONE-27)\nДодано підтримку Hourcounter (IOBROKER-LOXONE-23)\nДодано підтримку InfoOnlyText (IOBROKER-LOXONE-29)\nВиправлено проблеми з інструментами вибору кольорів Lumitech (№150)"
-      },
-      "2.2.1": {
-        "en": "Fixed typo causing \"Cannot read property 'off' of undefined\" (IOBROKER-LOXONE-2R, #72)\nImproved Sentry reporting for structure file",
-        "de": "Tippfehler behoben, der dazu führte, dass \"Eigenschaft 'aus' von undefiniert nicht gelesen werden konnte\" (IOBROKER-LOXONE-2R, # 72)\nVerbesserte Sentry-Berichterstellung für Strukturdateien",
-        "ru": "Исправлена опечатка, из-за которой \"Невозможно прочитать свойство\" off \"из неопределенного\" (IOBROKER-LOXONE-2R, # 72)\nУлучшенный отчет Sentry для файла структуры",
-        "pt": "Corrigido erro de digitação que causava \"Não é possível ler a propriedade 'desativada' de indefinido\" (IOBROKER-LOXONE-2R, # 72)\nRelatório de sentinela aprimorado para arquivo de estrutura",
-        "nl": "Typefout verholpen waardoor 'Kan eigenschap' uit 'van ongedefinieerd niet lezen' (IOBROKER-LOXONE-2R, # 72)\nVerbeterde Sentry-rapportage voor structuurbestand",
-        "fr": "Correction d'une faute de frappe causant \"Impossible de lire la propriété 'off' d'undefined\" (IOBROKER-LOXONE-2R, # 72)\nRapports Sentry améliorés pour le fichier de structure",
-        "it": "Risolto errore di battitura che causava \"Impossibile leggere la proprietà\" disattivata \"di undefined\" (IOBROKER-LOXONE-2R, # 72)\nSegnalazione Sentry migliorata per il file di struttura",
-        "es": "Se corrigió el error tipográfico que causaba \"No se puede leer la propiedad 'desactivada' de indefinida\" (IOBROKER-LOXONE-2R, # 72)\nInformes sentry mejorados para el archivo de estructura",
-        "pl": "Naprawiono literówkę powodującą „Nie można odczytać właściwości„ wyłączone ”wartości niezdefiniowanej” (IOBROKER-LOXONE-2R, # 72)\nUlepszone raportowanie Sentry dla pliku struktury",
-        "zh-cn": "修复了导致“无法读取未定义的属性'off'的拼写错误”的问题（IOBROKER-LOXONE-2R，＃72）\n改进的Sentry报告结构文件",
-        "uk": "Виправлена друкарська помилка, яка спричиняла «Неможливо прочитати властивість 'off' значення undefined» (IOBROKER-LOXONE-2R, #72)\nПокращено звітність Sentry для файлу структури"
       }
     },
     "titleLang": {
