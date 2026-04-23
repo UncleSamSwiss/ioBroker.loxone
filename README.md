@@ -1,4 +1,4 @@
-![Logo](admin/loxone.png)
+![Logo](admin/loxone.png){width=128}
 
 # ioBroker.loxone
 
@@ -726,6 +726,7 @@ Native value from ioBroker &gt; Objects
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
 ### 4.0.2 (2026-03-25)
 
 - (raintonr) Better handling of ack timeouts from Loxone (#751)
