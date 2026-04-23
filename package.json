@@ -51,7 +51,7 @@
         "@types/sprintf-js": "^1.1.4",
         "source-map-support": "^0.5.21",
         "ts-node": "^10.9.2",
-        "typescript": "~5.9.3"
+        "typescript": "~6.0.2"
     },
     "main": "src/main.ts",
     "files": [
