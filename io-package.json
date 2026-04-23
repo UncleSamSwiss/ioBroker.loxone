@@ -1,314 +1,302 @@
 {
-  "common": {
-    "name": "loxone",
-    "version": "4.0.2",
-    "news": {
-      "4.0.2": {
-        "en": "Better handling of ack timeouts from Loxone (#751)\nDefault ackTimeoutMs is now configurable (#522)\nUpdated icon to match the latest Loxone logo",
-        "de": "Bessere Handhabung von Ack Timeouts von Loxone (#751)\nDefault ackTimeout Ms ist nun konfigurierbar (#522)\nAktualisiertes Icon zum neuesten Loxone-Logo",
-        "ru": "Лучшее управление тайм-аутами от Loxone (#751)\nСкачать Default AckTimeout Ms теперь настраивается (#522)\nОбновленный значок, чтобы соответствовать последнему логотипу Loxone",
-        "pt": "Melhor manuseio de tempo limite de ack de Loxone (# 751)\nTempo- limite padrão Ms está agora configurável (# 522)\nÍcone atualizado para corresponder ao último logotipo do Loxone",
-        "nl": "Betere behandeling van ach timeouts van Loxone (#751)\nStandaard ackTimeout Mevrouw is nu configureerbaar (#522)\nBijgewerkt pictogram om bij het nieuwste Loxone-logo te komen",
-        "fr": "Meilleure gestion des temps d'attente de Loxone (#751)\nAckTimeout par défaut Mme est maintenant configurable (#522)\nIcône mise à jour pour correspondre au dernier logo Loxone",
-        "it": "Migliore gestione dei timeout di ack da Loxone (#751)\nDefault ackTimeout La signora è ora configurabile (#522)\nIcona aggiornata per abbinare l'ultimo logo Loxone",
-        "es": "Mejor manejo de los tiempo de ack de Loxone (#751)\nDefault ackTimeout Ms is now configurable (#522)\nIcono actualizado para que coincida con el último logo de Loxone",
-        "pl": "Lepsza obsługa ack timeout z Loxone (# 751)\nDomyślny ackTimeout Ms jest teraz konfigurowalne (# 522)\nAktualizacja ikony do najnowszego logo Loxone",
-        "uk": "Краще обслуговування стійок від Loxone (#751)\nЗа замовчуванням ackTimeout Ms тепер налаштований (#522)\nОновлена ікона, щоб відповідати останню логотипу Loxone",
-        "zh-cn": "更好地处理来自Loxone的事故超时(# 751)\n默认时断 女士现在可配置(# 522)\n更新图标以匹配最新的 Loxone 标志"
-      },
-      "4.0.1": {
-        "en": "Remove all special Sentry handling",
-        "de": "Alle speziellen Sentry Handling entfernen",
-        "ru": "Удалить все специальные Sentry",
-        "pt": "Remova todo o manuseio especial do sentinela",
-        "nl": "Verwijder alle speciale Sentry handling",
-        "fr": "Supprimer toute manipulation spéciale Sentry",
-        "it": "Rimuovere tutti i trattamenti speciali Sentry",
-        "es": "Quitar todo el manejo especial de Sentry",
-        "pl": "Usuń wszystkie specjalne obsługi Wstęp",
-        "uk": "Видаліть всі спеціальні послуги",
-        "zh-cn": "删除所有特殊的哨兵处理"
-      },
-      "4.0.0": {
-        "en": "Set correct min/max target on IRCv2 when in override (#528)\nFix compatibility with js-controller 7.1 (fixes #730)\nRecreate project structure using latest create-adapter\nBasic AudioZoneV2 implementation (#430)",
-        "de": "Setzen Sie korrektes Min/Max-Ziel auf IRCv2 bei Überschreiben (#528)\nKompatibilität mit js-controller 7.1 (fixes #730)\nProjektstruktur mit neuestem create-Adapter speichern\nGrundlegende AudioZoneV2 Implementierung (#430)",
-        "ru": "Установите правильную цель min/max на IRCv2 при оверрайде (#528)\nСовместимость с js-контроллером 7.1 (фиксы #730)\nВоссоздание структуры проекта с использованием новейшего адаптера\nБазовая реализация AudioZoneV2 (#430)",
-        "pt": "Definir o alvo min/max correcto no IRCv2 quando estiver em sobreposição (# 528)\nCorrigir compatibilidade com js-controller 7.1 (fixos #730)\nRecriar a estrutura do projeto usando o adaptador de criação mais recente\nImplementação básica do AudioZoneV2 (# 430)",
-        "nl": "Stel de juiste min/max-streefwaarde in op IRCv2 bij override (#528)\nFix compatibiliteit met js-controller 7.1 (fixes #730)\nProjectstructuur opnieuw aanmaken met de nieuwste aanmaak-adapter\nBasis AudioZoneV2 implementatie (#430)",
-        "fr": "Régler la cible min/max correcte sur IRCv2 en cas de dépassement (#528)\nCorrection de la compatibilité avec js-controller 7.1 (fixes #730)\nRecréer la structure du projet à l'aide de la dernière création-adaptation\nMise en œuvre de base AudioZoneV2 (#430)",
-        "it": "Impostare il target minimo/max corretto su IRCv2 quando in override (#528)\nFissare la compatibilità con js-controller 7.1 (fissi #730)\nRicreare la struttura del progetto utilizzando l'ultimo create-adapter\nImplementazione Basic AudioZoneV2 (#430)",
-        "es": "Establecer el objetivo min/max correcto en IRCv2 cuando en override (#528)\nFijar compatibilidad con js-controller 7.1 (fixes #730)\nRecrear la estructura del proyecto utilizando el último adaptador de creación\nAplicación básica AudioZoneV2 (#430)",
-        "pl": "Ustaw poprawny cel min / max na IRCv2 w przypadku nadłączenia (# 528)\nPopraw kompatybilność ze sterownikiem js- 7.1 (poprawki # 730)\nOdtworzyć strukturę projektu przy użyciu najnowszego create- adaptera\nPodstawowe wdrożenie AudioZoneV2 (# 430)",
-        "uk": "Встановити правильний мін/макс мішень на IRCv2 при перенареченні (#528)\nВиправлення сумісності з js-controller 7.1 (фікси #730)\nВідтворити структуру проекту за допомогою останнього конструктора\nБазова реалізація AudioZoneV2 (#430)",
-        "zh-cn": "在 IRCv2 上设定正确的分钟/最大目标( # 528)\n修复与 js 控制器 7.1 的兼容性( 固定 # 730)\n使用最新的创建适应器重建工程结构\n基本音频区域V2执行(# 430)"
-      },
-      "3.0.1": {
-        "en": "Added info statistics (#364)\nAdded missing states from IRCv2 (#365)\nAdded basic functionality for Remote (Media Controller)\nFixed ack overwrites of fast changing states (#399) and general ack improvements\nFix crash when state changes occur during Miniserver reboot or otherwise unavailable (#298)\nRelease script and other dependency updates",
-        "de": "Zusätzliche Info-Statistik (#364)\nHinzugefügt fehlende Zustände von IRCv2 (#365)\nBasisfunktionalität für Remote (Media Controller) hinzugefügt\nBehobene ack Überschreiben von schnell sich ändernden Zuständen (#399) und allgemeine ack Verbesserungen\nCrash beheben, wenn während des Miniserver-Neustarts Zustandsänderungen auftreten oder sonst nicht verfügbar (#298)\nRelease Skript und andere Abhängigkeitsaktualisierungen",
-        "ru": "Добавлена статистика объявлений (#364)\nДобавлены отсутствующие штаты от IRCv2 (#365)\nДобавлена базовая функциональность для Remote (Media Controller)\nФиксированные перезаписи быстро меняющихся государств (#399) и общие улучшения ack\nИсправление аварии, когда изменения состояния происходят во время перезагрузки Miniserver или в противном случае не доступны (#298)\nОтпустите сценарий и другие обновления зависимости",
-        "pt": "Adicionado estatísticas de informação (#364)\nAdicionado estados ausentes de IRCv2 (#365)\nAdicionada funcionalidade básica para Remote (Media Controller)\nSubstituições de ack fixos de estados de mudança rápida (#399) e melhorias de ack geral\nCorrigir acidente quando as alterações de estado ocorrem durante a reinicialização do Miniserver ou de outra forma indisponível (#298)\nScript de lançamento e outras atualizações de dependência",
-        "nl": "Vermeld info statistieken (364)\nVermiste staten van IRCV2 (365)\nToegevoegd basis functionaliteit voor verwijdering (Media Controller)\nVertaling:\nVerslag als de staat verandert tijdens het herstarten van Miniserver of anders onbereikbaar (#298)\nLaat het script en andere afhankelijkheid updates vrij",
-        "fr": "Statistiques d'information supplémentaires (#364)\nAjout d'états manquants de IRCv2 (#365)\nAjout de la fonctionnalité de base pour Remote (Media Controller)\nRéparation des écrasements d'états en évolution rapide (#399) et amélioration générale des ack\nCorrection d'un crash lorsque des changements d'état surviennent pendant le redémarrage de Miniserver ou autrement indisponible (#298)\nVersion script et autres mises à jour de dépendance",
-        "it": "Ulteriori informazioni statistiche (#364)\nAggiunto stati mancanti da IRCv2 (#365)\nAggiunta funzionalità di base per Remote (Media Controller)\nRisolto ack sovrascritture di stati in rapida evoluzione (#399) e miglioramenti generali di ack\nFissare l'incidente quando si verificano cambiamenti di stato durante il riavvio Miniserver o altrimenti non disponibile (#298)\nScript di rilascio e altri aggiornamenti di dipendenza",
-        "es": "Estadísticas de información agregada (#364)\nEstados desaparecidos adicionales del IRCv2 (#365)\nFunción básica agregada para control remoto (Media Controller)\nSobreescritura fija de estados de cambio rápido (#399) y mejoras en la cubierta general\nCorregir el accidente cuando se producen cambios estatales durante el reinicio de Miniserver o de otra manera no disponible (#298)\nPublicar script y otras actualizaciones de dependencia",
-        "pl": "Dane info (#364)\nZaginięcie stanu z IRCv2 (#365)\nPodstawową funkcjonalność dla Remote (Media Controller)\nFixed acknowledges of fast changing states (#399) \nSzybko rozbije się, gdy stanowe zmiany zachodzą podczas rebootu Miniserver lub w przeciwnym wypadku (#298)\nWydanie scenariusza i innych aktualizacji zależności",
-        "uk": "Додано статистику інформації (#364)\nДодано відсутні стани з IRCv2 (#365)\nДодано базову функціональність для пульта дистанційного керування (Media Controller)\nВиправлені перезаписи швидко змінених станів (#399) та загальне покращення ack\nВиправлення аварійної ситуації, коли відбуваються зміни в перезавантаженні міні-сервера або іншим чином (#298)\nРедагувати скрипт та інші оновлення залежностей",
-        "zh-cn": "增加fo统计(第364号)\nIRCv2(第365)号决议)\n增加遥感基本功能\n固定的快速变化国家(第399号)和总体改进\n当国家变化发生时,在明尼奥岛重新部署或以其他方式无法提供(第298号)\n说明和其他依赖性更新"
-      },
-      "3.0.0": {
-        "en": "Changed to lxcommunicator (fixes #210)\nUpdated all dependencies",
-        "de": "Zu lxcommunicator geändert (Fixes #210)\nAlle Abhängigkeiten aktualisiert",
-        "ru": "Изменен на lxcommunicator (исправления # 210)\nОбновлены все зависимости",
-        "pt": "Alterado para lxcommunicator (correções # 210)\nTodas as dependências atualizadas",
-        "nl": "Gewijzigd in lxcommunicator (reparatie #210)\nAlle afhankelijkheden bijgewerkt",
-        "fr": "Changé en lxcommunicator (correctifs #210)\nMise à jour de toutes les dépendances",
-        "it": "Modificato in lxcommunicator (correzioni #210)\nAggiornate tutte le dipendenze",
-        "es": "Cambiado a lxcommunicator (arreglos # 210)\nActualizadas todas las dependencias",
-        "pl": "Zmieniono na lxcommunicator (poprawki #210)\nZaktualizowano wszystkie zależności",
-        "zh-cn": "更改为 lxcommunicator（修复 #210）\n更新了所有依赖项",
-        "uk": "Змінено на lxcommunicator (виправлення #210)\nОновлено всі залежності"
-      },
-      "2.2.3": {
-        "en": "Reduced number of Sentry reports for unsupported controls.",
-        "de": "Reduzierte Anzahl von Sentry-Berichten für nicht unterstützte Kontrollen.",
-        "ru": "Уменьшено количество отчетов Sentry для неподдерживаемых элементов управления.",
-        "pt": "Número reduzido de relatórios Sentry para controles não suportados.",
-        "nl": "Verminderd aantal Sentry-rapporten voor niet-ondersteunde besturingselementen.",
-        "fr": "Réduction du nombre de rapports Sentry pour les contrôles non pris en charge.",
-        "it": "Numero ridotto di rapporti Sentry per controlli non supportati.",
-        "es": "Número reducido de informes Sentry para controles no compatibles.",
-        "pl": "Zmniejszono liczbę raportów Sentry dla nieobsługiwanych elementów sterujących.",
-        "zh-cn": "减少了不受支持的控件的哨兵报告数量。",
-        "uk": "Зменшено кількість звітів Sentry для непідтримуваних елементів керування."
-      },
-      "2.2.2": {
-        "en": "Explicitly setting adapter tier to 2.\nAdded support for Daytimer (IOBROKER-LOXONE-1Z)\nAdded support for Radio (IOBROKER-LOXONE-21)\nAdded support for Fronius (IOBROKER-LOXONE-1Y)\nAdded support for IRCDaytimer (IOBROKER-LOXONE-27)\nAdded support for Hourcounter (IOBROKER-LOXONE-23)\nAdded support for InfoOnlyText (IOBROKER-LOXONE-29)\nFixed issues with Lumitech color pickers (#150)",
-        "de": "Adapterschicht explizit auf 2 setzen.\nUnterstützung für Daytimer hinzugefügt (IOBROKER-LOXONE-1Z)\nUnterstützung für Radio hinzugefügt (IOBROKER-LOXONE-21)\nUnterstützung für Fronius (IOBROKER-LOXONE-1Y) hinzugefügt\nUnterstützung für IRCDaytimer hinzugefügt (IOBROKER-LOXONE-27)\nUnterstützung für Stundenzähler hinzugefügt (IOBROKER-LOXONE-23)\nUnterstützung für InfoOnlyText hinzugefügt (IOBROKER-LOXONE-29)\nProbleme mit Lumitech-Farbwählern behoben (#150)",
-        "ru": "Явная установка уровня адаптера на 2.\nДобавлена поддержка Daytimer (IOBROKER-LOXONE-1Z).\nДобавлена поддержка Радио (IOBROKER-LOXONE-21).\nДобавлена поддержка Fronius (IOBROKER-LOXONE-1Y).\nДобавлена поддержка IRCDaytimer (IOBROKER-LOXONE-27).\nДобавлена поддержка Hourcounter (IOBROKER-LOXONE-23).\nДобавлена поддержка InfoOnlyText (IOBROKER-LOXONE-29).\nИсправлены проблемы с палитры цветов Lumitech (# 150)",
-        "pt": "Definir explicitamente o nível do adaptador como 2.\nAdicionado suporte para Daytimer (IOBROKER-LOXONE-1Z)\nAdicionado suporte para rádio (IOBROKER-LOXONE-21)\nAdicionado suporte para Fronius (IOBROKER-LOXONE-1Y)\nAdicionado suporte para IRCDaytimer (IOBROKER-LOXONE-27)\nAdicionado suporte para contador de horas (IOBROKER-LOXONE-23)\nAdicionado suporte para InfoOnlyText (IOBROKER-LOXONE-29)\nProblemas corrigidos com seletores de cores Lumitech (# 150)",
-        "nl": "Expliciet adapterlaag instellen op 2.\nOndersteuning toegevoegd voor Daytimer (IOBROKER-LOXONE-1Z)\nOndersteuning toegevoegd voor radio (IOBROKER-LOXONE-21)\nOndersteuning toegevoegd voor Fronius (IOBROKER-LOXONE-1Y)\nOndersteuning toegevoegd voor IRCDaytimer (IOBROKER-LOXONE-27)\nOndersteuning toegevoegd voor urenteller (IOBROKER-LOXONE-23)\nOndersteuning toegevoegd voor InfoOnlyText (IOBROKER-LOXONE-29)\nProblemen opgelost met Lumitech-kleurkiezers (#150)",
-        "fr": "Définir explicitement le niveau de l'adaptateur sur 2.\nAjout de la prise en charge de Daytimer (IOBROKER-LOXONE-1Z)\nAjout de la prise en charge de la radio (IOBROKER-LOXONE-21)\nAjout de la prise en charge de Fronius (IOBROKER-LOXONE-1Y)\nAjout du support pour IRCDaytimer (IOBROKER-LOXONE-27)\nAjout du support pour Hourcounter (IOBROKER-LOXONE-23)\nAjout de la prise en charge d'InfoOnlyText (IOBROKER-LOXONE-29)\nCorrection de problèmes avec les sélecteurs de couleurs Lumitech (#150)",
-        "it": "Impostazione esplicita del livello dell'adattatore su 2.\nAggiunto supporto per Daytimer (IOBROKER-LOXONE-1Z)\nAggiunto supporto per Radio (IOBROKER-LOXONE-21)\nAggiunto supporto per Fronius (IOBROKER-LOXONE-1Y)\nAggiunto supporto per IRCDaytimer (IOBROKER-LOXONE-27)\nAggiunto supporto per Contaore (IOBROKER-LOXONE-23)\nAggiunto supporto per InfoOnlyText (IOBROKER-LOXONE-29)\nRisolti problemi con i selettori di colori Lumitech (n. 150)",
-        "es": "Establecer explícitamente el nivel del adaptador en 2.\nSoporte agregado para Daytimer (IOBROKER-LOXONE-1Z)\nSoporte agregado para Radio (IOBROKER-LOXONE-21)\nSoporte agregado para Fronius (IOBROKER-LOXONE-1Y)\nSoporte agregado para IRCDaytimer (IOBROKER-LOXONE-27)\nSoporte agregado para el contador de horas (IOBROKER-LOXONE-23)\nSoporte agregado para InfoOnlyText (IOBROKER-LOXONE-29)\nProblemas resueltos con los selectores de color de Lumitech (n. ° 150)",
-        "pl": "Jawne ustawienie warstwy karty na 2.\nDodano wsparcie dla Daytimera (IOBROKER-LOXONE-1Z)\nDodano obsługę radia (IOBROKER-LOXONE-21)\nDodano obsługę Fronius (IOBROKER-LOXONE-1Y)\nDodano wsparcie dla IRCdaytimer (IOBROKER-LOXONE-27)\nDodano obsługę licznika godzin (IOBROKER-LOXONE-23)\nDodano wsparcie dla InfoOnlyText (IOBROKER-LOXONE-29)\nNaprawiono problemy z próbnikami kolorów Lumitech (nr 150)",
-        "zh-cn": "将适配器层显式设置为 2。\n添加了对 Daytimer (IOBROKER-LOXONE-1Z) 的支持\n添加了对无线电的支持 (IOBROKER-LOXONE-21)\n添加了对 Fronius (IOBROKER-LOXONE-1Y) 的支持\n添加了对 IRCDaytimer (IOBROKER-LOXONE-27) 的支持\n添加了对计时 (IOBROKER-LOXONE-23) 的支持\n添加了对 InfoOnlyText (IOBROKER-LOXONE-29) 的支持\n修复了 Lumitech 颜色选择器 (#150) 的问题",
-        "uk": "Явне встановлення рівня адаптера на 2.\nДодана підтримка Daytimer (IOBROKER-LOXONE-1Z)\nДодана підтримка радіо (IOBROKER-LOXONE-21)\nДодана підтримка Fronius (IOBROKER-LOXONE-1Y)\nДодано підтримку IRCDaytimer (IOBROKER-LOXONE-27)\nДодано підтримку Hourcounter (IOBROKER-LOXONE-23)\nДодано підтримку InfoOnlyText (IOBROKER-LOXONE-29)\nВиправлено проблеми з інструментами вибору кольорів Lumitech (№150)"
-      }
+    "common": {
+        "name": "loxone",
+        "version": "4.0.2",
+        "news": {
+            "4.0.2": {
+                "en": "Better handling of ack timeouts from Loxone (#751)\nDefault ackTimeoutMs is now configurable (#522)\nUpdated icon to match the latest Loxone logo",
+                "de": "Bessere Handhabung von Ack Timeouts von Loxone (#751)\nDefault ackTimeout Ms ist nun konfigurierbar (#522)\nAktualisiertes Icon zum neuesten Loxone-Logo",
+                "ru": "Лучшее управление тайм-аутами от Loxone (#751)\nСкачать Default AckTimeout Ms теперь настраивается (#522)\nОбновленный значок, чтобы соответствовать последнему логотипу Loxone",
+                "pt": "Melhor manuseio de tempo limite de ack de Loxone (# 751)\nTempo- limite padrão Ms está agora configurável (# 522)\nÍcone atualizado para corresponder ao último logotipo do Loxone",
+                "nl": "Betere behandeling van ach timeouts van Loxone (#751)\nStandaard ackTimeout Mevrouw is nu configureerbaar (#522)\nBijgewerkt pictogram om bij het nieuwste Loxone-logo te komen",
+                "fr": "Meilleure gestion des temps d'attente de Loxone (#751)\nAckTimeout par défaut Mme est maintenant configurable (#522)\nIcône mise à jour pour correspondre au dernier logo Loxone",
+                "it": "Migliore gestione dei timeout di ack da Loxone (#751)\nDefault ackTimeout La signora è ora configurabile (#522)\nIcona aggiornata per abbinare l'ultimo logo Loxone",
+                "es": "Mejor manejo de los tiempo de ack de Loxone (#751)\nDefault ackTimeout Ms is now configurable (#522)\nIcono actualizado para que coincida con el último logo de Loxone",
+                "pl": "Lepsza obsługa ack timeout z Loxone (# 751)\nDomyślny ackTimeout Ms jest teraz konfigurowalne (# 522)\nAktualizacja ikony do najnowszego logo Loxone",
+                "uk": "Краще обслуговування стійок від Loxone (#751)\nЗа замовчуванням ackTimeout Ms тепер налаштований (#522)\nОновлена ікона, щоб відповідати останню логотипу Loxone",
+                "zh-cn": "更好地处理来自Loxone的事故超时(# 751)\n默认时断 女士现在可配置(# 522)\n更新图标以匹配最新的 Loxone 标志"
+            },
+            "4.0.1": {
+                "en": "Remove all special Sentry handling",
+                "de": "Alle speziellen Sentry Handling entfernen",
+                "ru": "Удалить все специальные Sentry",
+                "pt": "Remova todo o manuseio especial do sentinela",
+                "nl": "Verwijder alle speciale Sentry handling",
+                "fr": "Supprimer toute manipulation spéciale Sentry",
+                "it": "Rimuovere tutti i trattamenti speciali Sentry",
+                "es": "Quitar todo el manejo especial de Sentry",
+                "pl": "Usuń wszystkie specjalne obsługi Wstęp",
+                "uk": "Видаліть всі спеціальні послуги",
+                "zh-cn": "删除所有特殊的哨兵处理"
+            },
+            "4.0.0": {
+                "en": "Set correct min/max target on IRCv2 when in override (#528)\nFix compatibility with js-controller 7.1 (fixes #730)\nRecreate project structure using latest create-adapter\nBasic AudioZoneV2 implementation (#430)",
+                "de": "Setzen Sie korrektes Min/Max-Ziel auf IRCv2 bei Überschreiben (#528)\nKompatibilität mit js-controller 7.1 (fixes #730)\nProjektstruktur mit neuestem create-Adapter speichern\nGrundlegende AudioZoneV2 Implementierung (#430)",
+                "ru": "Установите правильную цель min/max на IRCv2 при оверрайде (#528)\nСовместимость с js-контроллером 7.1 (фиксы #730)\nВоссоздание структуры проекта с использованием новейшего адаптера\nБазовая реализация AudioZoneV2 (#430)",
+                "pt": "Definir o alvo min/max correcto no IRCv2 quando estiver em sobreposição (# 528)\nCorrigir compatibilidade com js-controller 7.1 (fixos #730)\nRecriar a estrutura do projeto usando o adaptador de criação mais recente\nImplementação básica do AudioZoneV2 (# 430)",
+                "nl": "Stel de juiste min/max-streefwaarde in op IRCv2 bij override (#528)\nFix compatibiliteit met js-controller 7.1 (fixes #730)\nProjectstructuur opnieuw aanmaken met de nieuwste aanmaak-adapter\nBasis AudioZoneV2 implementatie (#430)",
+                "fr": "Régler la cible min/max correcte sur IRCv2 en cas de dépassement (#528)\nCorrection de la compatibilité avec js-controller 7.1 (fixes #730)\nRecréer la structure du projet à l'aide de la dernière création-adaptation\nMise en œuvre de base AudioZoneV2 (#430)",
+                "it": "Impostare il target minimo/max corretto su IRCv2 quando in override (#528)\nFissare la compatibilità con js-controller 7.1 (fissi #730)\nRicreare la struttura del progetto utilizzando l'ultimo create-adapter\nImplementazione Basic AudioZoneV2 (#430)",
+                "es": "Establecer el objetivo min/max correcto en IRCv2 cuando en override (#528)\nFijar compatibilidad con js-controller 7.1 (fixes #730)\nRecrear la estructura del proyecto utilizando el último adaptador de creación\nAplicación básica AudioZoneV2 (#430)",
+                "pl": "Ustaw poprawny cel min / max na IRCv2 w przypadku nadłączenia (# 528)\nPopraw kompatybilność ze sterownikiem js- 7.1 (poprawki # 730)\nOdtworzyć strukturę projektu przy użyciu najnowszego create- adaptera\nPodstawowe wdrożenie AudioZoneV2 (# 430)",
+                "uk": "Встановити правильний мін/макс мішень на IRCv2 при перенареченні (#528)\nВиправлення сумісності з js-controller 7.1 (фікси #730)\nВідтворити структуру проекту за допомогою останнього конструктора\nБазова реалізація AudioZoneV2 (#430)",
+                "zh-cn": "在 IRCv2 上设定正确的分钟/最大目标( # 528)\n修复与 js 控制器 7.1 的兼容性( 固定 # 730)\n使用最新的创建适应器重建工程结构\n基本音频区域V2执行(# 430)"
+            },
+            "3.0.1": {
+                "en": "Added info statistics (#364)\nAdded missing states from IRCv2 (#365)\nAdded basic functionality for Remote (Media Controller)\nFixed ack overwrites of fast changing states (#399) and general ack improvements\nFix crash when state changes occur during Miniserver reboot or otherwise unavailable (#298)\nRelease script and other dependency updates",
+                "de": "Zusätzliche Info-Statistik (#364)\nHinzugefügt fehlende Zustände von IRCv2 (#365)\nBasisfunktionalität für Remote (Media Controller) hinzugefügt\nBehobene ack Überschreiben von schnell sich ändernden Zuständen (#399) und allgemeine ack Verbesserungen\nCrash beheben, wenn während des Miniserver-Neustarts Zustandsänderungen auftreten oder sonst nicht verfügbar (#298)\nRelease Skript und andere Abhängigkeitsaktualisierungen",
+                "ru": "Добавлена статистика объявлений (#364)\nДобавлены отсутствующие штаты от IRCv2 (#365)\nДобавлена базовая функциональность для Remote (Media Controller)\nФиксированные перезаписи быстро меняющихся государств (#399) и общие улучшения ack\nИсправление аварии, когда изменения состояния происходят во время перезагрузки Miniserver или в противном случае не доступны (#298)\nОтпустите сценарий и другие обновления зависимости",
+                "pt": "Adicionado estatísticas de informação (#364)\nAdicionado estados ausentes de IRCv2 (#365)\nAdicionada funcionalidade básica para Remote (Media Controller)\nSubstituições de ack fixos de estados de mudança rápida (#399) e melhorias de ack geral\nCorrigir acidente quando as alterações de estado ocorrem durante a reinicialização do Miniserver ou de outra forma indisponível (#298)\nScript de lançamento e outras atualizações de dependência",
+                "nl": "Vermeld info statistieken (364)\nVermiste staten van IRCV2 (365)\nToegevoegd basis functionaliteit voor verwijdering (Media Controller)\nVertaling:\nVerslag als de staat verandert tijdens het herstarten van Miniserver of anders onbereikbaar (#298)\nLaat het script en andere afhankelijkheid updates vrij",
+                "fr": "Statistiques d'information supplémentaires (#364)\nAjout d'états manquants de IRCv2 (#365)\nAjout de la fonctionnalité de base pour Remote (Media Controller)\nRéparation des écrasements d'états en évolution rapide (#399) et amélioration générale des ack\nCorrection d'un crash lorsque des changements d'état surviennent pendant le redémarrage de Miniserver ou autrement indisponible (#298)\nVersion script et autres mises à jour de dépendance",
+                "it": "Ulteriori informazioni statistiche (#364)\nAggiunto stati mancanti da IRCv2 (#365)\nAggiunta funzionalità di base per Remote (Media Controller)\nRisolto ack sovrascritture di stati in rapida evoluzione (#399) e miglioramenti generali di ack\nFissare l'incidente quando si verificano cambiamenti di stato durante il riavvio Miniserver o altrimenti non disponibile (#298)\nScript di rilascio e altri aggiornamenti di dipendenza",
+                "es": "Estadísticas de información agregada (#364)\nEstados desaparecidos adicionales del IRCv2 (#365)\nFunción básica agregada para control remoto (Media Controller)\nSobreescritura fija de estados de cambio rápido (#399) y mejoras en la cubierta general\nCorregir el accidente cuando se producen cambios estatales durante el reinicio de Miniserver o de otra manera no disponible (#298)\nPublicar script y otras actualizaciones de dependencia",
+                "pl": "Dane info (#364)\nZaginięcie stanu z IRCv2 (#365)\nPodstawową funkcjonalność dla Remote (Media Controller)\nFixed acknowledges of fast changing states (#399) \nSzybko rozbije się, gdy stanowe zmiany zachodzą podczas rebootu Miniserver lub w przeciwnym wypadku (#298)\nWydanie scenariusza i innych aktualizacji zależności",
+                "uk": "Додано статистику інформації (#364)\nДодано відсутні стани з IRCv2 (#365)\nДодано базову функціональність для пульта дистанційного керування (Media Controller)\nВиправлені перезаписи швидко змінених станів (#399) та загальне покращення ack\nВиправлення аварійної ситуації, коли відбуваються зміни в перезавантаженні міні-сервера або іншим чином (#298)\nРедагувати скрипт та інші оновлення залежностей",
+                "zh-cn": "增加fo统计(第364号)\nIRCv2(第365)号决议)\n增加遥感基本功能\n固定的快速变化国家(第399号)和总体改进\n当国家变化发生时,在明尼奥岛重新部署或以其他方式无法提供(第298号)\n说明和其他依赖性更新"
+            },
+            "3.0.0": {
+                "en": "Changed to lxcommunicator (fixes #210)\nUpdated all dependencies",
+                "de": "Zu lxcommunicator geändert (Fixes #210)\nAlle Abhängigkeiten aktualisiert",
+                "ru": "Изменен на lxcommunicator (исправления # 210)\nОбновлены все зависимости",
+                "pt": "Alterado para lxcommunicator (correções # 210)\nTodas as dependências atualizadas",
+                "nl": "Gewijzigd in lxcommunicator (reparatie #210)\nAlle afhankelijkheden bijgewerkt",
+                "fr": "Changé en lxcommunicator (correctifs #210)\nMise à jour de toutes les dépendances",
+                "it": "Modificato in lxcommunicator (correzioni #210)\nAggiornate tutte le dipendenze",
+                "es": "Cambiado a lxcommunicator (arreglos # 210)\nActualizadas todas las dependencias",
+                "pl": "Zmieniono na lxcommunicator (poprawki #210)\nZaktualizowano wszystkie zależności",
+                "zh-cn": "更改为 lxcommunicator（修复 #210）\n更新了所有依赖项",
+                "uk": "Змінено на lxcommunicator (виправлення #210)\nОновлено всі залежності"
+            },
+            "2.2.3": {
+                "en": "Reduced number of Sentry reports for unsupported controls.",
+                "de": "Reduzierte Anzahl von Sentry-Berichten für nicht unterstützte Kontrollen.",
+                "ru": "Уменьшено количество отчетов Sentry для неподдерживаемых элементов управления.",
+                "pt": "Número reduzido de relatórios Sentry para controles não suportados.",
+                "nl": "Verminderd aantal Sentry-rapporten voor niet-ondersteunde besturingselementen.",
+                "fr": "Réduction du nombre de rapports Sentry pour les contrôles non pris en charge.",
+                "it": "Numero ridotto di rapporti Sentry per controlli non supportati.",
+                "es": "Número reducido de informes Sentry para controles no compatibles.",
+                "pl": "Zmniejszono liczbę raportów Sentry dla nieobsługiwanych elementów sterujących.",
+                "zh-cn": "减少了不受支持的控件的哨兵报告数量。",
+                "uk": "Зменшено кількість звітів Sentry для непідтримуваних елементів керування."
+            },
+            "2.2.2": {
+                "en": "Explicitly setting adapter tier to 2.\nAdded support for Daytimer (IOBROKER-LOXONE-1Z)\nAdded support for Radio (IOBROKER-LOXONE-21)\nAdded support for Fronius (IOBROKER-LOXONE-1Y)\nAdded support for IRCDaytimer (IOBROKER-LOXONE-27)\nAdded support for Hourcounter (IOBROKER-LOXONE-23)\nAdded support for InfoOnlyText (IOBROKER-LOXONE-29)\nFixed issues with Lumitech color pickers (#150)",
+                "de": "Adapterschicht explizit auf 2 setzen.\nUnterstützung für Daytimer hinzugefügt (IOBROKER-LOXONE-1Z)\nUnterstützung für Radio hinzugefügt (IOBROKER-LOXONE-21)\nUnterstützung für Fronius (IOBROKER-LOXONE-1Y) hinzugefügt\nUnterstützung für IRCDaytimer hinzugefügt (IOBROKER-LOXONE-27)\nUnterstützung für Stundenzähler hinzugefügt (IOBROKER-LOXONE-23)\nUnterstützung für InfoOnlyText hinzugefügt (IOBROKER-LOXONE-29)\nProbleme mit Lumitech-Farbwählern behoben (#150)",
+                "ru": "Явная установка уровня адаптера на 2.\nДобавлена поддержка Daytimer (IOBROKER-LOXONE-1Z).\nДобавлена поддержка Радио (IOBROKER-LOXONE-21).\nДобавлена поддержка Fronius (IOBROKER-LOXONE-1Y).\nДобавлена поддержка IRCDaytimer (IOBROKER-LOXONE-27).\nДобавлена поддержка Hourcounter (IOBROKER-LOXONE-23).\nДобавлена поддержка InfoOnlyText (IOBROKER-LOXONE-29).\nИсправлены проблемы с палитры цветов Lumitech (# 150)",
+                "pt": "Definir explicitamente o nível do adaptador como 2.\nAdicionado suporte para Daytimer (IOBROKER-LOXONE-1Z)\nAdicionado suporte para rádio (IOBROKER-LOXONE-21)\nAdicionado suporte para Fronius (IOBROKER-LOXONE-1Y)\nAdicionado suporte para IRCDaytimer (IOBROKER-LOXONE-27)\nAdicionado suporte para contador de horas (IOBROKER-LOXONE-23)\nAdicionado suporte para InfoOnlyText (IOBROKER-LOXONE-29)\nProblemas corrigidos com seletores de cores Lumitech (# 150)",
+                "nl": "Expliciet adapterlaag instellen op 2.\nOndersteuning toegevoegd voor Daytimer (IOBROKER-LOXONE-1Z)\nOndersteuning toegevoegd voor radio (IOBROKER-LOXONE-21)\nOndersteuning toegevoegd voor Fronius (IOBROKER-LOXONE-1Y)\nOndersteuning toegevoegd voor IRCDaytimer (IOBROKER-LOXONE-27)\nOndersteuning toegevoegd voor urenteller (IOBROKER-LOXONE-23)\nOndersteuning toegevoegd voor InfoOnlyText (IOBROKER-LOXONE-29)\nProblemen opgelost met Lumitech-kleurkiezers (#150)",
+                "fr": "Définir explicitement le niveau de l'adaptateur sur 2.\nAjout de la prise en charge de Daytimer (IOBROKER-LOXONE-1Z)\nAjout de la prise en charge de la radio (IOBROKER-LOXONE-21)\nAjout de la prise en charge de Fronius (IOBROKER-LOXONE-1Y)\nAjout du support pour IRCDaytimer (IOBROKER-LOXONE-27)\nAjout du support pour Hourcounter (IOBROKER-LOXONE-23)\nAjout de la prise en charge d'InfoOnlyText (IOBROKER-LOXONE-29)\nCorrection de problèmes avec les sélecteurs de couleurs Lumitech (#150)",
+                "it": "Impostazione esplicita del livello dell'adattatore su 2.\nAggiunto supporto per Daytimer (IOBROKER-LOXONE-1Z)\nAggiunto supporto per Radio (IOBROKER-LOXONE-21)\nAggiunto supporto per Fronius (IOBROKER-LOXONE-1Y)\nAggiunto supporto per IRCDaytimer (IOBROKER-LOXONE-27)\nAggiunto supporto per Contaore (IOBROKER-LOXONE-23)\nAggiunto supporto per InfoOnlyText (IOBROKER-LOXONE-29)\nRisolti problemi con i selettori di colori Lumitech (n. 150)",
+                "es": "Establecer explícitamente el nivel del adaptador en 2.\nSoporte agregado para Daytimer (IOBROKER-LOXONE-1Z)\nSoporte agregado para Radio (IOBROKER-LOXONE-21)\nSoporte agregado para Fronius (IOBROKER-LOXONE-1Y)\nSoporte agregado para IRCDaytimer (IOBROKER-LOXONE-27)\nSoporte agregado para el contador de horas (IOBROKER-LOXONE-23)\nSoporte agregado para InfoOnlyText (IOBROKER-LOXONE-29)\nProblemas resueltos con los selectores de color de Lumitech (n. ° 150)",
+                "pl": "Jawne ustawienie warstwy karty na 2.\nDodano wsparcie dla Daytimera (IOBROKER-LOXONE-1Z)\nDodano obsługę radia (IOBROKER-LOXONE-21)\nDodano obsługę Fronius (IOBROKER-LOXONE-1Y)\nDodano wsparcie dla IRCdaytimer (IOBROKER-LOXONE-27)\nDodano obsługę licznika godzin (IOBROKER-LOXONE-23)\nDodano wsparcie dla InfoOnlyText (IOBROKER-LOXONE-29)\nNaprawiono problemy z próbnikami kolorów Lumitech (nr 150)",
+                "zh-cn": "将适配器层显式设置为 2。\n添加了对 Daytimer (IOBROKER-LOXONE-1Z) 的支持\n添加了对无线电的支持 (IOBROKER-LOXONE-21)\n添加了对 Fronius (IOBROKER-LOXONE-1Y) 的支持\n添加了对 IRCDaytimer (IOBROKER-LOXONE-27) 的支持\n添加了对计时 (IOBROKER-LOXONE-23) 的支持\n添加了对 InfoOnlyText (IOBROKER-LOXONE-29) 的支持\n修复了 Lumitech 颜色选择器 (#150) 的问题",
+                "uk": "Явне встановлення рівня адаптера на 2.\nДодана підтримка Daytimer (IOBROKER-LOXONE-1Z)\nДодана підтримка радіо (IOBROKER-LOXONE-21)\nДодана підтримка Fronius (IOBROKER-LOXONE-1Y)\nДодано підтримку IRCDaytimer (IOBROKER-LOXONE-27)\nДодано підтримку Hourcounter (IOBROKER-LOXONE-23)\nДодано підтримку InfoOnlyText (IOBROKER-LOXONE-29)\nВиправлено проблеми з інструментами вибору кольорів Lumitech (№150)"
+            }
+        },
+        "titleLang": {
+            "en": "Loxone Miniserver",
+            "de": "Loxone Miniserver",
+            "ru": "Мини-сервер Локсона",
+            "pt": "Miniservidor Loxone",
+            "nl": "Loxone Miniserver",
+            "fr": "Miniserveur Loxone",
+            "it": "Miniserver Loxone",
+            "es": "Miniservidor Loxone",
+            "pl": "Miniserwer Loxone",
+            "uk": "Мінісервер Loxone",
+            "zh-cn": "Loxone 迷你服务器"
+        },
+        "desc": {
+            "en": "Communicates with a Loxone Miniserver.",
+            "de": "Kommuniziert mit einem Loxone Miniserver.",
+            "ru": "Взаимодействует с мини-сервером Loxone.",
+            "pt": "Comunica-se com um Miniserver Loxone.",
+            "nl": "Communiceert met een Loxone Miniserver.",
+            "fr": "Communique avec un miniserveur Loxone.",
+            "it": "Comunica con un Miniserver Loxone.",
+            "es": "Se comunica con un Miniserver Loxone.",
+            "pl": "Komunikuje się z Miniserverem Loxone.",
+            "uk": "Зв’язується з міні-сервером Loxone.",
+            "zh-cn": "与 Loxone 迷你服务器通信。"
+        },
+        "authors": ["UncleSamSwiss <samuel.weibel@gmail.com>", "Robin Rainton <robin@rainton.com>"],
+        "keywords": ["loxone", "miniserver", "smarthome"],
+        "licenseInformation": {
+            "type": "free",
+            "license": "Apache-2.0"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "loxone.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png",
+        "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
+        "loglevel": "info",
+        "tier": 3,
+        "mode": "daemon",
+        "type": "iot-systems",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "push",
+        "adminUI": {
+            "config": "json"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.6.20"
+            }
+        ],
+        "plugins": {
+            "sentry": {
+                "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
+                "pathWhitelist": ["loxone"]
+            }
+        }
     },
-    "titleLang": {
-      "en": "Loxone Miniserver",
-      "de": "Loxone Miniserver",
-      "ru": "Мини-сервер Локсона",
-      "pt": "Miniservidor Loxone",
-      "nl": "Loxone Miniserver",
-      "fr": "Miniserveur Loxone",
-      "it": "Miniserver Loxone",
-      "es": "Miniservidor Loxone",
-      "pl": "Miniserwer Loxone",
-      "uk": "Мінісервер Loxone",
-      "zh-cn": "Loxone 迷你服务器"
+    "encryptedNative": ["password"],
+    "protectedNative": ["password"],
+    "native": {
+        "host": "0.0.0.0",
+        "port": 80,
+        "username": "",
+        "password": "",
+        "syncNames": false,
+        "syncRooms": false,
+        "syncFunctions": false,
+        "weatherServer": "all"
     },
-    "desc": {
-      "en": "Communicates with a Loxone Miniserver.",
-      "de": "Kommuniziert mit einem Loxone Miniserver.",
-      "ru": "Взаимодействует с мини-сервером Loxone.",
-      "pt": "Comunica-se com um Miniserver Loxone.",
-      "nl": "Communiceert met een Loxone Miniserver.",
-      "fr": "Communique avec un miniserveur Loxone.",
-      "it": "Comunica con un Miniserver Loxone.",
-      "es": "Se comunica con un Miniserver Loxone.",
-      "pl": "Komunikuje się z Miniserverem Loxone.",
-      "uk": "Зв’язується з міні-сервером Loxone.",
-      "zh-cn": "与 Loxone 迷你服务器通信。"
-    },
-    "authors": [
-      "UncleSamSwiss <samuel.weibel@gmail.com>"
-    ],
-    "keywords": [
-      "loxone",
-      "miniserver",
-      "smarthome"
-    ],
-    "licenseInformation": {
-      "type": "free",
-      "license": "Apache-2.0"
-    },
-    "platform": "Javascript/Node.js",
-    "icon": "loxone.png",
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/UncleSamSwiss/ioBroker.loxone/master/admin/loxone.png",
-    "readme": "https://github.com/UncleSamSwiss/ioBroker.loxone/blob/master/README.md",
-    "loglevel": "info",
-    "tier": 3,
-    "mode": "daemon",
-    "type": "iot-systems",
-    "compact": true,
-    "connectionType": "local",
-    "dataSource": "push",
-    "adminUI": {
-      "config": "json"
-    },
-    "dependencies": [
-      {
-        "js-controller": ">=6.0.11"
-      }
-    ],
-    "globalDependencies": [
-      {
-        "admin": ">=7.6.17"
-      }
-    ],
-    "plugins": {
-      "sentry": {
-        "dsn": "https://b83357399aec406c8be63ce73482f7fe@sentry.iobroker.net/130",
-        "pathWhitelist": [
-          "loxone"
-        ]
-      }
-    }
-  },
-  "encryptedNative": [
-    "password"
-  ],
-  "protectedNative": [
-    "password"
-  ],
-  "native": {
-    "host": "0.0.0.0",
-    "port": 80,
-    "username": "",
-    "password": "",
-    "syncNames": false,
-    "syncRooms": false,
-    "syncFunctions": false,
-    "weatherServer": "all"
-  },
-  "objects": [],
-  "instanceObjects": [
-    {
-      "_id": "info",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.connection",
-      "type": "state",
-      "common": {
-        "role": "indicator.connected",
-        "name": "Connected to Miniserver",
-        "type": "boolean",
-        "read": true,
-        "write": false,
-        "def": false
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.ackTimeouts",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of commands sent to Loxone not acknowledged within timeout period",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.ackTimeoutsDetail",
-      "type": "state",
-      "common": {
-        "role": "json",
-        "name": "Array detailing ack timeouts - for debugging only & not persistant across restarts",
-        "type": "string",
-        "read": true,
-        "write": false,
-        "def": ""
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.messagesReceived",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of messages received",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.messagesSent",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of messages sent",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.stateChangesDelayed",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of state changes delayed while waiting for Loxone to acknowledge",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.stateChangesDiscarded",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of state changes discarded while waiting for Loxone to acknowledge",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.unknownEvents",
-      "type": "state",
-      "common": {
-        "role": "value",
-        "name": "Number of unknown events received",
-        "type": "number",
-        "read": true,
-        "write": false,
-        "def": 0
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.unknownEventsDetail",
-      "type": "state",
-      "common": {
-        "role": "json",
-        "name": "Array detailing unknown events - for debugging only & not persistant across restarts",
-        "type": "string",
-        "read": true,
-        "write": false,
-        "def": ""
-      },
-      "native": {}
-    }
-  ]
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Connected to Miniserver",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.ackTimeouts",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of commands sent to Loxone not acknowledged within timeout period",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.ackTimeoutsDetail",
+            "type": "state",
+            "common": {
+                "role": "json",
+                "name": "Array detailing ack timeouts - for debugging only & not persistant across restarts",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.messagesReceived",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of messages received",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.messagesSent",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of messages sent",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.stateChangesDelayed",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of state changes delayed while waiting for Loxone to acknowledge",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.stateChangesDiscarded",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of state changes discarded while waiting for Loxone to acknowledge",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.unknownEvents",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Number of unknown events received",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.unknownEventsDetail",
+            "type": "state",
+            "common": {
+                "role": "json",
+                "name": "Array detailing unknown events - for debugging only & not persistant across restarts",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        }
+    ]
 }
