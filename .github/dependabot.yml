@@ -10,7 +10,7 @@ updates:
           interval: 'cron'
           timezone: 'Europe/Berlin'
           cronjob: '22 4 6 * *'
-      open-pull-requests-limit: 5
+      open-pull-requests-limit: 15
       assignees:
           - 'UncleSamSwiss'
       versioning-strategy: 'increase'
@@ -23,6 +23,6 @@ updates:
           interval: 'cron'
           timezone: 'Europe/Berlin'
           cronjob: '22 4 6 * *'
-      open-pull-requests-limit: 5
+      open-pull-requests-limit: 15
       assignees:
           - 'UncleSamSwiss'
