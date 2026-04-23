@@ -1,4 +1,4 @@
-![Logo](admin/loxone.png){width=128}
+<img src="admin/loxone.png" width="128" alt="Loxone Logo" />
 
 # ioBroker.loxone
 
