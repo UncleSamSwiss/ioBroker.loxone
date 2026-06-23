@@ -727,6 +727,9 @@ Native value from ioBroker &gt; Objects
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 4.0.2 (2026-03-25)
 
 - (raintonr) Better handling of ack timeouts from Loxone (#751)
