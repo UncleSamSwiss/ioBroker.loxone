@@ -871,6 +871,8 @@ Native value from ioBroker &gt; Objects
 
 - (UncleSamSwiss) Initial version
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 Copyright 2026 UncleSamSwiss
